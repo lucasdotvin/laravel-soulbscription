@@ -3,8 +3,8 @@
 namespace LucasDotDev\Soulbscription\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Orchestra\Testbench\TestCase as Orchestra;
 use LucasDotDev\Soulbscription\SoulbscriptionServiceProvider;
+use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {

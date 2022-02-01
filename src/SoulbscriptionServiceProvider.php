@@ -2,9 +2,9 @@
 
 namespace LucasDotDev\Soulbscription;
 
+use LucasDotDev\Soulbscription\Commands\SoulbscriptionCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use LucasDotDev\Soulbscription\Commands\SoulbscriptionCommand;
 
 class SoulbscriptionServiceProvider extends PackageServiceProvider
 {
