@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace LucasDotDev\Soulbscription\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class SoulbscriptionCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'laravel-soulbscription';
 
     public $description = 'My command';
 
