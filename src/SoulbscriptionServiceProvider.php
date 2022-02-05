@@ -2,24 +2,12 @@
 
 namespace LucasDotDev\Soulbscription;
 
-use LucasDotDev\Soulbscription\Commands\SoulbscriptionCommand;
-use Spatie\LaravelPackageTools\Package;
-use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Illuminate\Support\ServiceProvider;
 
-class SoulbscriptionServiceProvider extends PackageServiceProvider
+class SoulbscriptionServiceProvider extends ServiceProvider
 {
-    public function configurePackage(Package $package): void
+    public function boot()
     {
-        /*
-         * This class is a Package Service Provider
-         *
-         * More info: https://github.com/spatie/laravel-package-tools
-         */
-        $package
-            ->name('laravel-soulbscription')
-            ->hasConfigFile()
-            ->hasViews()
-            ->hasMigration('create_laravel-soulbscription_table')
-            ->hasCommand(SoulbscriptionCommand::class);
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
     }
 }
