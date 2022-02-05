@@ -12,8 +12,11 @@ class TestCase extends Orchestra
     {
         parent::setUp();
 
+        $this->loadLaravelMigrations();
+
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'LucasDotDev\\Soulbscription\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName) =>
+                'LucasDotDev\\Soulbscription\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
     }
 
@@ -27,10 +30,5 @@ class TestCase extends Orchestra
     public function getEnvironmentSetUp($app)
     {
         config()->set('database.default', 'testing');
-
-        /*
-        $migration = include __DIR__.'/../database/migrations/create_laravel-soulbscription_table.php.stub';
-        $migration->up();
-        */
     }
 }
