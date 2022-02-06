@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="PSR12" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/squizlabs/PHP_CodeSniffer/master/phpcs.xsd">
+    <arg name="tab-width" value="4"/>
+
+    <!-- 2. General -->
+    <file>src</file>
+    <file>database/factories</file>
+    <file>tests</file>
+
+    <!-- 2.1 Basic Coding Standard -->
+
+    <!-- Code MUST follow all rules outlined in PSR-12. -->
+    <rule ref="PSR12"/>
+
+</ruleset>
