@@ -2,10 +2,11 @@
 
 namespace LucasDotDev\Soulbscription\Tests\Feature\Models;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Carbon;
 use LucasDotDev\Soulbscription\Enums\PeriodicityType;
 use LucasDotDev\Soulbscription\Models\Feature;
-use Illuminate\Foundation\Testing\{RefreshDatabase, WithFaker};
-use Illuminate\Support\Carbon;
 use LucasDotDev\Soulbscription\Tests\TestCase;
 
 class FeatureTest extends TestCase
@@ -17,10 +18,10 @@ class FeatureTest extends TestCase
     {
         Carbon::setTestNow(now());
 
-        $years   = $this->faker->randomDigitNotZero();
+        $years = $this->faker->randomDigitNotZero();
         $feature = Feature::factory()->create([
             'periodicity_type' => PeriodicityType::Year->value,
-            'periodicity'      => $years,
+            'periodicity' => $years,
         ]);
 
         $this->assertEquals(now()->addYears($years), $feature->calculateExpiration());
@@ -30,10 +31,10 @@ class FeatureTest extends TestCase
     {
         Carbon::setTestNow(now());
 
-        $months  = $this->faker->randomDigitNotZero();
+        $months = $this->faker->randomDigitNotZero();
         $feature = Feature::factory()->create([
             'periodicity_type' => PeriodicityType::Month->value,
-            'periodicity'      => $months,
+            'periodicity' => $months,
         ]);
 
         $this->assertEquals(now()->addMonths($months), $feature->calculateExpiration());
@@ -43,10 +44,10 @@ class FeatureTest extends TestCase
     {
         Carbon::setTestNow(now());
 
-        $weeks   = $this->faker->randomDigitNotZero();
+        $weeks = $this->faker->randomDigitNotZero();
         $feature = Feature::factory()->create([
             'periodicity_type' => PeriodicityType::Week->value,
-            'periodicity'      => $weeks,
+            'periodicity' => $weeks,
         ]);
 
         $this->assertEquals(now()->addWeeks($weeks), $feature->calculateExpiration());
@@ -56,10 +57,10 @@ class FeatureTest extends TestCase
     {
         Carbon::setTestNow(now());
 
-        $days    = $this->faker->randomDigitNotZero();
+        $days = $this->faker->randomDigitNotZero();
         $feature = Feature::factory()->create([
             'periodicity_type' => PeriodicityType::Day->value,
-            'periodicity'      => $days,
+            'periodicity' => $days,
         ]);
 
         $this->assertEquals(now()->addDays($days), $feature->calculateExpiration());

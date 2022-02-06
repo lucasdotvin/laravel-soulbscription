@@ -2,9 +2,10 @@
 
 namespace LucasDotDev\Soulbscription\Models;
 
-use LucasDotDev\Soulbscription\Models\Concerns\Expires;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\{Model, SoftDeletes};
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use LucasDotDev\Soulbscription\Models\Concerns\Expires;
 
 class Plan extends Model
 {

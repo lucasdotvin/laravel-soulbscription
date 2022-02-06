@@ -4,8 +4,8 @@ namespace LucasDotDev\Soulbscription\Enums;
 
 enum PeriodicityType: string
 {
-    case Year  = 'year';
+    case Year = 'year';
     case Month = 'month';
-    case Week  = 'week';
-    case Day   = 'day';
+    case Week = 'week';
+    case Day = 'day';
 }

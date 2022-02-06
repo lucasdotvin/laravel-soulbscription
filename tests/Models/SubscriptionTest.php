@@ -14,8 +14,8 @@ class SubscriptionTest extends TestCase
 
     public function testModelRenews()
     {
-        $plan         = Plan::factory()->create();
-        $subscriber   = User::factory()->create();
+        $plan = Plan::factory()->create();
+        $subscriber = User::factory()->create();
         $subscription = Subscription::factory()
             ->for($plan)
             ->for($subscriber, 'subscriber')
@@ -24,16 +24,16 @@ class SubscriptionTest extends TestCase
         $subscription->renew();
 
         $this->assertDatabaseHas('subscriptions', [
-            'plan_id'         => $plan->id,
-            'subscriber_id'   => $subscriber->id,
+            'plan_id' => $plan->id,
+            'subscriber_id' => $subscriber->id,
             'subscriber_type' => User::class,
-            'expires_at'      => $plan->calculateExpiration(),
+            'expires_at' => $plan->calculateExpiration(),
         ]);
     }
 
     public function testModelRegistersRenewal()
     {
-        $subscriber   = User::factory()->create();
+        $subscriber = User::factory()->create();
         $subscription = Subscription::factory()
             ->for($subscriber, 'subscriber')
             ->create();
@@ -43,13 +43,13 @@ class SubscriptionTest extends TestCase
         $this->assertDatabaseCount('subscription_renewals', 1);
         $this->assertDatabaseHas('subscription_renewals', [
             'subscription_id' => $subscription->id,
-            'renewal'         => true,
+            'renewal' => true,
         ]);
     }
 
     public function testModelRegistersOverdue()
     {
-        $subscriber   = User::factory()->create();
+        $subscriber = User::factory()->create();
         $subscription = Subscription::factory()
             ->for($subscriber, 'subscriber')
             ->create([
@@ -61,7 +61,7 @@ class SubscriptionTest extends TestCase
         $this->assertDatabaseCount('subscription_renewals', 1);
         $this->assertDatabaseHas('subscription_renewals', [
             'subscription_id' => $subscription->id,
-            'overdue'         => true,
+            'overdue' => true,
         ]);
     }
 }

@@ -2,9 +2,10 @@
 
 namespace LucasDotDev\Soulbscription\Models;
 
-use LucasDotDev\Soulbscription\Models\Concerns\Expires;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\{Model, SoftDeletes};
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use LucasDotDev\Soulbscription\Models\Concerns\Expires;
 
 class Feature extends Model
 {
@@ -13,7 +14,7 @@ class Feature extends Model
     use SoftDeletes;
 
     protected $casts = [
-        'consumable'           => 'boolean',
+        'consumable' => 'boolean',
         'recharges_on_renewal' => 'boolean',
     ];
 
