@@ -27,7 +27,8 @@ trait HasSubscriptions
     {
         return $this->belongsToMany(Plan::class, 'subscriptions', 'subscriber_id')
             ->as('subscription')
-            ->withPivot(app(Subscription::class)->getFillable());
+            ->withPivot(app(Subscription::class)->getFillable())
+            ->withTimestamps();
     }
 
     public function renewals()
@@ -90,7 +91,7 @@ trait HasSubscriptions
         $consumedPlan = $this->activePlans->first(fn (Plan $plan) => $plan->features->firstWhere('name', $featureName));
         $feature      = $consumedPlan->features->firstWhere('name', $featureName);
 
-        $consumptionExpiration = $feature->calculateExpiration($consumedPlan->subscription->created_at);
+        $consumptionExpiration = $feature->calculateNextRecurrenceEnd($consumedPlan->subscription->created_at);
 
         $this->featureConsumptions()
             ->make([
@@ -104,7 +105,7 @@ trait HasSubscriptions
 
     public function subscribeTo(Plan $plan, $expiration = null): Subscription
     {
-        $expiration = $expiration ?? $plan->calculateExpiration();
+        $expiration = $expiration ?? $plan->calculateNextRecurrenceEnd();
 
         return tap(
             $this->subscriptions()
