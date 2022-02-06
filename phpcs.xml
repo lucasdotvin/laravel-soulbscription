@@ -11,5 +11,8 @@
 
     <!-- Code MUST follow all rules outlined in PSR-12. -->
     <rule ref="PSR12"/>
+    <rule ref="Generic.WhiteSpace.ScopeIndent">
+        <exclude-pattern>*Enum*</exclude-pattern>
+    </rule>
 
 </ruleset>
