@@ -4,7 +4,8 @@ namespace LucasDotDev\Soulbscription\Tests\Feature\Models;
 
 use LucasDotDev\Soulbscription\Enums\PeriodicityType;
 use LucasDotDev\Soulbscription\Models\Feature;
-use Illuminate\Foundation\Testing\{RefreshDatabase, WithFaker};
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use LucasDotDev\Soulbscription\Tests\TestCase;
 
@@ -19,11 +20,11 @@ class FeatureTest extends TestCase
 
         $years   = $this->faker->randomDigitNotZero();
         $feature = Feature::factory()->create([
-            'periodicity_type' => PeriodicityType::Year->value,
+            'periodicity_type' => PeriodicityType::Year->name,
             'periodicity'      => $years,
         ]);
 
-        $this->assertEquals(now()->addYears($years), $feature->calculateExpiration());
+        $this->assertEquals(now()->addYears($years), $feature->calculateNextRecurrenceEnd());
     }
 
     public function testModelCalculateMonthlyExpiration()
@@ -32,11 +33,11 @@ class FeatureTest extends TestCase
 
         $months  = $this->faker->randomDigitNotZero();
         $feature = Feature::factory()->create([
-            'periodicity_type' => PeriodicityType::Month->value,
+            'periodicity_type' => PeriodicityType::Month->name,
             'periodicity'      => $months,
         ]);
 
-        $this->assertEquals(now()->addMonths($months), $feature->calculateExpiration());
+        $this->assertEquals(now()->addMonths($months), $feature->calculateNextRecurrenceEnd());
     }
 
     public function testModelCalculateWeeklyExpiration()
@@ -45,11 +46,11 @@ class FeatureTest extends TestCase
 
         $weeks   = $this->faker->randomDigitNotZero();
         $feature = Feature::factory()->create([
-            'periodicity_type' => PeriodicityType::Week->value,
+            'periodicity_type' => PeriodicityType::Week->name,
             'periodicity'      => $weeks,
         ]);
 
-        $this->assertEquals(now()->addWeeks($weeks), $feature->calculateExpiration());
+        $this->assertEquals(now()->addWeeks($weeks), $feature->calculateNextRecurrenceEnd());
     }
 
     public function testModelCalculateDailyExpiration()
@@ -58,10 +59,24 @@ class FeatureTest extends TestCase
 
         $days    = $this->faker->randomDigitNotZero();
         $feature = Feature::factory()->create([
-            'periodicity_type' => PeriodicityType::Day->value,
+            'periodicity_type' => PeriodicityType::Day->name,
             'periodicity'      => $days,
         ]);
 
-        $this->assertEquals(now()->addDays($days), $feature->calculateExpiration());
+        $this->assertEquals(now()->addDays($days), $feature->calculateNextRecurrenceEnd());
+    }
+
+    public function testModelcalculateNextRecurrenceEndConsideringRecurrences()
+    {
+        Carbon::setTestNow(now());
+
+        $feature = Feature::factory()->create([
+            'periodicity_type' => PeriodicityType::Week->name,
+            'periodicity'      => 1,
+        ]);
+
+        $startDate = now()->subDays(11);
+
+        $this->assertEquals(now()->addDays(3), $feature->calculateNextRecurrenceEnd($startDate));
     }
 }
