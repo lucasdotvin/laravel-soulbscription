@@ -2,10 +2,10 @@
 
 namespace LucasDotDev\Soulbscription\Models;
 
-use LucasDotDev\Soulbscription\Models\Concerns\HandlesRecurrence;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use LucasDotDev\Soulbscription\Models\Concerns\HandlesRecurrence;
 
 class Feature extends Model
 {

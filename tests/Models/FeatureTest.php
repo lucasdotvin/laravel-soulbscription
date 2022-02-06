@@ -21,7 +21,7 @@ class FeatureTest extends TestCase
         $years = $this->faker->randomDigitNotZero();
         $feature = Feature::factory()->create([
             'periodicity_type' => PeriodicityType::Year->name,
-            'periodicity'      => $years,
+            'periodicity' => $years,
         ]);
 
         $this->assertEquals(now()->addYears($years), $feature->calculateNextRecurrenceEnd());
@@ -34,7 +34,7 @@ class FeatureTest extends TestCase
         $months = $this->faker->randomDigitNotZero();
         $feature = Feature::factory()->create([
             'periodicity_type' => PeriodicityType::Month->name,
-            'periodicity'      => $months,
+            'periodicity' => $months,
         ]);
 
         $this->assertEquals(now()->addMonths($months), $feature->calculateNextRecurrenceEnd());
@@ -47,7 +47,7 @@ class FeatureTest extends TestCase
         $weeks = $this->faker->randomDigitNotZero();
         $feature = Feature::factory()->create([
             'periodicity_type' => PeriodicityType::Week->name,
-            'periodicity'      => $weeks,
+            'periodicity' => $weeks,
         ]);
 
         $this->assertEquals(now()->addWeeks($weeks), $feature->calculateNextRecurrenceEnd());
@@ -60,7 +60,7 @@ class FeatureTest extends TestCase
         $days = $this->faker->randomDigitNotZero();
         $feature = Feature::factory()->create([
             'periodicity_type' => PeriodicityType::Day->name,
-            'periodicity'      => $days,
+            'periodicity' => $days,
         ]);
 
         $this->assertEquals(now()->addDays($days), $feature->calculateNextRecurrenceEnd());
@@ -72,7 +72,7 @@ class FeatureTest extends TestCase
 
         $feature = Feature::factory()->create([
             'periodicity_type' => PeriodicityType::Week->name,
-            'periodicity'      => 1,
+            'periodicity' => 1,
         ]);
 
         $startDate = now()->subDays(11);

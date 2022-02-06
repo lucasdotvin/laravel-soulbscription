@@ -19,9 +19,9 @@ class PlanTest extends TestCase
         Carbon::setTestNow(now());
 
         $years = $this->faker->randomDigitNotZero();
-        $plan  = Plan::factory()->create([
+        $plan = Plan::factory()->create([
             'periodicity_type' => PeriodicityType::Year->name,
-            'periodicity'      => $years,
+            'periodicity' => $years,
         ]);
 
         $this->assertEquals(now()->addYears($years), $plan->calculateNextRecurrenceEnd());
@@ -32,9 +32,9 @@ class PlanTest extends TestCase
         Carbon::setTestNow(now());
 
         $months = $this->faker->randomDigitNotZero();
-        $plan   = Plan::factory()->create([
+        $plan = Plan::factory()->create([
             'periodicity_type' => PeriodicityType::Month->name,
-            'periodicity'      => $months,
+            'periodicity' => $months,
         ]);
 
         $this->assertEquals(now()->addMonths($months), $plan->calculateNextRecurrenceEnd());
@@ -45,9 +45,9 @@ class PlanTest extends TestCase
         Carbon::setTestNow(now());
 
         $weeks = $this->faker->randomDigitNotZero();
-        $plan  = Plan::factory()->create([
+        $plan = Plan::factory()->create([
             'periodicity_type' => PeriodicityType::Week->name,
-            'periodicity'      => $weeks,
+            'periodicity' => $weeks,
         ]);
 
         $this->assertEquals(now()->addWeeks($weeks), $plan->calculateNextRecurrenceEnd());
@@ -60,7 +60,7 @@ class PlanTest extends TestCase
         $days = $this->faker->randomDigitNotZero();
         $plan = Plan::factory()->create([
             'periodicity_type' => PeriodicityType::Day->name,
-            'periodicity'      => $days,
+            'periodicity' => $days,
         ]);
 
         $this->assertEquals(now()->addDays($days), $plan->calculateNextRecurrenceEnd());

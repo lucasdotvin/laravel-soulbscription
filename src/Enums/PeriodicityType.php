@@ -14,7 +14,7 @@ enum PeriodicityType
 
     public static function getDateDifference(Carbon $from, Carbon $to, string|PeriodicityType $unit): int
     {
-        $unitName     = $unit->name ?? $unit;
+        $unitName = $unit->name ?? $unit;
         $unitInPlural = Str::plural($unitName);
 
         $differenceMethodName = 'diffIn' . $unitInPlural;
