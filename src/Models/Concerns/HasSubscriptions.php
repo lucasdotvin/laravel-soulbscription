@@ -47,7 +47,7 @@ trait HasSubscriptions
             return false;
         }
 
-        if (!$feature->consumable) {
+        if (! $feature->consumable) {
             return true;
         }
 
@@ -61,12 +61,12 @@ trait HasSubscriptions
 
     public function cantConsume($featureName, ?float $consumption = null): bool
     {
-        return !$this->canConsume($featureName, $consumption);
+        return ! $this->canConsume($featureName, $consumption);
     }
 
     public function hasFeature($featureName): bool
     {
-        return !$this->missingFeature($featureName);
+        return ! $this->missingFeature($featureName);
     }
 
     public function missingFeature($featureName): bool
@@ -89,14 +89,14 @@ trait HasSubscriptions
         ));
 
         $consumedPlan = $this->activePlans->first(fn (Plan $plan) => $plan->features->firstWhere('name', $featureName));
-        $feature      = $consumedPlan->features->firstWhere('name', $featureName);
+        $feature = $consumedPlan->features->firstWhere('name', $featureName);
 
         $consumptionExpiration = $feature->calculateNextRecurrenceEnd($consumedPlan->subscription->created_at);
 
         $this->featureConsumptions()
             ->make([
                 'consumption' => $consumption,
-                'expires_at'  => $consumptionExpiration,
+                'expires_at' => $consumptionExpiration,
             ])
             ->feature()
             ->associate($feature)
@@ -122,7 +122,7 @@ trait HasSubscriptions
         $this->loadMissing('activePlans.features');
 
         $availableFeatures = $this->activePlans->flatMap(fn (Plan $plan) => $plan->features);
-        $feature           = $availableFeatures->firstWhere('name', $featureName);
+        $feature = $availableFeatures->firstWhere('name', $featureName);
 
         return $feature;
     }

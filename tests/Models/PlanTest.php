@@ -2,10 +2,11 @@
 
 namespace LucasDotDev\Soulbscription\Tests\Feature\Models;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Carbon;
 use LucasDotDev\Soulbscription\Enums\PeriodicityType;
 use LucasDotDev\Soulbscription\Models\Plan;
-use Illuminate\Foundation\Testing\{RefreshDatabase, WithFaker};
-use Illuminate\Support\Carbon;
 use LucasDotDev\Soulbscription\Tests\TestCase;
 
 class PlanTest extends TestCase

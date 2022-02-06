@@ -14,7 +14,7 @@ class Feature extends Model
     use SoftDeletes;
 
     protected $casts = [
-        'consumable'           => 'boolean',
+        'consumable' => 'boolean',
         'recharges_on_renewal' => 'boolean',
     ];
 
