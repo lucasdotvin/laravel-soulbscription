@@ -2,13 +2,14 @@
 
 namespace LucasDotDev\Soulbscription\Models;
 
-use LucasDotDev\Soulbscription\Models\Concerns\Expires;
+use LucasDotDev\Soulbscription\Models\Concerns\HandlesRecurrence;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\{Model, SoftDeletes};
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Feature extends Model
 {
-    use Expires;
+    use HandlesRecurrence;
     use HasFactory;
     use SoftDeletes;
 

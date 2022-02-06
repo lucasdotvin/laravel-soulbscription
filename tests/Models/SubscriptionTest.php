@@ -27,7 +27,7 @@ class SubscriptionTest extends TestCase
             'plan_id'         => $plan->id,
             'subscriber_id'   => $subscriber->id,
             'subscriber_type' => User::class,
-            'expires_at'      => $plan->calculateExpiration(),
+            'expires_at'      => $plan->calculateNextRecurrenceEnd(),
         ]);
     }
 

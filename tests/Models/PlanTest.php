@@ -19,11 +19,11 @@ class PlanTest extends TestCase
 
         $years = $this->faker->randomDigitNotZero();
         $plan  = Plan::factory()->create([
-            'periodicity_type' => PeriodicityType::Year->value,
+            'periodicity_type' => PeriodicityType::Year->name,
             'periodicity'      => $years,
         ]);
 
-        $this->assertEquals(now()->addYears($years), $plan->calculateExpiration());
+        $this->assertEquals(now()->addYears($years), $plan->calculateNextRecurrenceEnd());
     }
 
     public function testModelCalculateMonthlyExpiration()
@@ -32,11 +32,11 @@ class PlanTest extends TestCase
 
         $months = $this->faker->randomDigitNotZero();
         $plan   = Plan::factory()->create([
-            'periodicity_type' => PeriodicityType::Month->value,
+            'periodicity_type' => PeriodicityType::Month->name,
             'periodicity'      => $months,
         ]);
 
-        $this->assertEquals(now()->addMonths($months), $plan->calculateExpiration());
+        $this->assertEquals(now()->addMonths($months), $plan->calculateNextRecurrenceEnd());
     }
 
     public function testModelCalculateWeeklyExpiration()
@@ -45,11 +45,11 @@ class PlanTest extends TestCase
 
         $weeks = $this->faker->randomDigitNotZero();
         $plan  = Plan::factory()->create([
-            'periodicity_type' => PeriodicityType::Week->value,
+            'periodicity_type' => PeriodicityType::Week->name,
             'periodicity'      => $weeks,
         ]);
 
-        $this->assertEquals(now()->addWeeks($weeks), $plan->calculateExpiration());
+        $this->assertEquals(now()->addWeeks($weeks), $plan->calculateNextRecurrenceEnd());
     }
 
     public function testModelCalculateDailyExpiration()
@@ -58,10 +58,10 @@ class PlanTest extends TestCase
 
         $days = $this->faker->randomDigitNotZero();
         $plan = Plan::factory()->create([
-            'periodicity_type' => PeriodicityType::Day->value,
+            'periodicity_type' => PeriodicityType::Day->name,
             'periodicity'      => $days,
         ]);
 
-        $this->assertEquals(now()->addDays($days), $plan->calculateExpiration());
+        $this->assertEquals(now()->addDays($days), $plan->calculateNextRecurrenceEnd());
     }
 }

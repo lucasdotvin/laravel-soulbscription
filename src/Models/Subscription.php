@@ -64,7 +64,7 @@ class Subscription extends Model
             'overdue' => $overdue,
         ]);
 
-        $expiration = $this->plan->calculateExpiration();
+        $expiration = $this->plan->calculateNextRecurrenceEnd();
 
         $this->update([
             'expires_at' => $expiration,

@@ -23,10 +23,10 @@ class FeatureFactory extends Factory
             'slug'             => $this->faker->slug(),
             'periodicity'      => $this->faker->randomDigitNotZero(),
             'periodicity_type' => $this->faker->randomElement([
-                PeriodicityType::Year->value,
-                PeriodicityType::Month->value,
-                PeriodicityType::Week->value,
-                PeriodicityType::Day->value,
+                PeriodicityType::Year->name,
+                PeriodicityType::Month->name,
+                PeriodicityType::Week->name,
+                PeriodicityType::Day->name,
             ]),
         ];
     }

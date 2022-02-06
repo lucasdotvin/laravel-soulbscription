@@ -25,7 +25,7 @@ class HasSubscriptionsTest extends TestCase
             'id'            => $subscription->id,
             'plan_id'       => $plan->id,
             'subscriber_id' => $subscriber->id,
-            'expires_at'    => $plan->calculateExpiration(),
+            'expires_at'    => $plan->calculateNextRecurrenceEnd(),
         ]);
     }
 
