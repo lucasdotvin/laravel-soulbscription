@@ -43,13 +43,14 @@ class Subscription extends Model
 
     public function scopeActive(Builder $query)
     {
-        return $query->unexpired()->unsuppressed();
+        return $query->unexpired()->started()->unsuppressed();
     }
 
     public function scopeInactive(Builder $query)
     {
         return $query->where(function (Builder $query) {
             return $query->expired()
+                ->orWhere(fn (Builder $query) => $query->notStarted())
                 ->orWhere(fn (Builder $query) => $query->suppressed());
         });
     }
@@ -72,6 +73,16 @@ class Subscription extends Model
     public function scopeUnexpired(Builder $query)
     {
         return $query->where('expires_at', '>', now());
+    }
+
+    public function scopeStarted(Builder $query)
+    {
+        return $query->where('started_at', '<', now());
+    }
+
+    public function scopeNotStarted(Builder $query)
+    {
+        return $query->where('started_at', '<', now());
     }
 
     public function scopeSuppressed(Builder $query)
