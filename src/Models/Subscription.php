@@ -116,7 +116,7 @@ class Subscription extends Model
     public function start(): self
     {
         return $this->fill([
-            'started_at' => now(),
+            'started_at' => today(),
         ]);
     }
 

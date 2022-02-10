@@ -49,7 +49,7 @@ class SubscriptionTest extends TestCase
 
         $this->assertDatabaseHas('subscriptions', [
             'id' => $subscription->id,
-            'started_at' => now(),
+            'started_at' => today(),
         ]);
     }
 

@@ -2,6 +2,7 @@
 
 namespace LucasDotDev\Soulbscription\Tests\Feature\Models\Concerns;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use LucasDotDev\Soulbscription\Models\Feature;
@@ -30,6 +31,7 @@ class HasSubscriptionsTest extends TestCase
             'id' => $subscription->id,
             'plan_id' => $plan->id,
             'subscriber_id' => $subscriber->id,
+            'started_at' => today(),
             'expires_at' => $plan->calculateNextRecurrenceEnd(),
         ]);
     }
