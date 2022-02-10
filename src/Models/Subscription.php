@@ -57,14 +57,14 @@ class Subscription extends Model
         return $query->whereNotNull('canceled_at');
     }
 
-    public function scopeExpired(Builder $query)
-    {
-        return $query->where('expires_at', '<', now());
-    }
-
     public function scopeUncanceled(Builder $query)
     {
         return $query->whereNull('canceled_at');
+    }
+
+    public function scopeExpired(Builder $query)
+    {
+        return $query->where('expires_at', '<', now());
     }
 
     public function scopeUnexpired(Builder $query)
