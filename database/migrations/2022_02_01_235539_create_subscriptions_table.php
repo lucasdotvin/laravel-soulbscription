@@ -17,6 +17,7 @@ return new class() extends Migration {
             $table->foreignIdFor(\LucasDotDev\Soulbscription\Models\Plan::class);
             $table->timestamp('canceled_at')->nullable();
             $table->timestamp('expires_at');
+            $table->timestamp('started_at')->nullable()->useCurrent();
             $table->timestamp('suppressed_at')->nullable();
             $table->softDeletes();
             $table->timestamps();

@@ -15,12 +15,14 @@ class Subscription extends Model
     protected $dates = [
         'canceled_at',
         'expires_at',
+        'started_at',
         'suppressed_at',
     ];
 
     protected $fillable = [
         'canceled_at',
         'expires_at',
+        'started_at',
         'suppressed_at',
     ];
 
@@ -98,6 +100,13 @@ class Subscription extends Model
         ]);
 
         return $this;
+    }
+
+    public function start(): self
+    {
+        return $this->fill([
+            'started_at' => now(),
+        ]);
     }
 
     public function suppress(): self

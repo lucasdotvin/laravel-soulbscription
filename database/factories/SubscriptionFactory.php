@@ -46,6 +46,20 @@ class SubscriptionFactory extends Factory
         ]);
     }
 
+    public function started()
+    {
+        return $this->state(fn (array $attributes) => [
+            'started_at' => $this->faker->dateTime(),
+        ]);
+    }
+
+    public function notStarted()
+    {
+        return $this->state(fn (array $attributes) => [
+            'started_at' => null,
+        ]);
+    }
+
     public function suppressed()
     {
         return $this->state(fn (array $attributes) => [
