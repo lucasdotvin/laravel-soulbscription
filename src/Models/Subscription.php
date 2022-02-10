@@ -76,4 +76,11 @@ class Subscription extends Model
 
         return $this;
     }
+
+    public function suppress(): self
+    {
+        return $this->fill([
+            'suppressed_at' => now(),
+        ]);
+    }
 }
