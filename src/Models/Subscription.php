@@ -39,6 +39,19 @@ class Subscription extends Model
         return $this->morphTo('subscriber');
     }
 
+    public function scopeActive(Builder $query)
+    {
+        return $query->unexpired()->unsuppressed();
+    }
+
+    public function scopeInactive(Builder $query)
+    {
+        return $query->where(function (Builder $query) {
+            return $query->expired()
+                ->orWhere(fn (Builder $query) => $query->suppressed());
+        });
+    }
+
     public function scopeCanceled(Builder $query)
     {
         return $query->whereNotNull('canceled_at');
