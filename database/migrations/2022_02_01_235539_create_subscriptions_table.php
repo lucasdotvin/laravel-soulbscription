@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class() extends Migration {
@@ -17,7 +18,7 @@ return new class() extends Migration {
             $table->foreignIdFor(\LucasDotDev\Soulbscription\Models\Plan::class);
             $table->timestamp('canceled_at')->nullable();
             $table->timestamp('expires_at');
-            $table->date('started_at');
+            $table->date('started_at')->default(DB::raw('created_at'));
             $table->timestamp('suppressed_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
