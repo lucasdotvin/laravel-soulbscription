@@ -59,6 +59,16 @@ class Subscription extends Model
         return $query->where('expires_at', '>', now());
     }
 
+    public function scopeSuppressed(Builder $query)
+    {
+        return $query->where('suppressed_at', '<', now());
+    }
+
+    public function scopeUnsuppressed(Builder $query)
+    {
+        return $query->where('suppressed_at', '<', now());
+    }
+
     public function renew(): self
     {
         $overdue = $this->expires_at->isPast();
