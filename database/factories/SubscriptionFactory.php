@@ -20,6 +20,7 @@ class SubscriptionFactory extends Factory
         return [
             'plan_id'       => Plan::factory(),
             'canceled_at'   => null,
+            'started_at'    => $this->faker->dateTime(),
             'suppressed_at' => null,
             'expires_at'    => $this->faker->dateTime(),
         ];
