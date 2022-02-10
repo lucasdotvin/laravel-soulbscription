@@ -32,17 +32,17 @@ class SubscriptionFactory extends Factory
         ]);
     }
 
-    public function expired()
-    {
-        return $this->state(fn (array $attributes) => [
-            'expires_at' => $this->faker->dateTime(),
-        ]);
-    }
-
     public function uncanceled()
     {
         return $this->state(fn (array $attributes) => [
             'canceled_at' => null,
+        ]);
+    }
+
+    public function expired()
+    {
+        return $this->state(fn (array $attributes) => [
+            'expires_at' => $this->faker->dateTime(),
         ]);
     }
 
