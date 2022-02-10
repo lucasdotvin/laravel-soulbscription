@@ -3,6 +3,7 @@
 namespace LucasDotDev\Soulbscription\Tests\Feature\Models;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use LucasDotDev\Soulbscription\Models\Plan;
 use LucasDotDev\Soulbscription\Models\Subscription;
 use LucasDotDev\Soulbscription\Tests\Mocks\Models\User;
@@ -28,6 +29,26 @@ class SubscriptionTest extends TestCase
             'subscriber_id' => $subscriber->id,
             'subscriber_type' => User::class,
             'expires_at' => $plan->calculateNextRecurrenceEnd(),
+        ]);
+    }
+
+    public function testModelCanSuppress()
+    {
+        Carbon::setTestNow(now());
+
+        $plan = Plan::factory()->create();
+        $subscriber = User::factory()->create();
+        $subscription = Subscription::factory()
+            ->for($plan)
+            ->for($subscriber, 'subscriber')
+            ->create();
+
+        $subscription->suppress()
+            ->save();
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $subscription->id,
+            'suppressed_at' => now(),
         ]);
     }
 
