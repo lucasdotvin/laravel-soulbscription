@@ -15,11 +15,13 @@ class Subscription extends Model
     protected $dates = [
         'canceled_at',
         'expires_at',
+        'suppressed_at',
     ];
 
     protected $fillable = [
         'canceled_at',
         'expires_at',
+        'suppressed_at',
     ];
 
     public function plan()
