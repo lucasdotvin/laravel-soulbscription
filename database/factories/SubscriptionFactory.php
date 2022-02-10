@@ -56,7 +56,7 @@ class SubscriptionFactory extends Factory
     public function notStarted()
     {
         return $this->state(fn (array $attributes) => [
-            'started_at' => null,
+            'started_at' => $this->faker->dateTimeBetween('now', '+30 years'),
         ]);
     }
 
