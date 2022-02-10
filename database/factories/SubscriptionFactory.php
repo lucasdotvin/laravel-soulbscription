@@ -18,9 +18,10 @@ class SubscriptionFactory extends Factory
     public function definition()
     {
         return [
-            'plan_id'     => Plan::factory(),
-            'canceled_at' => $this->faker->dateTime(),
-            'expires_at'  => $this->faker->dateTime(),
+            'plan_id'       => Plan::factory(),
+            'canceled_at'   => null,
+            'suppressed_at' => null,
+            'expires_at'    => $this->faker->dateTime(),
         ];
     }
 
@@ -45,10 +46,17 @@ class SubscriptionFactory extends Factory
         ]);
     }
 
-    public function unexpired()
+    public function suppressed()
     {
         return $this->state(fn (array $attributes) => [
-            'expires_at' => null,
+            'suppressed_at' => $this->faker->dateTime(),
+        ]);
+    }
+
+    public function unsuppressed()
+    {
+        return $this->state(fn (array $attributes) => [
+            'suppressed_at' => null,
         ]);
     }
 }
