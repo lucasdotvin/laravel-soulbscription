@@ -112,6 +112,7 @@ trait HasSubscriptions
                 ->make([
                     'expires_at' => $expiration,
                 ])
+                ->start()
                 ->plan()
                 ->associate($plan),
         )->save();
