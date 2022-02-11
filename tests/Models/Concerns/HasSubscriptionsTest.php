@@ -2,7 +2,6 @@
 
 namespace LucasDotDev\Soulbscription\Tests\Feature\Models\Concerns;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use LucasDotDev\Soulbscription\Models\Feature;
