@@ -113,10 +113,14 @@ class Subscription extends Model
         return $this;
     }
 
-    public function start(): self
+    public function start($startDate = null): self
     {
+        if (empty($startDate)) {
+            $startDate = today();
+        }
+
         return $this->fill([
-            'started_at' => today(),
+            'started_at' => $startDate,
         ]);
     }
 
