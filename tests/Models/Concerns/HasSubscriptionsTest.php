@@ -88,6 +88,34 @@ class HasSubscriptionsTest extends TestCase
         ]);
     }
 
+    public function testModelGetNewSubscriptionAfterSwitching()
+    {
+        $oldPlan = Plan::factory()->createOne();
+        $newPlan = Plan::factory()->createOne();
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($oldPlan, startDate: now()->subDay());
+
+        $newSubscription = $subscriber->switchTo($newPlan);
+
+        $this->assertTrue($newSubscription->is($subscriber->fresh()->subscription));
+    }
+
+    public function testModelGetCurrentSubscriptionAfterScheduleASwitch()
+    {
+        Carbon::setTestNow(now());
+
+        $oldPlan = Plan::factory()->createOne();
+        $newPlan = Plan::factory()->createOne();
+
+        $subscriber = User::factory()->createOne();
+        $oldSubscription = $subscriber->subscribeTo($oldPlan);
+
+        $subscriber->switchTo($newPlan, immediately: false);
+
+        $this->assertTrue($oldSubscription->is($subscriber->fresh()->subscription));
+    }
+
     public function testModelCanConsumeAFeature()
     {
         $charges = $this->faker->numberBetween(5, 10);
