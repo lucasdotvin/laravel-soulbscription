@@ -48,7 +48,7 @@ class HasSubscriptionsTest extends TestCase
         ]);
 
         $subscriber = User::factory()->createOne();
-        $subscriber->subscribeTo($plan);
+        $subscription = $subscriber->subscribeTo($plan);
 
         $subscriber->consume($feature->name, $consumption);
 
@@ -56,6 +56,7 @@ class HasSubscriptionsTest extends TestCase
             'consumption' => $consumption,
             'feature_id' => $feature->id,
             'subscriber_id' => $subscriber->id,
+            'expires_at' => $feature->calculateNextRecurrenceEnd($subscription->started_at),
         ]);
     }
 
