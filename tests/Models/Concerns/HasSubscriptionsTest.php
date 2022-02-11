@@ -59,6 +59,7 @@ class HasSubscriptionsTest extends TestCase
         $this->assertDatabaseHas('subscriptions', [
             'id' => $oldSubscription->id,
             'suppressed_at' => now(),
+            'was_switched' => true,
         ]);
     }
 
@@ -79,6 +80,11 @@ class HasSubscriptionsTest extends TestCase
             'plan_id' => $newPlan->id,
             'started_at' => $oldSubscription->expires_at,
             'expires_at' => $newPlan->calculateNextRecurrenceEnd($oldSubscription->expires_at),
+        ]);
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $oldSubscription->id,
+            'was_switched' => true,
         ]);
     }
 

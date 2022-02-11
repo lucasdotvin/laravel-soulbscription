@@ -73,6 +73,24 @@ class SubscriptionTest extends TestCase
         ]);
     }
 
+    public function testModelCanMarkAsSwitched()
+    {
+        $plan = Plan::factory()->create();
+        $subscriber = User::factory()->create();
+        $subscription = Subscription::factory()
+            ->for($plan)
+            ->for($subscriber, 'subscriber')
+            ->create();
+
+        $subscription->markAsSwitched()
+            ->save();
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $subscription->id,
+            'was_switched' => true,
+        ]);
+    }
+
     public function testModelRegistersRenewal()
     {
         $subscriber = User::factory()->create();
