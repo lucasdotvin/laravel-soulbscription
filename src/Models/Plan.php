@@ -24,7 +24,7 @@ class Plan extends Model
     {
         return $this->belongsToMany(Feature::class)
             ->using(PlanFeature::class)
-            ->withPivot(app(PlanFeature::class)->getFillable());
+            ->withPivot(['charges']);
     }
 
     public function subscriptions()

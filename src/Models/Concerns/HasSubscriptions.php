@@ -27,7 +27,13 @@ trait HasSubscriptions
     {
         return $this->belongsToMany(Plan::class, 'subscriptions', 'subscriber_id')
             ->as('subscription')
-            ->withPivot(app(Subscription::class)->getFillable())
+            ->withPivot([
+                'canceled_at',
+                'expires_at',
+                'started_at',
+                'suppressed_at',
+                'was_switched',
+            ])
             ->withTimestamps();
     }
 
