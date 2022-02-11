@@ -103,19 +103,34 @@ trait HasSubscriptions
             ->save();
     }
 
-    public function subscribeTo(Plan $plan, $expiration = null): Subscription
+    public function subscribeTo(Plan $plan, $expiration = null, $startDate = null): Subscription
     {
-        $expiration = $expiration ?? $plan->calculateNextRecurrenceEnd();
+        $expiration = $expiration ?? $plan->calculateNextRecurrenceEnd($startDate);
 
         return tap(
             $this->subscription()
                 ->make([
                     'expires_at' => $expiration,
                 ])
-                ->start()
+                ->start($startDate)
                 ->plan()
                 ->associate($plan),
         )->save();
+    }
+
+    public function switchTo(Plan $plan, $expiration = null, $immediately = true): Subscription
+    {
+        if ($immediately) {
+            $this->subscription
+                ->suppress()
+                ->save();
+
+            return $this->subscribeTo($plan, $expiration);
+        }
+
+        $startDate = $this->subscription->expires_at;
+
+        return $this->subscribeTo($plan, startDate: $startDate);
     }
 
     private function getAvailableFeature(string $featureName): ?Feature
