@@ -4,6 +4,7 @@ namespace LucasDotDev\Soulbscription\Tests\Feature\Models\Concerns;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Carbon;
 use LucasDotDev\Soulbscription\Models\Feature;
 use LucasDotDev\Soulbscription\Models\FeatureConsumption;
 use LucasDotDev\Soulbscription\Models\Plan;
@@ -32,6 +33,52 @@ class HasSubscriptionsTest extends TestCase
             'subscriber_id' => $subscriber->id,
             'started_at' => today(),
             'expires_at' => $plan->calculateNextRecurrenceEnd(),
+        ]);
+    }
+
+    public function testModelCanSwitchToAPlan()
+    {
+        Carbon::setTestNow(now());
+
+        $oldPlan = Plan::factory()->createOne();
+        $newPlan = Plan::factory()->createOne();
+
+        $subscriber = User::factory()->createOne();
+        $oldSubscription = $subscriber->subscribeTo($oldPlan);
+
+        $newSubscription = $subscriber->switchTo($newPlan);
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $newSubscription->id,
+            'plan_id' => $newPlan->id,
+            'subscriber_id' => $subscriber->id,
+            'started_at' => today(),
+            'expires_at' => $newPlan->calculateNextRecurrenceEnd(),
+        ]);
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $oldSubscription->id,
+            'suppressed_at' => now(),
+        ]);
+    }
+
+    public function testModelCanScheduleSwitchToAPlan()
+    {
+        Carbon::setTestNow(now());
+
+        $oldPlan = Plan::factory()->createOne();
+        $newPlan = Plan::factory()->createOne();
+
+        $subscriber = User::factory()->createOne();
+        $oldSubscription = $subscriber->subscribeTo($oldPlan);
+
+        $newSubscription = $subscriber->switchTo($newPlan, immediately: false);
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $newSubscription->id,
+            'plan_id' => $newPlan->id,
+            'started_at' => $oldSubscription->expires_at,
+            'expires_at' => $newPlan->calculateNextRecurrenceEnd($oldSubscription->expires_at),
         ]);
     }
 
