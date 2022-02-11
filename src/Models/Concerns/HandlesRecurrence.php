@@ -7,10 +7,14 @@ use LucasDotDev\Soulbscription\Enums\PeriodicityType;
 
 trait HandlesRecurrence
 {
-    public function calculateNextRecurrenceEnd(?Carbon $start = null)
+    public function calculateNextRecurrenceEnd(Carbon|string $start = null)
     {
         if (empty($start)) {
             $start = now();
+        }
+
+        if (is_string($start)) {
+            $start = Carbon::parse($start);
         }
 
         $recurrences = PeriodicityType::getDateDifference(from: now(), to: $start, unit: $this->periodicity_type);
