@@ -20,6 +20,7 @@ return new class() extends Migration {
             $table->timestamp('expires_at');
             $table->date('started_at');
             $table->timestamp('suppressed_at')->nullable();
+            $table->boolean('was_switched')->default(false);
             $table->softDeletes();
             $table->timestamps();
 

@@ -23,6 +23,7 @@ class SubscriptionFactory extends Factory
             'started_at'    => $this->faker->dateTime(),
             'suppressed_at' => null,
             'expires_at'    => $this->faker->dateTime(),
+            'was_switched'  => false,
         ];
     }
 
@@ -72,6 +73,20 @@ class SubscriptionFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'suppressed_at' => null,
+        ]);
+    }
+
+    public function switched()
+    {
+        return $this->state(fn (array $attributes) => [
+            'was_switched' => true,
+        ]);
+    }
+
+    public function notSwitched()
+    {
+        return $this->state(fn (array $attributes) => [
+            'was_switched' => false,
         ]);
     }
 }

@@ -122,11 +122,16 @@ trait HasSubscriptions
     {
         if ($immediately) {
             $this->subscription
+                ->markAsSwitched()
                 ->suppress()
                 ->save();
 
             return $this->subscribeTo($plan, $expiration);
         }
+
+        $this->subscription
+            ->markAsSwitched()
+            ->save();
 
         $startDate = $this->subscription->expires_at;
 

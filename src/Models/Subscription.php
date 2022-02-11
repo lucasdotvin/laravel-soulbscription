@@ -24,6 +24,7 @@ class Subscription extends Model
         'expires_at',
         'started_at',
         'suppressed_at',
+        'was_switched',
     ];
 
     public function plan()
@@ -93,6 +94,13 @@ class Subscription extends Model
     public function scopeUnsuppressed(Builder $query)
     {
         return $query->where('suppressed_at', '<', now());
+    }
+
+    public function markAsSwitched(): self
+    {
+        return $this->fill([
+            'was_switched' => true,
+        ]);
     }
 
     public function renew(): self
