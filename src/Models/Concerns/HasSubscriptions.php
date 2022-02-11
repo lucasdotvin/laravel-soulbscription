@@ -91,7 +91,7 @@ trait HasSubscriptions
         $consumedPlan = $this->activePlans->first(fn (Plan $plan) => $plan->features->firstWhere('name', $featureName));
         $feature = $consumedPlan->features->firstWhere('name', $featureName);
 
-        $consumptionExpiration = $feature->calculateNextRecurrenceEnd($consumedPlan->subscription->created_at);
+        $consumptionExpiration = $feature->calculateNextRecurrenceEnd($consumedPlan->subscription->started_at);
 
         $this->featureConsumptions()
             ->make([
