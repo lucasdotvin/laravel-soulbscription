@@ -2,6 +2,7 @@
 
 namespace LucasDotDev\Soulbscription\Models\Concerns;
 
+use Illuminate\Database\Eloquent\Builder;
 use LucasDotDev\Soulbscription\Models\Feature;
 use LucasDotDev\Soulbscription\Models\FeatureConsumption;
 use LucasDotDev\Soulbscription\Models\Plan;
@@ -44,7 +45,12 @@ trait HasSubscriptions
 
     public function subscription()
     {
-        return $this->morphOne(Subscription::class, 'subscriber');
+        return $this->morphOne(Subscription::class, 'subscriber')->ofMany(
+            [
+                'started_at' => 'max',
+            ],
+            fn (Builder $query) => $query->started(),
+        );
     }
 
     public function canConsume($featureName, ?float $consumption = null): bool
