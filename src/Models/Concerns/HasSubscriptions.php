@@ -36,9 +36,9 @@ trait HasSubscriptions
         return $this->hasManyThrough(SubscriptionRenewal::class, Subscription::class, 'subscriber_id');
     }
 
-    public function subscriptions()
+    public function subscription()
     {
-        return $this->morphMany(Subscription::class, 'subscriber');
+        return $this->morphOne(Subscription::class, 'subscriber');
     }
 
     public function canConsume($featureName, ?float $consumption = null): bool
@@ -108,7 +108,7 @@ trait HasSubscriptions
         $expiration = $expiration ?? $plan->calculateNextRecurrenceEnd();
 
         return tap(
-            $this->subscriptions()
+            $this->subscription()
                 ->make([
                     'expires_at' => $expiration,
                 ])
