@@ -121,6 +121,13 @@ class Subscription extends Model
         return $this;
     }
 
+    public function cancel(): self
+    {
+        return tap($this)->update([
+            'canceled_at' => now(),
+        ]);
+    }
+
     public function start($startDate = null): self
     {
         if (empty($startDate)) {
