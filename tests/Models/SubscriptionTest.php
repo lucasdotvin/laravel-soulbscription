@@ -44,7 +44,8 @@ class SubscriptionTest extends TestCase
             ->notStarted()
             ->create();
 
-        $subscription->cancel();
+        $subscription->cancel()
+            ->save();
 
         $this->assertDatabaseHas('subscriptions', [
             'id' => $subscription->id,

@@ -123,7 +123,7 @@ class Subscription extends Model
 
     public function cancel(): self
     {
-        return tap($this)->update([
+        return $this->fill([
             'canceled_at' => now(),
         ]);
     }
