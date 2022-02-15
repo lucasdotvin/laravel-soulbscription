@@ -22,7 +22,7 @@ class Plan extends Model
     public function features()
     {
         return $this->belongsToMany(Feature::class)
-            ->using(PlanFeature::class)
+            ->using(FeaturePlan::class)
             ->withPivot(['charges']);
     }
 

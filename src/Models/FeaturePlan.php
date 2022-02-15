@@ -4,7 +4,7 @@ namespace LucasDotDev\Soulbscription\Models;
 
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class PlanFeature extends Pivot
+class FeaturePlan extends Pivot
 {
     protected $fillable = [
         'charges',

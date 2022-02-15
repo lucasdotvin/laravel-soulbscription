@@ -23,6 +23,6 @@ class Feature extends Model
     public function plans()
     {
         return $this->belongsToMany(Plan::class)
-            ->using(PlanFeature::class);
+            ->using(FeaturePlan::class);
     }
 }
