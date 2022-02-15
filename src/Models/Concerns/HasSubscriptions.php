@@ -87,8 +87,8 @@ trait HasSubscriptions
     }
 
     /**
-     * @throws \Illuminate\Auth\Access\OutOfBoundsException
-     * @throws \Illuminate\Auth\Access\OverflowException
+     * @throws OutOfBoundsException
+     * @throws OverflowException
      */
     public function consume($featureName, ?float $consumption = null)
     {
