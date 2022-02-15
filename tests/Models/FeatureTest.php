@@ -20,7 +20,7 @@ class FeatureTest extends TestCase
 
         $years = $this->faker->randomDigitNotZero();
         $feature = Feature::factory()->create([
-            'periodicity_type' => PeriodicityType::Year->name,
+            'periodicity_type' => PeriodicityType::Year,
             'periodicity' => $years,
         ]);
 
@@ -33,7 +33,7 @@ class FeatureTest extends TestCase
 
         $months = $this->faker->randomDigitNotZero();
         $feature = Feature::factory()->create([
-            'periodicity_type' => PeriodicityType::Month->name,
+            'periodicity_type' => PeriodicityType::Month,
             'periodicity' => $months,
         ]);
 
@@ -46,7 +46,7 @@ class FeatureTest extends TestCase
 
         $weeks = $this->faker->randomDigitNotZero();
         $feature = Feature::factory()->create([
-            'periodicity_type' => PeriodicityType::Week->name,
+            'periodicity_type' => PeriodicityType::Week,
             'periodicity' => $weeks,
         ]);
 
@@ -59,7 +59,7 @@ class FeatureTest extends TestCase
 
         $days = $this->faker->randomDigitNotZero();
         $feature = Feature::factory()->create([
-            'periodicity_type' => PeriodicityType::Day->name,
+            'periodicity_type' => PeriodicityType::Day,
             'periodicity' => $days,
         ]);
 
@@ -71,7 +71,7 @@ class FeatureTest extends TestCase
         Carbon::setTestNow(now());
 
         $feature = Feature::factory()->create([
-            'periodicity_type' => PeriodicityType::Week->name,
+            'periodicity_type' => PeriodicityType::Week,
             'periodicity' => 1,
         ]);
 

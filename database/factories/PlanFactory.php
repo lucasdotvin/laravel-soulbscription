@@ -21,10 +21,10 @@ class PlanFactory extends Factory
             'name'             => $this->faker->words(asText: true),
             'periodicity'      => $this->faker->randomDigitNotZero(),
             'periodicity_type' => $this->faker->randomElement([
-                PeriodicityType::Year->name,
-                PeriodicityType::Month->name,
-                PeriodicityType::Week->name,
-                PeriodicityType::Day->name,
+                PeriodicityType::Year,
+                PeriodicityType::Month,
+                PeriodicityType::Week,
+                PeriodicityType::Day,
             ]),
         ];
     }

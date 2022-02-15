@@ -73,7 +73,7 @@ class FeatureSeeder extends Seeder
         $deployMinutes = Feature::create([
             'consumable'       => true,
             'name'             => 'deploy-minutes',
-            'periodicity_type' => PeriodicityType::Day->name,
+            'periodicity_type' => PeriodicityType::Day,
             'periodicity'      => 1,
         ]);
 
@@ -85,7 +85,7 @@ class FeatureSeeder extends Seeder
 }
 ```
 
-By saying the `deploy-minutes` is a consumable feature, we are telling the users can use it a limited number of times (or until a given amount). On the other hand, by passing `PeriodicityType::Day->name` and 1 as its `periodicity_type` and `periodicity` respectively, we said that it should be renewed everyday. So a user could spend his minutes today and have it back tomorrow, for instance.
+By saying the `deploy-minutes` is a consumable feature, we are telling the users can use it a limited number of times (or until a given amount). On the other hand, by passing `PeriodicityType::Day` and 1 as its `periodicity_type` and `periodicity` respectively, we said that it should be renewed everyday. So a user could spend his minutes today and have it back tomorrow, for instance.
 
 > It is important to keep in mind that both plans and consumable features have its periodicity, so your users can, for instance, have a monthly plan with weekly features.
 
@@ -110,13 +110,13 @@ class PlanSeeder extends Seeder
     {
         $silver = Plan::create([
             'name'             => 'silver',
-            'periodicity_type' => PeriodicityType::Month->name,
+            'periodicity_type' => PeriodicityType::Month,
             'periodicity'      => 1,
         ]);
 
         $gold = Plan::create([
             'name'             => 'gold',
-            'periodicity_type' => PeriodicityType::Month->name,
+            'periodicity_type' => PeriodicityType::Month,
             'periodicity'      => 1,
         ]);
     }

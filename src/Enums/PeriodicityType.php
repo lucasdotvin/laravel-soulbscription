@@ -5,17 +5,19 @@ namespace LucasDotDev\Soulbscription\Enums;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
-enum PeriodicityType
+class PeriodicityType
 {
-    case Year;
-    case Month;
-    case Week;
-    case Day;
+    public const Year = 'Year';
 
-    public static function getDateDifference(Carbon $from, Carbon $to, string|PeriodicityType $unit): int
+    public const Month = 'Month';
+
+    public const Week = 'Week';
+
+    public const Day = 'Day';
+
+    public static function getDateDifference(Carbon $from, Carbon $to, string $unit): int
     {
-        $unitName = $unit->name ?? $unit;
-        $unitInPlural = Str::plural($unitName);
+        $unitInPlural = Str::plural($unit);
 
         $differenceMethodName = 'diffIn' . $unitInPlural;
 
