@@ -1,19 +1,11 @@
-# This is my package laravel-soulbscription
+# Laravel Soulbscription
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/lucasdotdev/laravel-soulbscription.svg?style=flat-square)](https://packagist.org/packages/lucasdotdev/laravel-soulbscription)
 [![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/lucasdotdev/laravel-soulbscription/run-tests?label=tests)](https://github.com/lucasdotdev/laravel-soulbscription/actions?query=workflow%3Arun-tests+branch%3Amain)
 [![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/lucasdotdev/laravel-soulbscription/Check%20&%20fix%20styling?label=code%20style)](https://github.com/lucasdotdev/laravel-soulbscription/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/lucasdotdev/laravel-soulbscription.svg?style=flat-square)](https://packagist.org/packages/lucasdotdev/laravel-soulbscription)
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
-
-## Support us
-
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/laravel-soulbscription.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/laravel-soulbscription)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+This package provides a straightforward interface to handle subscriptions and features consumption.
 
 ## Installation
 
@@ -23,38 +15,256 @@ You can install the package via composer:
 composer require lucasdotdev/laravel-soulbscription
 ```
 
-You can publish and run the migrations with:
+The package migrations are loaded automatically, but you can still publish them with this command:
 
 ```bash
 php artisan vendor:publish --tag="laravel-soulbscription-migrations"
 php artisan migrate
 ```
 
-You can publish the config file with:
-
-```bash
-php artisan vendor:publish --tag="laravel-soulbscription-config"
-```
-
-This is the contents of the published config file:
-
-```php
-return [
-];
-```
-
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="laravel-soulbscription-views"
-```
-
 ## Usage
 
+To start using it, you just have to add the given trait to your `User` model (or any entity you want to have subscriptions):
+
 ```php
-$soulbscription = new LucasDotDev\Soulbscription();
-echo $soulbscription->echoPhrase('Hello, LucasDotDev!');
+<?php
+
+namespace App\Models;
+
+use LucasDotDev\Soulbscription\Models\Concerns\HasSubscriptions;
+
+class User
+{
+    use HasSubscriptions;
+}
 ```
+
+And that's it!
+
+### Setting Features Up
+
+First things first, you have to define the features you'll offer. In the example below, we are creating two features: one to handle how much minutes each user can spend with deploys and if they can use subdomains.
+
+```php
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use LucasDotDev\Soulbscription\Enums\PeriodicityType;
+use LucasDotDev\Soulbscription\Models\Feature;
+
+class FeatureSeeder extends Seeder
+{
+    public function run()
+    {
+        $deployMinutes = Feature::create([
+            'consumable'       => true,
+            'name'             => 'deploy-minutes',
+            'periodicity_type' => PeriodicityType::Day->name,
+            'periodicity'      => 1,
+        ]);
+
+        $customDomain = Feature::create([
+            'consumable' => false,
+            'name'       => 'custom-domain',
+        ]);
+    }
+}
+```
+
+By saying the `deploy-minutes` is a consumable feature, we are telling the users can use it a limited number of times (or until a given amount). On the other hand, by passing `PeriodicityType::Day->name` and 1 as its `periodicity_type` and `periodicity` respectively, we said that it should be renewed everyday. So a user could spend his minutes today and have it back tomorrow, for instance.
+
+> It is important to keep in mind that both plans and consumable features have its periodicity, so your users can, for instance, have a monthly plan with weekly features.
+
+The other feature we defined was `$customDomain`, which was a not consumable feature. By being not consumable, this feature implies only that the users with access to it can perform a given action (in this case, use a custom domain).
+
+### Creating Plans
+
+Now you need to define the plans available to subscription in your app:
+
+```php
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use LucasDotDev\Soulbscription\Enums\PeriodicityType;
+use LucasDotDev\Soulbscription\Models\Plan;
+
+class PlanSeeder extends Seeder
+{
+    public function run()
+    {
+        $silver = Plan::create([
+            'name'             => 'silver',
+            'periodicity_type' => PeriodicityType::Month->name,
+            'periodicity'      => 1,
+        ]);
+
+        $gold = Plan::create([
+            'name'             => 'gold',
+            'periodicity_type' => PeriodicityType::Month->name,
+            'periodicity'      => 1,
+        ]);
+    }
+}
+```
+
+Everything here is quite simple, but it is worth to emphasize: by receiving the periodicity options above, the two plans are defined as monthly.
+
+### Associating Plans with Features
+
+As each feature can belong to multiple plans (and they can have multiple features), you have to associate them:
+
+```php
+use LucasDotDev\Soulbscription\Models\Feature;
+
+// ...
+
+$deployMinutes = Feature::whereName('deploy-minutes')->first();
+$subdomains    = Feature::whereName('subdomains')->first();
+
+$silver->features()->attach($deployMinutes, ['charges' => 15]);
+
+$gold->features()->attach($deployMinutes, ['charges' => 25]);
+$gold->features()->attach($subdomains);
+```
+
+It is necessary to pass a value to `charges` when associating a consumable feature with a plan.
+
+In the example above, we are giving 15 minutes of deploy time to silver users and 25 to gold users. We are also allowing gold users to use subdomains.
+
+### Subscribing
+
+Now that you have a set of plans with their own features, it is time to subscribe users to them. Registering subscriptions is quite simple:
+
+```php
+<?php
+
+namespace App\Listeners;
+
+use App\Events\PaymentApproved;
+
+class SubscribeUser
+{
+    public function handle(PaymentApproved $event)
+    {
+        $subscriber = $event->user;
+        $plan       = $event->plan;
+
+        $subscriber->subscribeTo($plan);
+    }
+}
+```
+
+In the example above, we are simulating an application that subscribes its users when their payments are approved. It is easy to see that the method `subscribeTo` requires only one argument: the plan the user is subscribing to. There are other options you can pass to it to handle particular cases that we're gonna cover below.
+
+> By default, the `subscribeTo` method calculates the expiration considering the plan periodicity, so you don't have to worry about it.
+
+#### Defining Expiration and Start Date
+
+You can override the subscription expiration by passing the `$expiration` argument to the method call. Below, we are setting the subscription of a given user to expire only in the next year.
+
+```php
+$subscriber->subscribeTo($plan, expiration: today()->addYear());
+```
+
+It is possible also to define when a subscription will effectively start (the default behavior is to start it immediately):
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\StudentStoreFormRequest;
+use App\Models\Course;
+use App\Models\User;
+use LucasDotDev\Soulbscription\Models\Plan;
+
+class StudentController extends Controller
+{
+    public function store(StudentStoreFormRequest $request, Course $course)
+    {
+        $student = User::make($request->validated());
+        $student->course()->associate($course);
+        $student->save();
+
+        $plan = Plan::find($request->validated('plan_id'));
+        $student->subscribeTo($plan, startDate: $course->starts_at);
+
+        return redirect()->route('admin.students.index');
+    }
+}
+```
+
+Above, we are simulating an application for a school. It has to subscribe students at their registration, but also ensure their subscription will make effect only when the course starts.
+
+### Switching Plans
+
+Users change their mind all the time and you have to deal with it. If you need to change the current plan o a user, simply call the method `switchTo`:
+
+```php
+$student->switchTo($newPlan);
+```
+
+If you don't pass any arguments, the method will suspend the current subscription and start a new one immediately.
+
+#### Scheduling a Switch
+
+If you want to keep your user with the current plan until its expiration, pass the `$immediately` parameter as `false`:
+
+```php
+$primeMonthly = Plan::whereName('prime-monthly')->first();
+$user->subscribeTo($primeMonthly);
+
+...
+
+$primeYearly = Plan::whereName('prime-yearly')->first();
+$user->switchTo($primeYearly, immediately: false);
+```
+
+In the example above, the user will keep its monthly subscription until its expiration and then start on the yearly plan. This is pretty useful when you don't want to deal with partial refunds, as you can bill your user only when the current paid plan expires.
+
+Under the hood, this call will create a subscription with a start date equal to the current expiration, so it won't affect your application until there.
+
+### Feature Consumption
+
+To register a consumption of a given feature, you just have to call the `consume` method and pass the feature name and the consumption amount (you don't need to provide it for not consumable features):
+
+```php
+$subscriber->consume('deploy-minutes', 4.5);
+```
+
+The method will check if the feature is available and throws exceptions if they are not: `OutOfBoundsException` if the feature is not available to the plan, and `OverflowException` if it is available, but the charges are not enough to cover the consumption.
+
+#### Check Availability
+
+To check if a feature is available to consumption, you can use one of the methods below:
+
+```php
+$subscriber->canConsume('deploy-minutes', 10);
+```
+
+To check if a user can consume a certain amount of a given feature (it checks if the user has access to the feature and if he has enough remaining charges).
+
+```php
+$subscriber->cantConsume('deploy-minutes', 10);
+```
+
+It calls the `canConsume()` method under the hood and reverse the return.
+
+```php
+$subscriber->hasFeature('deploy-minutes');
+```
+
+To simply checks if the user has access to a given feature (without looking for its charges).
+
+```php
+$subscriber->missingFeature('deploy-minutes');
+```
+
+Similarly to `cantConsume`, it returns the reverse of `hasFeature`.
 
 ## Testing
 
