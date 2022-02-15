@@ -19,7 +19,6 @@ class PlanFactory extends Factory
     {
         return [
             'name'             => $this->faker->words(asText: true),
-            'slug'             => $this->faker->slug(),
             'periodicity'      => $this->faker->randomDigitNotZero(),
             'periodicity_type' => $this->faker->randomElement([
                 PeriodicityType::Year->name,

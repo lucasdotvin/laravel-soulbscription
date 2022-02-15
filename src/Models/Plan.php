@@ -17,7 +17,6 @@ class Plan extends Model
         'name',
         'periodicity_type',
         'periodicity',
-        'slug',
     ];
 
     public function features()
