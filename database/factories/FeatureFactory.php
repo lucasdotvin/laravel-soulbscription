@@ -20,7 +20,7 @@ class FeatureFactory extends Factory
         return [
             'consumable'       => $this->faker->boolean(),
             'name'             => $this->faker->words(asText: true),
-            'periodicity'      => $this->faker->randomDigitNotZero(),
+            'periodicity'      => $this->faker->randomDigitNotNull(),
             'periodicity_type' => $this->faker->randomElement([
                 PeriodicityType::Year,
                 PeriodicityType::Month,

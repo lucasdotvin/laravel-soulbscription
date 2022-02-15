@@ -301,7 +301,7 @@ class HasSubscriptionsTest extends TestCase
             ->for($subscriber, 'subscriber')
             ->createOne();
 
-        $renewalsCount = $this->faker->randomDigitNotZero();
+        $renewalsCount = $this->faker->randomDigitNotNull();
         $renewals = SubscriptionRenewal::factory()
             ->times($renewalsCount)
             ->for($subscription)

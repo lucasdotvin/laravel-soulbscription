@@ -18,7 +18,7 @@ class PlanTest extends TestCase
     {
         Carbon::setTestNow(now());
 
-        $years = $this->faker->randomDigitNotZero();
+        $years = $this->faker->randomDigitNotNull();
         $plan = Plan::factory()->create([
             'periodicity_type' => PeriodicityType::Year,
             'periodicity' => $years,
@@ -31,7 +31,7 @@ class PlanTest extends TestCase
     {
         Carbon::setTestNow(now());
 
-        $months = $this->faker->randomDigitNotZero();
+        $months = $this->faker->randomDigitNotNull();
         $plan = Plan::factory()->create([
             'periodicity_type' => PeriodicityType::Month,
             'periodicity' => $months,
@@ -44,7 +44,7 @@ class PlanTest extends TestCase
     {
         Carbon::setTestNow(now());
 
-        $weeks = $this->faker->randomDigitNotZero();
+        $weeks = $this->faker->randomDigitNotNull();
         $plan = Plan::factory()->create([
             'periodicity_type' => PeriodicityType::Week,
             'periodicity' => $weeks,
@@ -57,7 +57,7 @@ class PlanTest extends TestCase
     {
         Carbon::setTestNow(now());
 
-        $days = $this->faker->randomDigitNotZero();
+        $days = $this->faker->randomDigitNotNull();
         $plan = Plan::factory()->create([
             'periodicity_type' => PeriodicityType::Day,
             'periodicity' => $days,
