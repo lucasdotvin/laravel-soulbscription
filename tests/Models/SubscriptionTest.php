@@ -32,6 +32,26 @@ class SubscriptionTest extends TestCase
         ]);
     }
 
+    public function testModelCanCancel()
+    {
+        Carbon::setTestNow(now());
+
+        $plan = Plan::factory()->create();
+        $subscriber = User::factory()->create();
+        $subscription = Subscription::factory()
+            ->for($plan)
+            ->for($subscriber, 'subscriber')
+            ->notStarted()
+            ->create();
+
+        $subscription->cancel();
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $subscription->id,
+            'canceled_at' => now(),
+        ]);
+    }
+
     public function testModelCanStart()
     {
         Carbon::setTestNow(now());
