@@ -13,11 +13,6 @@ class Feature extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $casts = [
-        'consumable' => 'boolean',
-        'recharges_on_renewal' => 'boolean',
-    ];
-
     protected $fillable = [
         'consumable',
         'name',
