@@ -228,6 +228,38 @@ In the example above, the user will keep its monthly subscription until its expi
 
 Under the hood, this call will create a subscription with a start date equal to the current expiration, so it won't affect your application until there.
 
+#### Renewing
+
+To renew a subscription, simply call the `renew()` method:
+
+```php
+$subscriber->subscription->renew();
+```
+
+It will calculate a new expiration based on the current date.
+
+#### Canceling
+
+> There is a thing to keep in mind when canceling a subscription: it won't revoke the access immediately. To avoid making you need to handle refunds of any kind, we keep the subscription active and just mark it as canceled, so you just have to not renew it in the future. If you need to suspend a subscription immediately, give a look on the method `suspend()`.
+
+To cancel a subscription, use the method `cancel()`:
+
+```php
+$subscriber->subscription->cancel()->save();
+```
+
+This method will mark the subscription as canceled by filling the column `canceled_at` with the current timestamp.
+
+#### Suspending
+
+To suspend a subscription (and immediately revoke it), use the method `suspend()`:
+
+```php
+$subscriber->subscription->suspend()->save();
+```
+
+This method will mark the subscription as suppressed by filling the column `suppressed_at` with the current timestamp.
+
 ### Feature Consumption
 
 To register a consumption of a given feature, you just have to call the `consume` method and pass the feature name and the consumption amount (you don't need to provide it for not consumable features):
