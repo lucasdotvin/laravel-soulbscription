@@ -1,19 +1,9 @@
 <h1 align="center">Laravel Soulbscription</h1>
 
-<p align="center">
-    <a href="https://packagist.org/packages/lucasdotdev/laravel-soulbscription">
-        <img alt="Latest Version on Packagist" src="https://img.shields.io/packagist/v/lucasdotdev/laravel-soulbscription.svg?style=flat-square">
-    </a>
-    <a href="https://github.com/lucasdotdev/laravel-soulbscription/actions?query=workflow%3Arun-tests+branch%3Amain">
-        <img alt="GitHub Tests Action Status" src="https://img.shields.io/github/workflow/status/lucasdotdev/laravel-soulbscription/run-tests?label=tests">
-    </a>
-    <a href="https://github.com/lucasdotdev/laravel-soulbscription/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain">
-        <img alt="GitHub Code Style Action Status" src="https://img.shields.io/github/workflow/status/lucasdotdev/laravel-soulbscription/Check%20&%20fix%20styling?label=code%20style">
-    </a>
-    <a href="https://packagist.org/packages/lucasdotdev/laravel-soulbscription">
-        <img alt="Total Downloads" src="https://img.shields.io/packagist/dt/lucasdotdev/laravel-soulbscription.svg?style=flat-square">
-    </a>
-</p>
+<p align="center"><a href="https://packagist.org/packages/lucasdotdev/laravel-soulbscription"><img alt="Latest Version on Packagist" src="https://img.shields.io/packagist/v/lucasdotdev/laravel-soulbscription.svg?style=flat-square"></a>
+<a href="https://github.com/lucasdotdev/laravel-soulbscription/actions?query=workflow%3Arun-tests+branch%3Amain"><img alt="GitHub Tests Action Status" src="https://img.shields.io/github/workflow/status/lucasdotdev/laravel-soulbscription/run-tests?label=tests"></a>
+<a href="https://github.com/lucasdotdev/laravel-soulbscription/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain"><img alt="GitHub Code Style Action Status" src="https://img.shields.io/github/workflow/status/lucasdotdev/laravel-soulbscription/Check%20&%20fix%20styling?label=code%20style"></a>
+<a href="https://packagist.org/packages/lucasdotdev/laravel-soulbscription"><img alt="Total Downloads" src="https://img.shields.io/packagist/dt/lucasdotdev/laravel-soulbscription.svg?style=flat-square"></a></p>
 
 ## About
 
