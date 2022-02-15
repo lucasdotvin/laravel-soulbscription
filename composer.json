@@ -1,6 +1,6 @@
 {
     "name": "lucasdotdev/laravel-soulbscription",
-    "description": "This is my package laravel-soulbscription",
+    "description": "This package provides a straightforward interface to handle subscriptions and features consumption.",
     "keywords": [
         "lucasdotdev",
         "laravel",
