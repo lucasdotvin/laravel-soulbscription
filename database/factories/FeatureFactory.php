@@ -41,6 +41,8 @@ class FeatureFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'consumable' => false,
+            'periodicity' => null,
+            'periodicity_type' => null,
         ]);
     }
 }

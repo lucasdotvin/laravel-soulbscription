@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class () extends Migration {
+return new class() extends Migration {
     /**
      * Run the migrations.
      *
@@ -15,7 +15,7 @@ return new class () extends Migration {
         Schema::create('feature_consumptions', function (Blueprint $table) {
             $table->id();
             $table->unsignedDecimal('consumption')->nullable();
-            $table->timestamp('expires_at');
+            $table->timestamp('expires_at')->nullable();
             $table->foreignIdFor(\LucasDotDev\Soulbscription\Models\Feature::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
 
