@@ -85,8 +85,7 @@ class SubscriptionTest extends TestCase
             ->for($subscriber, 'subscriber')
             ->create();
 
-        $subscription->suppress()
-            ->save();
+        $subscription->suppress();
 
         $this->assertDatabaseHas('subscriptions', [
             'id' => $subscription->id,

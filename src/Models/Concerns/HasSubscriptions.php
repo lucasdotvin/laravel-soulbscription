@@ -25,12 +25,7 @@ trait HasSubscriptions
 
     public function subscription()
     {
-        return $this->morphOne(Subscription::class, 'subscriber')->ofMany(
-            [
-                'started_at' => 'max',
-            ],
-            fn (Builder $query) => $query->started(),
-        );
+        return $this->morphOne(Subscription::class, 'subscriber')->ofMany('started_at', 'MAX');
     }
 
     public function canConsume($featureName, ?float $consumption = null): bool
@@ -104,9 +99,9 @@ trait HasSubscriptions
                 ->make([
                     'expired_at' => $expiration,
                 ])
-                ->start($startDate)
                 ->plan()
-                ->associate($plan),
+                ->associate($plan)
+                ->start($startDate),
         )->save();
     }
 

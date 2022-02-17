@@ -7,17 +7,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use LucasDotDev\Soulbscription\Models\Concerns\Expires;
+use LucasDotDev\Soulbscription\Models\Concerns\Starts;
+use LucasDotDev\Soulbscription\Models\Concerns\Suppresses;
 
 class Subscription extends Model
 {
     use Expires;
     use HasFactory;
     use SoftDeletes;
+    use Starts;
+    use Suppresses;
 
     protected $dates = [
         'canceled_at',
-        'started_at',
-        'suppressed_at',
     ];
 
     protected $fillable = [
@@ -45,15 +47,15 @@ class Subscription extends Model
 
     public function scopeActive(Builder $query)
     {
-        return $query->started()->NotSuppressed();
+        return $query->withoutNotStarted();
     }
 
     public function scopeNotActive(Builder $query)
     {
         return $query->where(function (Builder $query) {
-            return $query->withExpired()
-                ->orWhere(fn (Builder $query) => $query->notStarted())
-                ->orWhere(fn (Builder $query) => $query->suppressed());
+            return $query->onlyExpired()
+                ->onlyNotStarted()
+                ->onlySuppressed();
         });
     }
 
@@ -65,26 +67,6 @@ class Subscription extends Model
     public function scopeNotCanceled(Builder $query)
     {
         return $query->whereNull('canceled_at');
-    }
-
-    public function scopeStarted(Builder $query)
-    {
-        return $query->where('started_at', '<', now());
-    }
-
-    public function scopeNotStarted(Builder $query)
-    {
-        return $query->where('started_at', '<', now());
-    }
-
-    public function scopeSuppressed(Builder $query)
-    {
-        return $query->where('suppressed_at', '<', now());
-    }
-
-    public function scopeNotSuppressed(Builder $query)
-    {
-        return $query->where('suppressed_at', '<', now());
     }
 
     public function markAsSwitched(): self
@@ -116,24 +98,6 @@ class Subscription extends Model
     {
         return $this->fill([
             'canceled_at' => now(),
-        ]);
-    }
-
-    public function start($startDate = null): self
-    {
-        if (empty($startDate)) {
-            $startDate = today();
-        }
-
-        return $this->fill([
-            'started_at' => $startDate,
-        ]);
-    }
-
-    public function suppress(): self
-    {
-        return $this->fill([
-            'suppressed_at' => now(),
         ]);
     }
 }
