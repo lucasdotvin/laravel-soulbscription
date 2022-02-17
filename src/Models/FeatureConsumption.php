@@ -16,7 +16,7 @@ class FeatureConsumption extends Model
 
     protected $fillable = [
         'consumption',
-        'expires_at',
+        'expired_at',
     ];
 
     public function feature()

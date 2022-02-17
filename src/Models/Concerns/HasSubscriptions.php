@@ -110,7 +110,7 @@ trait HasSubscriptions
         $this->featureConsumptions()
             ->make([
                 'consumption' => $consumption,
-                'expires_at' => $consumptionExpiration,
+                'expired_at' => $consumptionExpiration,
             ])
             ->feature()
             ->associate($feature)
@@ -124,7 +124,7 @@ trait HasSubscriptions
         return tap(
             $this->subscription()
                 ->make([
-                    'expires_at' => $expiration,
+                    'expired_at' => $expiration,
                 ])
                 ->start($startDate)
                 ->plan()

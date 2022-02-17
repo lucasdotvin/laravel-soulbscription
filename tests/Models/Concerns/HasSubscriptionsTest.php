@@ -32,7 +32,7 @@ class HasSubscriptionsTest extends TestCase
             'plan_id' => $plan->id,
             'subscriber_id' => $subscriber->id,
             'started_at' => today(),
-            'expires_at' => $plan->calculateNextRecurrenceEnd(),
+            'expired_at' => $plan->calculateNextRecurrenceEnd(),
         ]);
     }
 
@@ -53,7 +53,7 @@ class HasSubscriptionsTest extends TestCase
             'plan_id' => $newPlan->id,
             'subscriber_id' => $subscriber->id,
             'started_at' => today(),
-            'expires_at' => $newPlan->calculateNextRecurrenceEnd(),
+            'expired_at' => $newPlan->calculateNextRecurrenceEnd(),
         ]);
 
         $this->assertDatabaseHas('subscriptions', [
@@ -78,8 +78,8 @@ class HasSubscriptionsTest extends TestCase
         $this->assertDatabaseHas('subscriptions', [
             'id' => $newSubscription->id,
             'plan_id' => $newPlan->id,
-            'started_at' => $oldSubscription->expires_at,
-            'expires_at' => $newPlan->calculateNextRecurrenceEnd($oldSubscription->expires_at),
+            'started_at' => $oldSubscription->expired_at,
+            'expired_at' => $newPlan->calculateNextRecurrenceEnd($oldSubscription->expired_at),
         ]);
 
         $this->assertDatabaseHas('subscriptions', [
@@ -136,7 +136,7 @@ class HasSubscriptionsTest extends TestCase
             'consumption' => $consumption,
             'feature_id' => $feature->id,
             'subscriber_id' => $subscriber->id,
-            'expires_at' => $feature->calculateNextRecurrenceEnd($subscription->started_at),
+            'expired_at' => $feature->calculateNextRecurrenceEnd($subscription->started_at),
         ]);
     }
 
@@ -286,7 +286,7 @@ class HasSubscriptionsTest extends TestCase
             ->for($subscriber, 'subscriber')
             ->createOne([
                 'consumption' => now()->subDay(),
-                'expires_at' => $this->faker->dateTime(),
+                'expired_at' => $this->faker->dateTime(),
             ]);
 
         $modelCanUse = $subscriber->canConsume($feature->name, $consumption);

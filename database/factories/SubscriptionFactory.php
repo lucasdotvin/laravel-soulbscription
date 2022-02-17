@@ -22,7 +22,7 @@ class SubscriptionFactory extends Factory
             'canceled_at'   => null,
             'started_at'    => $this->faker->dateTime(),
             'suppressed_at' => null,
-            'expires_at'    => $this->faker->dateTime(),
+            'expired_at'    => $this->faker->dateTime(),
             'was_switched'  => false,
         ];
     }
@@ -34,7 +34,7 @@ class SubscriptionFactory extends Factory
         ]);
     }
 
-    public function uncanceled()
+    public function NotCanceled()
     {
         return $this->state(fn (array $attributes) => [
             'canceled_at' => null,
@@ -44,7 +44,7 @@ class SubscriptionFactory extends Factory
     public function expired()
     {
         return $this->state(fn (array $attributes) => [
-            'expires_at' => $this->faker->dateTime(),
+            'expired_at' => $this->faker->dateTime(),
         ]);
     }
 
@@ -69,7 +69,7 @@ class SubscriptionFactory extends Factory
         ]);
     }
 
-    public function unsuppressed()
+    public function NotSuppressed()
     {
         return $this->state(fn (array $attributes) => [
             'suppressed_at' => null,

@@ -21,7 +21,7 @@ class Subscription extends Model
 
     protected $fillable = [
         'canceled_at',
-        'expires_at',
+        'expired_at',
         'started_at',
         'suppressed_at',
         'was_switched',
@@ -105,7 +105,7 @@ class Subscription extends Model
 
     public function renew(): self
     {
-        $overdue = $this->expires_at->isPast();
+        $overdue = $this->expired_at->isPast();
 
         $this->renewals()->create([
             'renewal' => true,
@@ -115,7 +115,7 @@ class Subscription extends Model
         $expiration = $this->plan->calculateNextRecurrenceEnd();
 
         $this->update([
-            'expires_at' => $expiration,
+            'expired_at' => $expiration,
         ]);
 
         return $this;
