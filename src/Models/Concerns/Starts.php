@@ -21,15 +21,9 @@ trait Starts
 
     public function start(?Carbon $startDate = null)
     {
-        $this->fill([
+        return $this->fill([
             'started_at' => $startDate ?: today(),
         ]);
-
-        if ($this->exists()) {
-            $this->save();
-        }
-
-        return $this;
     }
 
     public function started()

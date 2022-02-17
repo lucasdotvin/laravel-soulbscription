@@ -96,12 +96,10 @@ trait HasSubscriptions
 
         return tap(
             $this->subscription()
-                ->make([
-                    'expired_at' => $expiration,
-                ])
+                ->make(['expired_at' => $expiration])
+                ->start($startDate)
                 ->plan()
                 ->associate($plan)
-                ->start($startDate),
         )->save();
     }
 
