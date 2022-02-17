@@ -9,7 +9,7 @@ trait Suppresses
 {
     public static function bootSuppresses()
     {
-        static::addGlobalScope(new SuppressingScope);
+        static::addGlobalScope(new SuppressingScope());
     }
 
     public function initializeSuppresses()

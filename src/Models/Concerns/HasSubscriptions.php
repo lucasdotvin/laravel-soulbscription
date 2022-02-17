@@ -2,7 +2,6 @@
 
 namespace LucasDotDev\Soulbscription\Models\Concerns;
 
-use Illuminate\Database\Eloquent\Builder;
 use LucasDotDev\Soulbscription\Models\Feature;
 use LucasDotDev\Soulbscription\Models\FeatureConsumption;
 use LucasDotDev\Soulbscription\Models\Plan;
