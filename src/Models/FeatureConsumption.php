@@ -5,14 +5,12 @@ namespace LucasDotDev\Soulbscription\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use LucasDotDev\Soulbscription\Models\Concerns\Expires;
 
 class FeatureConsumption extends Model
 {
+    use Expires;
     use HasFactory;
-
-    protected $dates = [
-        'expires_at',
-    ];
 
     protected $fillable = [
         'consumption',
@@ -27,15 +25,5 @@ class FeatureConsumption extends Model
     public function subscriber()
     {
         return $this->morphTo('subscriber');
-    }
-
-    public function scopeExpired(Builder $query)
-    {
-        return $query->where('expires_at', '<', now());
-    }
-
-    public function scopeUnexpired(Builder $query)
-    {
-        return $query->where('expires_at', '>', now());
     }
 }

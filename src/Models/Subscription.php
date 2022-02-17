@@ -6,15 +6,16 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use LucasDotDev\Soulbscription\Models\Concerns\Expires;
 
 class Subscription extends Model
 {
+    use Expires;
     use HasFactory;
     use SoftDeletes;
 
     protected $dates = [
         'canceled_at',
-        'expires_at',
         'started_at',
         'suppressed_at',
     ];
@@ -44,13 +45,13 @@ class Subscription extends Model
 
     public function scopeActive(Builder $query)
     {
-        return $query->unexpired()->started()->unsuppressed();
+        return $query->started()->NotSuppressed();
     }
 
-    public function scopeInactive(Builder $query)
+    public function scopeNotActive(Builder $query)
     {
         return $query->where(function (Builder $query) {
-            return $query->expired()
+            return $query->withExpired()
                 ->orWhere(fn (Builder $query) => $query->notStarted())
                 ->orWhere(fn (Builder $query) => $query->suppressed());
         });
@@ -61,19 +62,9 @@ class Subscription extends Model
         return $query->whereNotNull('canceled_at');
     }
 
-    public function scopeUncanceled(Builder $query)
+    public function scopeNotCanceled(Builder $query)
     {
         return $query->whereNull('canceled_at');
-    }
-
-    public function scopeExpired(Builder $query)
-    {
-        return $query->where('expires_at', '<', now());
-    }
-
-    public function scopeUnexpired(Builder $query)
-    {
-        return $query->where('expires_at', '>', now());
     }
 
     public function scopeStarted(Builder $query)
@@ -91,7 +82,7 @@ class Subscription extends Model
         return $query->where('suppressed_at', '<', now());
     }
 
-    public function scopeUnsuppressed(Builder $query)
+    public function scopeNotSuppressed(Builder $query)
     {
         return $query->where('suppressed_at', '<', now());
     }
