@@ -6,22 +6,25 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use LucasDotDev\Soulbscription\Models\Concerns\Expires;
+use LucasDotDev\Soulbscription\Models\Concerns\Starts;
+use LucasDotDev\Soulbscription\Models\Concerns\Suppresses;
 
 class Subscription extends Model
 {
+    use Expires;
     use HasFactory;
     use SoftDeletes;
+    use Starts;
+    use Suppresses;
 
     protected $dates = [
         'canceled_at',
-        'expires_at',
-        'started_at',
-        'suppressed_at',
     ];
 
     protected $fillable = [
         'canceled_at',
-        'expires_at',
+        'expired_at',
         'started_at',
         'suppressed_at',
         'was_switched',
@@ -44,15 +47,15 @@ class Subscription extends Model
 
     public function scopeActive(Builder $query)
     {
-        return $query->unexpired()->started()->unsuppressed();
+        return $query->withoutNotStarted();
     }
 
-    public function scopeInactive(Builder $query)
+    public function scopeNotActive(Builder $query)
     {
         return $query->where(function (Builder $query) {
-            return $query->expired()
-                ->orWhere(fn (Builder $query) => $query->notStarted())
-                ->orWhere(fn (Builder $query) => $query->suppressed());
+            return $query->onlyExpired()
+                ->onlyNotStarted()
+                ->onlySuppressed();
         });
     }
 
@@ -61,39 +64,9 @@ class Subscription extends Model
         return $query->whereNotNull('canceled_at');
     }
 
-    public function scopeUncanceled(Builder $query)
+    public function scopeNotCanceled(Builder $query)
     {
         return $query->whereNull('canceled_at');
-    }
-
-    public function scopeExpired(Builder $query)
-    {
-        return $query->where('expires_at', '<', now());
-    }
-
-    public function scopeUnexpired(Builder $query)
-    {
-        return $query->where('expires_at', '>', now());
-    }
-
-    public function scopeStarted(Builder $query)
-    {
-        return $query->where('started_at', '<', now());
-    }
-
-    public function scopeNotStarted(Builder $query)
-    {
-        return $query->where('started_at', '<', now());
-    }
-
-    public function scopeSuppressed(Builder $query)
-    {
-        return $query->where('suppressed_at', '<', now());
-    }
-
-    public function scopeUnsuppressed(Builder $query)
-    {
-        return $query->where('suppressed_at', '<', now());
     }
 
     public function markAsSwitched(): self
@@ -105,7 +78,7 @@ class Subscription extends Model
 
     public function renew(): self
     {
-        $overdue = $this->expires_at->isPast();
+        $overdue = $this->expired_at->isPast();
 
         $this->renewals()->create([
             'renewal' => true,
@@ -115,7 +88,7 @@ class Subscription extends Model
         $expiration = $this->plan->calculateNextRecurrenceEnd();
 
         $this->update([
-            'expires_at' => $expiration,
+            'expired_at' => $expiration,
         ]);
 
         return $this;
@@ -125,24 +98,6 @@ class Subscription extends Model
     {
         return $this->fill([
             'canceled_at' => now(),
-        ]);
-    }
-
-    public function start($startDate = null): self
-    {
-        if (empty($startDate)) {
-            $startDate = today();
-        }
-
-        return $this->fill([
-            'started_at' => $startDate,
-        ]);
-    }
-
-    public function suppress(): self
-    {
-        return $this->fill([
-            'suppressed_at' => now(),
         ]);
     }
 }

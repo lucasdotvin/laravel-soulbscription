@@ -28,7 +28,7 @@ class SubscriptionTest extends TestCase
             'plan_id' => $plan->id,
             'subscriber_id' => $subscriber->id,
             'subscriber_type' => User::class,
-            'expires_at' => $plan->calculateNextRecurrenceEnd(),
+            'expired_at' => $plan->calculateNextRecurrenceEnd(),
         ]);
     }
 
@@ -134,7 +134,7 @@ class SubscriptionTest extends TestCase
         $subscription = Subscription::factory()
             ->for($subscriber, 'subscriber')
             ->create([
-                'expires_at' => now()->subDay(),
+                'expired_at' => now()->subDay(),
             ]);
 
         $subscription->renew();

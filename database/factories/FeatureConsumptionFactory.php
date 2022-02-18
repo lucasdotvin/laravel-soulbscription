@@ -20,7 +20,7 @@ class FeatureConsumptionFactory extends Factory
         return [
             'feature_id'  => Feature::factory(),
             'consumption' => $this->faker->randomFloat(),
-            'expires_at'  => $this->faker->dateTime(),
+            'expired_at'  => $this->faker->dateTime(),
         ];
     }
 }

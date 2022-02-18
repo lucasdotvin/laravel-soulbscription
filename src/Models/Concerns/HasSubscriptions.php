@@ -2,7 +2,6 @@
 
 namespace LucasDotDev\Soulbscription\Models\Concerns;
 
-use Illuminate\Database\Eloquent\Builder;
 use LucasDotDev\Soulbscription\Models\Feature;
 use LucasDotDev\Soulbscription\Models\FeatureConsumption;
 use LucasDotDev\Soulbscription\Models\Plan;
@@ -13,29 +12,9 @@ use OverflowException;
 
 trait HasSubscriptions
 {
-    public function activePlans()
-    {
-        return $this->plans()
-            ->wherePivot('expires_at', '>', now());
-    }
-
     public function featureConsumptions()
     {
         return $this->morphMany(FeatureConsumption::class, 'subscriber');
-    }
-
-    public function plans()
-    {
-        return $this->belongsToMany(Plan::class, 'subscriptions', 'subscriber_id')
-            ->as('subscription')
-            ->withPivot([
-                'canceled_at',
-                'expires_at',
-                'started_at',
-                'suppressed_at',
-                'was_switched',
-            ])
-            ->withTimestamps();
     }
 
     public function renewals()
@@ -45,12 +24,7 @@ trait HasSubscriptions
 
     public function subscription()
     {
-        return $this->morphOne(Subscription::class, 'subscriber')->ofMany(
-            [
-                'started_at' => 'max',
-            ],
-            fn (Builder $query) => $query->started(),
-        );
+        return $this->morphOne(Subscription::class, 'subscriber')->ofMany('started_at', 'MAX');
     }
 
     public function canConsume($featureName, ?float $consumption = null): bool
@@ -65,7 +39,6 @@ trait HasSubscriptions
 
         $currentConsumption = $this->featureConsumptions()
             ->whereBelongsTo($feature)
-            ->unexpired()
             ->sum('consumption');
 
         return ($currentConsumption + $consumption) <= $feature->pivot->charges;
@@ -100,17 +73,16 @@ trait HasSubscriptions
             'The feature has no enough charges to this consumption.',
         ));
 
-        $consumedPlan = $this->activePlans->first(fn (Plan $plan) => $plan->features->firstWhere('name', $featureName));
-        $feature = $consumedPlan->features->firstWhere('name', $featureName);
+        $feature = $this->subscription->plan->features->firstWhere('name', $featureName);
 
         $consumptionExpiration = $feature->consumable
-            ? $feature->calculateNextRecurrenceEnd($consumedPlan->subscription->started_at)
+            ? $feature->calculateNextRecurrenceEnd($this->subscription->started_at)
             : null;
 
         $this->featureConsumptions()
             ->make([
                 'consumption' => $consumption,
-                'expires_at' => $consumptionExpiration,
+                'expired_at' => $consumptionExpiration,
             ])
             ->feature()
             ->associate($feature)
@@ -123,12 +95,10 @@ trait HasSubscriptions
 
         return tap(
             $this->subscription()
-                ->make([
-                    'expires_at' => $expiration,
-                ])
+                ->make(['expired_at' => $expiration])
                 ->start($startDate)
                 ->plan()
-                ->associate($plan),
+                ->associate($plan)
         )->save();
     }
 
@@ -147,17 +117,20 @@ trait HasSubscriptions
             ->markAsSwitched()
             ->save();
 
-        $startDate = $this->subscription->expires_at;
+        $startDate = $this->subscription->expired_at;
 
         return $this->subscribeTo($plan, startDate: $startDate);
     }
 
     private function getAvailableFeature(string $featureName): ?Feature
     {
-        $this->loadMissing('activePlans.features');
+        $this->loadMissing('subscription.plan.features');
 
-        $availableFeatures = $this->activePlans->flatMap(fn (Plan $plan) => $plan->features);
-        $feature = $availableFeatures->firstWhere('name', $featureName);
+        if (empty($this->subscription)) {
+            return null;
+        }
+
+        $feature = $this->subscription->plan->features->firstWhere('name', $featureName);
 
         return $feature;
     }
