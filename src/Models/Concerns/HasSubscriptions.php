@@ -2,6 +2,8 @@
 
 namespace LucasDotDev\Soulbscription\Models\Concerns;
 
+use LucasDotDev\Soulbscription\Events\FeatureConsumed;
+use LucasDotDev\Soulbscription\Events\SubscriptionScheduled;
 use LucasDotDev\Soulbscription\Models\Feature;
 use LucasDotDev\Soulbscription\Models\FeatureConsumption;
 use LucasDotDev\Soulbscription\Models\Plan;
@@ -79,27 +81,28 @@ trait HasSubscriptions
             ? $feature->calculateNextRecurrenceEnd($this->subscription->started_at)
             : null;
 
-        $this->featureConsumptions()
+        $featureConsumption = $this->featureConsumptions()
             ->make([
                 'consumption' => $consumption,
                 'expired_at' => $consumptionExpiration,
             ])
             ->feature()
-            ->associate($feature)
-            ->save();
+            ->associate($feature);
+
+        $featureConsumption->save();
+
+        event(new FeatureConsumed($this, $feature, $featureConsumption));
     }
 
     public function subscribeTo(Plan $plan, $expiration = null, $startDate = null): Subscription
     {
         $expiration = $expiration ?? $plan->calculateNextRecurrenceEnd($startDate);
 
-        return tap(
-            $this->subscription()
-                ->make(['expired_at' => $expiration])
-                ->start($startDate)
-                ->plan()
-                ->associate($plan)
-        )->save();
+        return $this->subscription()
+            ->make(['expired_at' => $expiration])
+            ->plan()
+            ->associate($plan)
+            ->start($startDate);
     }
 
     public function switchTo(Plan $plan, $expiration = null, $immediately = true): Subscription
@@ -118,8 +121,11 @@ trait HasSubscriptions
             ->save();
 
         $startDate = $this->subscription->expired_at;
+        $newSubscription = $this->subscribeTo($plan, startDate: $startDate);
 
-        return $this->subscribeTo($plan, startDate: $startDate);
+        event(new SubscriptionScheduled($newSubscription));
+
+        return $newSubscription;
     }
 
     private function getAvailableFeature(string $featureName): ?Feature

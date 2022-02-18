@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
+use LucasDotDev\Soulbscription\Events\SubscriptionCanceled;
+use LucasDotDev\Soulbscription\Events\SubscriptionRenewed;
+use LucasDotDev\Soulbscription\Events\SubscriptionStarted;
+use LucasDotDev\Soulbscription\Events\SubscriptionSuppressed;
 use LucasDotDev\Soulbscription\Models\Concerns\Expires;
 use LucasDotDev\Soulbscription\Models\Concerns\Starts;
 use LucasDotDev\Soulbscription\Models\Concerns\Suppresses;
@@ -29,6 +34,13 @@ class Subscription extends Model
         'suppressed_at',
         'was_switched',
     ];
+
+    protected static function booted()
+    {
+        static::registerModelEvent('suppressed', function (Subscription $subscription) {
+            event(new SubscriptionSuppressed($subscription));
+        });
+    }
 
     public function plan()
     {
@@ -76,28 +88,43 @@ class Subscription extends Model
         ]);
     }
 
+    public function start(?Carbon $startDate = null): self
+    {
+        $startDate = $startDate ?: today();
+
+        $this->fill(['started_at' => $startDate])
+            ->save();
+
+        if ($startDate->isToday()) {
+            event(new SubscriptionStarted($this));
+        }
+
+        return $this;
+    }
+
     public function renew(): self
     {
-        $overdue = $this->expired_at->isPast();
-
         $this->renewals()->create([
             'renewal' => true,
-            'overdue' => $overdue,
+            'overdue' => $this->expired_at->isPast(),
         ]);
-
-        $expiration = $this->plan->calculateNextRecurrenceEnd();
 
         $this->update([
-            'expired_at' => $expiration,
+            'expired_at' => $this->plan->calculateNextRecurrenceEnd(),
         ]);
+
+        event(new SubscriptionRenewed($this));
 
         return $this;
     }
 
     public function cancel(): self
     {
-        return $this->fill([
-            'canceled_at' => now(),
-        ]);
+        $this->fill(['canceled_at' => now()])
+            ->save();
+
+        event(new SubscriptionCanceled($this));
+
+        return $this;
     }
 }

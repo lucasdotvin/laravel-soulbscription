@@ -2,7 +2,6 @@
 
 namespace LucasDotDev\Soulbscription\Models\Concerns;
 
-use Illuminate\Support\Carbon;
 use LucasDotDev\Soulbscription\Models\Scopes\StartingScope;
 
 trait Starts
@@ -17,13 +16,6 @@ trait Starts
         if (! isset($this->casts['started_at'])) {
             $this->casts['started_at'] = 'datetime';
         }
-    }
-
-    public function start(?Carbon $startDate = null)
-    {
-        return $this->fill([
-            'started_at' => $startDate ?: today(),
-        ]);
     }
 
     public function started()
