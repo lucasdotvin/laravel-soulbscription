@@ -5,6 +5,10 @@ namespace LucasDotDev\Soulbscription\Tests\Feature\Models\Concerns;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
+use LucasDotDev\Soulbscription\Events\FeatureConsumed;
+use LucasDotDev\Soulbscription\Events\SubscriptionScheduled;
+use LucasDotDev\Soulbscription\Events\SubscriptionStarted;
+use LucasDotDev\Soulbscription\Events\SubscriptionSuppressed;
 use LucasDotDev\Soulbscription\Models\Feature;
 use LucasDotDev\Soulbscription\Models\FeatureConsumption;
 use LucasDotDev\Soulbscription\Models\Plan;
@@ -23,8 +27,10 @@ class HasSubscriptionsTest extends TestCase
     public function testModelCanSubscribeToAPlan()
     {
         $plan = Plan::factory()->createOne();
-
         $subscriber = User::factory()->createOne();
+
+        $this->expectsEvents(SubscriptionStarted::class);
+
         $subscription = $subscriber->subscribeTo($plan);
 
         $this->assertDatabaseHas('subscriptions', [
@@ -45,6 +51,8 @@ class HasSubscriptionsTest extends TestCase
 
         $subscriber = User::factory()->createOne();
         $oldSubscription = $subscriber->subscribeTo($oldPlan);
+
+        $this->expectsEvents([SubscriptionStarted::class, SubscriptionSuppressed::class]);
 
         $newSubscription = $subscriber->switchTo($newPlan);
 
@@ -72,6 +80,9 @@ class HasSubscriptionsTest extends TestCase
 
         $subscriber = User::factory()->createOne();
         $oldSubscription = $subscriber->subscribeTo($oldPlan);
+
+        $this->expectsEvents(SubscriptionScheduled::class);
+        $this->doesntExpectEvents(SubscriptionStarted::class);
 
         $newSubscription = $subscriber->switchTo($newPlan, immediately: false);
 
@@ -129,6 +140,8 @@ class HasSubscriptionsTest extends TestCase
 
         $subscriber = User::factory()->createOne();
         $subscription = $subscriber->subscribeTo($plan);
+
+        $this->expectsEvents(FeatureConsumed::class);
 
         $subscriber->consume($feature->name, $consumption);
 
