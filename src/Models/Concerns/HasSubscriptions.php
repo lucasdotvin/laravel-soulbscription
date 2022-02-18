@@ -3,7 +3,6 @@
 namespace LucasDotDev\Soulbscription\Models\Concerns;
 
 use LucasDotDev\Soulbscription\Events\FeatureConsumed;
-use LucasDotDev\Soulbscription\Events\SubscriptionScheduled;
 use LucasDotDev\Soulbscription\Models\Feature;
 use LucasDotDev\Soulbscription\Models\FeatureConsumption;
 use LucasDotDev\Soulbscription\Models\Plan;
