@@ -210,7 +210,9 @@ Users change their mind all the time and you have to deal with it. If you need t
 $student->switchTo($newPlan);
 ```
 
-If you don't pass any arguments, the method will suspend the current subscription and start a new one immediately.
+If you don't pass any arguments, the method will suppress the current subscription and start a new one immediately.
+
+> This call will fire a `SubscriptionStarted(Subscription $subscription)` event.
 
 #### Scheduling a Switch
 
@@ -230,6 +232,8 @@ In the example above, the user will keep its monthly subscription until its expi
 
 Under the hood, this call will create a subscription with a start date equal to the current expiration, so it won't affect your application until there.
 
+> This call will fire a `SubscriptionScheduled(Subscription $subscription)` event.
+
 #### Renewing
 
 To renew a subscription, simply call the `renew()` method:
@@ -238,11 +242,13 @@ To renew a subscription, simply call the `renew()` method:
 $subscriber->subscription->renew();
 ```
 
+> This method will fire a `SubscriptionRenewed(Subscription $subscription)` event.
+
 It will calculate a new expiration based on the current date.
 
 #### Canceling
 
-> There is a thing to keep in mind when canceling a subscription: it won't revoke the access immediately. To avoid making you need to handle refunds of any kind, we keep the subscription active and just mark it as canceled, so you just have to not renew it in the future. If you need to suspend a subscription immediately, give a look on the method `suspend()`.
+> There is a thing to keep in mind when canceling a subscription: it won't revoke the access immediately. To avoid making you need to handle refunds of any kind, we keep the subscription active and just mark it as canceled, so you just have to not renew it in the future. If you need to suppress a subscription immediately, give a look on the method `suppress()`.
 
 To cancel a subscription, use the method `cancel()`:
 
@@ -252,15 +258,19 @@ $subscriber->subscription->cancel();
 
 This method will mark the subscription as canceled by filling the column `canceled_at` with the current timestamp.
 
-#### Suspending
+> This method will fire a `SubscriptionCanceled(Subscription $subscription)` event.
 
-To suspend a subscription (and immediately revoke it), use the method `suspend()`:
+#### Suppressing
+
+To suppress a subscription (and immediately revoke it), use the method `suppress()`:
 
 ```php
-$subscriber->subscription->suspend();
+$subscriber->subscription->suppress();
 ```
 
 This method will mark the subscription as suppressed by filling the column `suppressed_at` with the current timestamp.
+
+> This method will fire a `SubscriptionSuppressed(Subscription $subscription)` event.
 
 #### Starting
 
@@ -270,6 +280,8 @@ To start a subscription, use the method `start()`:
 $subscriber->subscription->start(); // To start it immediately
 $subscriber->subscription->start($startDate); // To determine when to start
 ```
+
+> This method will fire a `SubscriptionStarted(Subscription $subscription)` event when no argument is passed, and fire a `SubscriptionStarted(Subscription $subscription)` event when the provided start date is future.
 
 This method will mark the subscription as started (or scheduled to start) by filling the column `started_at`.
 
@@ -282,6 +294,8 @@ $subscriber->consume('deploy-minutes', 4.5);
 ```
 
 The method will check if the feature is available and throws exceptions if they are not: `OutOfBoundsException` if the feature is not available to the plan, and `OverflowException` if it is available, but the charges are not enough to cover the consumption.
+
+> This call will fire a `FeatureConsumed($subscriber, Feature $feature, FeatureConsumption $featureConsumption)` event.
 
 #### Check Availability
 
