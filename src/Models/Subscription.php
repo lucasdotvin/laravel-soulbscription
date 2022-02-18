@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use LucasDotDev\Soulbscription\Events\SubscriptionCanceled;
 use LucasDotDev\Soulbscription\Events\SubscriptionRenewed;
+use LucasDotDev\Soulbscription\Events\SubscriptionScheduled;
 use LucasDotDev\Soulbscription\Events\SubscriptionStarted;
 use LucasDotDev\Soulbscription\Events\SubscriptionSuppressed;
 use LucasDotDev\Soulbscription\Models\Concerns\Expires;
@@ -97,6 +98,8 @@ class Subscription extends Model
 
         if ($startDate->isToday()) {
             event(new SubscriptionStarted($this));
+        } elseif ($startDate->isFuture()) {
+            event(new SubscriptionScheduled($this));
         }
 
         return $this;

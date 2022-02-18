@@ -123,8 +123,6 @@ trait HasSubscriptions
         $startDate = $this->subscription->expired_at;
         $newSubscription = $this->subscribeTo($plan, startDate: $startDate);
 
-        event(new SubscriptionScheduled($newSubscription));
-
         return $newSubscription;
     }
 
