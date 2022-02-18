@@ -247,7 +247,7 @@ It will calculate a new expiration based on the current date.
 To cancel a subscription, use the method `cancel()`:
 
 ```php
-$subscriber->subscription->cancel()->save();
+$subscriber->subscription->cancel();
 ```
 
 This method will mark the subscription as canceled by filling the column `canceled_at` with the current timestamp.
@@ -257,10 +257,21 @@ This method will mark the subscription as canceled by filling the column `cancel
 To suspend a subscription (and immediately revoke it), use the method `suspend()`:
 
 ```php
-$subscriber->subscription->suspend()->save();
+$subscriber->subscription->suspend();
 ```
 
 This method will mark the subscription as suppressed by filling the column `suppressed_at` with the current timestamp.
+
+#### Starting
+
+To start a subscription, use the method `start()`:
+
+```php
+$subscriber->subscription->start(); // To start it immediately
+$subscriber->subscription->start($startDate); // To determine when to start
+```
+
+This method will mark the subscription as started (or scheduled to start) by filling the column `started_at`.
 
 ### Feature Consumption
 
