@@ -4,6 +4,10 @@ namespace LucasDotDev\Soulbscription\Tests\Feature\Models;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use LucasDotDev\Soulbscription\Events\SubscriptionCanceled;
+use LucasDotDev\Soulbscription\Events\SubscriptionRenewed;
+use LucasDotDev\Soulbscription\Events\SubscriptionStarted;
+use LucasDotDev\Soulbscription\Events\SubscriptionSuppressed;
 use LucasDotDev\Soulbscription\Models\Plan;
 use LucasDotDev\Soulbscription\Models\Subscription;
 use LucasDotDev\Soulbscription\Tests\Mocks\Models\User;
@@ -21,6 +25,8 @@ class SubscriptionTest extends TestCase
             ->for($plan)
             ->for($subscriber, 'subscriber')
             ->create();
+
+        $this->expectsEvents(SubscriptionRenewed::class);
 
         $subscription->renew();
 
@@ -44,8 +50,9 @@ class SubscriptionTest extends TestCase
             ->notStarted()
             ->create();
 
-        $subscription->cancel()
-            ->save();
+        $this->expectsEvents(SubscriptionCanceled::class);
+
+        $subscription->cancel();
 
         $this->assertDatabaseHas('subscriptions', [
             'id' => $subscription->id,
@@ -65,8 +72,9 @@ class SubscriptionTest extends TestCase
             ->notStarted()
             ->create();
 
-        $subscription->start()
-            ->save();
+        $this->expectsEvents(SubscriptionStarted::class);
+
+        $subscription->start();
 
         $this->assertDatabaseHas('subscriptions', [
             'id' => $subscription->id,
@@ -85,8 +93,9 @@ class SubscriptionTest extends TestCase
             ->for($subscriber, 'subscriber')
             ->create();
 
-        $subscription->suppress()
-            ->save();
+        $this->expectsEvents(SubscriptionSuppressed::class);
+
+        $subscription->suppress();
 
         $this->assertDatabaseHas('subscriptions', [
             'id' => $subscription->id,

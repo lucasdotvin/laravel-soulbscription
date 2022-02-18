@@ -21,9 +21,12 @@ trait Suppresses
 
     public function suppress(?Carbon $suppressation = null)
     {
-        return $this->fill([
-            'suppressed_at' => $suppressation ?: now(),
-        ]);
+        $this->fill(['suppressed_at' => $suppressation ?: now()])
+            ->save();
+
+        $this->fireModelEvent('suppressed');
+
+        return $this;
     }
 
     public function suppressed()
