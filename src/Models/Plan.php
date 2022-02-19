@@ -21,13 +21,13 @@ class Plan extends Model
 
     public function features()
     {
-        return $this->belongsToMany(Feature::class)
-            ->using(FeaturePlan::class)
+        return $this->belongsToMany(config('soulbscription.models.feature'))
+            ->using(config('soulbscription.models.feature_plan'))
             ->withPivot(['charges']);
     }
 
     public function subscriptions()
     {
-        return $this->hasMany(Subscription::class);
+        return $this->hasMany(config('soulbscription.models.subscription'));
     }
 }

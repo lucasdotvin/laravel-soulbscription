@@ -18,7 +18,7 @@ class FeatureConsumption extends Model
 
     public function feature()
     {
-        return $this->belongsTo(Feature::class);
+        return $this->belongsTo(config('soulbscription.models.feature'));
     }
 
     public function subscriber()

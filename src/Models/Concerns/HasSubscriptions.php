@@ -15,17 +15,17 @@ trait HasSubscriptions
 {
     public function featureConsumptions()
     {
-        return $this->morphMany(FeatureConsumption::class, 'subscriber');
+        return $this->morphMany(config('soulbscription.models.feature_consumption'), 'subscriber');
     }
 
     public function renewals()
     {
-        return $this->hasManyThrough(SubscriptionRenewal::class, Subscription::class, 'subscriber_id');
+        return $this->hasManyThrough(config('soulbscription.models.subscription_renewal'), config('soulbscription.models.subscription'), 'subscriber_id');
     }
 
     public function subscription()
     {
-        return $this->morphOne(Subscription::class, 'subscriber')->ofMany('started_at', 'MAX');
+        return $this->morphOne(config('soulbscription.models.subscription'), 'subscriber')->ofMany('started_at', 'MAX');
     }
 
     public function canConsume($featureName, ?float $consumption = null): bool

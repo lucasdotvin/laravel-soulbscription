@@ -21,6 +21,6 @@ class SubscriptionRenewal extends Model
 
     public function subscription()
     {
-        return $this->belongsTo(Subscription::class);
+        return $this->belongsTo(config('soulbscription.models.subscription'));
     }
 }
