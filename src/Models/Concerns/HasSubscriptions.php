@@ -4,10 +4,8 @@ namespace LucasDotDev\Soulbscription\Models\Concerns;
 
 use LucasDotDev\Soulbscription\Events\FeatureConsumed;
 use LucasDotDev\Soulbscription\Models\Feature;
-use LucasDotDev\Soulbscription\Models\FeatureConsumption;
 use LucasDotDev\Soulbscription\Models\Plan;
 use LucasDotDev\Soulbscription\Models\Subscription;
-use LucasDotDev\Soulbscription\Models\SubscriptionRenewal;
 use OutOfBoundsException;
 use OverflowException;
 
