@@ -2,6 +2,7 @@
 
 namespace LucasDotDev\Soulbscription\Models\Concerns;
 
+use Illuminate\Database\Eloquent\Collection;
 use LucasDotDev\Soulbscription\Events\FeatureConsumed;
 use LucasDotDev\Soulbscription\Models\Feature;
 use LucasDotDev\Soulbscription\Models\Plan;
@@ -11,6 +12,8 @@ use OverflowException;
 
 trait HasSubscriptions
 {
+    public ?Collection $features = null;
+
     public function featureConsumptions()
     {
         return $this->morphMany(config('soulbscription.models.feature_consumption'), 'subscriber');
@@ -28,7 +31,7 @@ trait HasSubscriptions
 
     public function canConsume($featureName, ?float $consumption = null): bool
     {
-        if (empty($feature = $this->getAvailableFeature($featureName))) {
+        if (empty($feature = $this->getFeature($featureName))) {
             return false;
         }
 
@@ -55,7 +58,7 @@ trait HasSubscriptions
 
     public function missingFeature($featureName): bool
     {
-        return empty($this->getAvailableFeature($featureName));
+        return empty($this->getFeature($featureName));
     }
 
     /**
@@ -72,7 +75,7 @@ trait HasSubscriptions
             'The feature has no enough charges to this consumption.',
         ));
 
-        $feature = $this->subscription->plan->features->firstWhere('name', $featureName);
+        $feature = $this->getFeature($featureName);
 
         $consumptionExpiration = $feature->consumable
             ? $feature->calculateNextRecurrenceEnd($this->subscription->started_at)
@@ -123,16 +126,26 @@ trait HasSubscriptions
         return $newSubscription;
     }
 
-    private function getAvailableFeature(string $featureName): ?Feature
+    public function getFeature(string $featureName): ?Feature
+    {
+        $feature = $this->getFeatures()->firstWhere('name', $featureName);
+
+        return $feature;
+    }
+
+    public function getFeatures(): Collection
+    {
+        if (!$this->features) {
+            $this->loadFeatures();
+        }
+
+        return $this->features;
+    }
+
+    private function loadFeatures()
     {
         $this->loadMissing('subscription.plan.features');
 
-        if (empty($this->subscription)) {
-            return null;
-        }
-
-        $feature = $this->subscription->plan->features->firstWhere('name', $featureName);
-
-        return $feature;
+        $this->features = $this->subscription->plan->features ?? Collection::empty();
     }
 }
