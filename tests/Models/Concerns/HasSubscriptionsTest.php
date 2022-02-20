@@ -342,10 +342,10 @@ class HasSubscriptionsTest extends TestCase
         $subscriber = User::factory()->createOne();
         $subscriber->subscribeTo($plan);
 
-        $this->whileCountingQueries(fn () => $subscriber->getFeatures());
+        $this->whileCountingQueries(fn () => $subscriber->features);
         $initiallyPerformedQueries = $this->getQueryCount();
 
-        $this->whileCountingQueries(fn () => $subscriber->getFeatures());
+        $this->whileCountingQueries(fn () => $subscriber->features);
         $totalPerformedQueries = $this->getQueryCount();
 
         $this->assertEquals($initiallyPerformedQueries, $totalPerformedQueries);

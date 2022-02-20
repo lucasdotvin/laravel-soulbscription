@@ -12,7 +12,7 @@ use OverflowException;
 
 trait HasSubscriptions
 {
-    public ?Collection $features = null;
+    public ?Collection $loadedFeatures = null;
 
     public function featureConsumptions()
     {
@@ -128,24 +128,24 @@ trait HasSubscriptions
 
     public function getFeature(string $featureName): ?Feature
     {
-        $feature = $this->getFeatures()->firstWhere('name', $featureName);
+        $feature = $this->features->firstWhere('name', $featureName);
 
         return $feature;
     }
 
-    public function getFeatures(): Collection
+    public function getFeaturesAttribute(): Collection
     {
-        if (!$this->features) {
+        if (!$this->loadedFeatures) {
             $this->loadFeatures();
         }
 
-        return $this->features;
+        return $this->loadedFeatures;
     }
 
     private function loadFeatures()
     {
         $this->loadMissing('subscription.plan.features');
 
-        $this->features = $this->subscription->plan->features ?? Collection::empty();
+        $this->loadedFeatures = $this->subscription->plan->features ?? Collection::empty();
     }
 }
