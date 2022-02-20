@@ -135,7 +135,7 @@ trait HasSubscriptions
 
     public function getFeaturesAttribute(): Collection
     {
-        if (!$this->loadedFeatures) {
+        if (! $this->loadedFeatures) {
             $this->loadFeatures();
         }
 
