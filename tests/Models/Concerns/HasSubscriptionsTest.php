@@ -298,8 +298,8 @@ class HasSubscriptionsTest extends TestCase
             ->for($feature)
             ->for($subscriber, 'subscriber')
             ->createOne([
-                'consumption' => now()->subDay(),
-                'expired_at' => $this->faker->dateTime(),
+                'consumption' => $this->faker->numberBetween(5, 10),
+                'expired_at' => now()->subDay(),
             ]);
 
         $modelCanUse = $subscriber->canConsume($feature->name, $consumption);

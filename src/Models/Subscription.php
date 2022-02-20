@@ -45,12 +45,12 @@ class Subscription extends Model
 
     public function plan()
     {
-        return $this->belongsTo(Plan::class);
+        return $this->belongsTo(config('soulbscription.models.plan'));
     }
 
     public function renewals()
     {
-        return $this->hasMany(SubscriptionRenewal::class);
+        return $this->hasMany(config('soulbscription.models.subscription_renewal'));
     }
 
     public function subscriber()

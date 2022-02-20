@@ -22,7 +22,7 @@ class Feature extends Model
 
     public function plans()
     {
-        return $this->belongsToMany(Plan::class)
-            ->using(FeaturePlan::class);
+        return $this->belongsToMany(config('soulbscription.models.plan'))
+            ->using(config('soulbscription.models.feature_plan'));
     }
 }

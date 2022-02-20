@@ -12,11 +12,11 @@ class FeaturePlan extends Pivot
 
     public function feature()
     {
-        return $this->belongsTo(Feature::class);
+        return $this->belongsTo(config('soulbscription.models.feature'));
     }
 
     public function plan()
     {
-        return $this->belongsTo(Plan::class);
+        return $this->belongsTo(config('soulbscription.models.plan'));
     }
 }
