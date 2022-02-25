@@ -2,7 +2,6 @@
 
 namespace LucasDotDev\Soulbscription\Models\Concerns;
 
-use Illuminate\Support\Carbon;
 use LucasDotDev\Soulbscription\Models\Scopes\SuppressingScope;
 
 trait Suppresses
