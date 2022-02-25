@@ -5,12 +5,10 @@ namespace LucasDotDev\Soulbscription\Models\Scopes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
-use Illuminate\Support\Carbon;
 
 class ExpiringScope implements Scope
 {
     protected $extensions = [
-        'Expire',
         'OnlyExpired',
         'WithExpired',
         'WithoutExpired',
@@ -54,19 +52,6 @@ class ExpiringScope implements Scope
             $builder->withoutGlobalScope($this)->where('expired_at', '<=', now());
 
             return $builder;
-        });
-    }
-
-    protected function addExpire(Builder $builder)
-    {
-        $builder->macro('expire', function (Builder $builder, ?Carbon $expiration = null) {
-            $builder->withExpired();
-
-            if (is_null($expiration)) {
-                $expiration = now();
-            }
-
-            return $builder->update(['expired_at' => $expiration]);
         });
     }
 }
