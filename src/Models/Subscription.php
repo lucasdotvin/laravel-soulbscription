@@ -36,13 +36,6 @@ class Subscription extends Model
         'was_switched',
     ];
 
-    protected static function booted()
-    {
-        static::registerModelEvent('suppressed', function (Subscription $subscription) {
-            event(new SubscriptionSuppressed($subscription));
-        });
-    }
-
     public function plan()
     {
         return $this->belongsTo(config('soulbscription.models.plan'));
@@ -142,7 +135,7 @@ class Subscription extends Model
         $this->fill(['suppressed_at' => $suppressationDate])
             ->save();
 
-        $this->fireModelEvent('suppressed');
+        event(new SubscriptionSuppressed($this));
 
         return $this;
     }
