@@ -135,7 +135,7 @@ trait HasSubscriptions
         return empty($this->getFeature($featureName));
     }
 
-    public function getRemainingCharges($featureName)
+    public function getRemainingCharges($featureName): float
     {
         if (empty($this->getFeature($featureName))) {
             return 0;
@@ -147,7 +147,7 @@ trait HasSubscriptions
         return $totalCharges - $currentConsumption;
     }
 
-    public function getCurrentConsumption($featureName)
+    public function getCurrentConsumption($featureName): float
     {
         if (empty($feature = $this->getFeature($featureName))) {
             return 0;
