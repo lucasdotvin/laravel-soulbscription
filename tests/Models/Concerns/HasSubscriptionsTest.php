@@ -533,4 +533,40 @@ class HasSubscriptionsTest extends TestCase
 
         $this->assertEquals($charges - $consumption, $receivedRemainingCharges);
     }
+
+    public function testModelCantUseChargesFromExpiredTickets()
+    {
+        $feature = Feature::factory()->consumable()->createOne();
+        $subscriber = User::factory()->createOne();
+
+        $plan = Plan::factory()->createOne();
+        $subscriber->subscribeTo($plan);
+
+        $subscriptionFeatureCharges = $this->faker->numberBetween(5, 10);
+        $feature->plans()->attach($plan, [
+            'charges' => $subscriptionFeatureCharges,
+        ]);
+
+        $activeTicketCharges = $this->faker->numberBetween(5, 10);
+        $activeTicket = $subscriber->featureTickets()->make([
+            'charges' => $activeTicketCharges,
+            'expired_at' => now()->addDay(),
+        ]);
+
+        $activeTicket->feature()->associate($feature);
+        $activeTicket->save();
+
+        $expiredTicketCharges = $this->faker->numberBetween(5, 10);
+        $expiredTicket = $subscriber->featureTickets()->make([
+            'charges' => $expiredTicketCharges,
+            'expired_at' => now()->subDay(),
+        ]);
+
+        $expiredTicket->feature()->associate($feature);
+        $expiredTicket->save();
+
+        $totalCharges = $subscriber->getTotalCharges($feature->name);
+
+        $this->assertEquals($totalCharges, $subscriptionFeatureCharges + $activeTicketCharges);
+    }
 }
