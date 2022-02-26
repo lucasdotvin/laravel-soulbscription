@@ -36,13 +36,6 @@ class Subscription extends Model
         'was_switched',
     ];
 
-    protected static function booted()
-    {
-        static::registerModelEvent('suppressed', function (Subscription $subscription) {
-            event(new SubscriptionSuppressed($subscription));
-        });
-    }
-
     public function plan()
     {
         return $this->belongsTo(config('soulbscription.models.plan'));
@@ -105,15 +98,17 @@ class Subscription extends Model
         return $this;
     }
 
-    public function renew(): self
+    public function renew(?Carbon $expirationDate = null): self
     {
         $this->renewals()->create([
             'renewal' => true,
             'overdue' => $this->expired_at->isPast(),
         ]);
 
+        $expirationDate = $expirationDate ?: $this->plan->calculateNextRecurrenceEnd();
+
         $this->update([
-            'expired_at' => $this->plan->calculateNextRecurrenceEnd(),
+            'expired_at' => $expirationDate,
         ]);
 
         event(new SubscriptionRenewed($this));
@@ -121,12 +116,26 @@ class Subscription extends Model
         return $this;
     }
 
-    public function cancel(): self
+    public function cancel(?Carbon $cancelDate = null): self
     {
-        $this->fill(['canceled_at' => now()])
+        $cancelDate = $cancelDate ?: now();
+
+        $this->fill(['canceled_at' => $cancelDate])
             ->save();
 
         event(new SubscriptionCanceled($this));
+
+        return $this;
+    }
+
+    public function suppress(?Carbon $suppressation = null)
+    {
+        $suppressationDate = $suppressation ?: now();
+
+        $this->fill(['suppressed_at' => $suppressationDate])
+            ->save();
+
+        event(new SubscriptionSuppressed($this));
 
         return $this;
     }

@@ -5,12 +5,10 @@ namespace LucasDotDev\Soulbscription\Models\Scopes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
-use Illuminate\Support\Carbon;
 
 class SuppressingScope implements Scope
 {
     protected $extensions = [
-        'Suppress',
         'OnlySuppressed',
         'WithSuppressed',
         'WithoutSuppressed',
@@ -54,17 +52,6 @@ class SuppressingScope implements Scope
             $builder->withoutGlobalScope($this)->whereNotNull();
 
             return $builder;
-        });
-    }
-
-    protected function addSuppress(Builder $builder)
-    {
-        $builder->macro('suppress', function (Builder $builder, ?Carbon $suppressation = null) {
-            $builder->withoutSuppressed();
-
-            $suppressation = $suppressation ?: now();
-
-            return $builder->update(['suppressed_at' => $suppressation]);
         });
     }
 }

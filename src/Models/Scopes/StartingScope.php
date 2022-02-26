@@ -5,12 +5,10 @@ namespace LucasDotDev\Soulbscription\Models\Scopes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
-use Illuminate\Support\Carbon;
 
 class StartingScope implements Scope
 {
     protected $extensions = [
-        'Start',
         'OnlyNotStarted',
         'WithNotStarted',
         'WithoutNotStarted',
@@ -54,17 +52,6 @@ class StartingScope implements Scope
             $builder->withoutGlobalScope($this)->where('started_at', '>', now());
 
             return $builder;
-        });
-    }
-
-    protected function addStart(Builder $builder)
-    {
-        $builder->macro('start', function (Builder $builder, ?Carbon $startation = null) {
-            $builder->withoutNotStarted();
-
-            $startation = $startation ?: now();
-
-            return $builder->update(['started_at' => $startation]);
         });
     }
 }

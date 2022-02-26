@@ -25,4 +25,9 @@ class Feature extends Model
         return $this->belongsToMany(config('soulbscription.models.plan'))
             ->using(config('soulbscription.models.feature_plan'));
     }
+
+    public function tickets()
+    {
+        return $this->hasMany(config('soulbscription.models.feature_ticket'));
+    }
 }

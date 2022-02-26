@@ -2,7 +2,6 @@
 
 namespace LucasDotDev\Soulbscription\Models\Concerns;
 
-use Illuminate\Support\Carbon;
 use LucasDotDev\Soulbscription\Models\Scopes\SuppressingScope;
 
 trait Suppresses
@@ -17,16 +16,6 @@ trait Suppresses
         if (! isset($this->casts['suppressed_at'])) {
             $this->casts['suppressed_at'] = 'datetime';
         }
-    }
-
-    public function suppress(?Carbon $suppressation = null)
-    {
-        $this->fill(['suppressed_at' => $suppressation ?: now()])
-            ->save();
-
-        $this->fireModelEvent('suppressed');
-
-        return $this;
     }
 
     public function suppressed()
