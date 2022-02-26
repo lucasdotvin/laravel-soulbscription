@@ -461,7 +461,7 @@ class HasSubscriptionsTest extends TestCase
         $ticket->feature()->associate($feature);
         $ticket->save();
 
-        $totalCharges = $subscriber->getTotalChargesForAFeature($feature->name);
+        $totalCharges = $subscriber->getTotalCharges($feature->name);
 
         $this->assertEquals($totalCharges, $subscriptionFeatureCharges + $ticketFeatureCharges);
     }
@@ -502,7 +502,7 @@ class HasSubscriptionsTest extends TestCase
             ->associate($feature)
             ->save();
 
-        $receivedConsumption = $subscriber->getTotalConsumptionForAFeature($feature->name);
+        $receivedConsumption = $subscriber->getCurrentConsumption($feature->name);
 
         $this->assertEquals($consumption, $receivedConsumption);
     }
@@ -529,7 +529,7 @@ class HasSubscriptionsTest extends TestCase
             ->associate($feature)
             ->save();
 
-        $receivedRemainingCharges = $subscriber->getRemainingChargesForAFeature($feature->name);
+        $receivedRemainingCharges = $subscriber->getRemainingCharges($feature->name);
 
         $this->assertEquals($charges - $consumption, $receivedRemainingCharges);
     }

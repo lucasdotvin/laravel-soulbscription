@@ -51,7 +51,7 @@ trait HasSubscriptions
             return true;
         }
 
-        $remainingCharges = $this->getRemainingChargesForAFeature($featureName);
+        $remainingCharges = $this->getRemainingCharges($featureName);
 
         return $remainingCharges >= $consumption;
     }
@@ -71,19 +71,19 @@ trait HasSubscriptions
         return empty($this->getFeature($featureName));
     }
 
-    public function getRemainingChargesForAFeature($featureName)
+    public function getRemainingCharges($featureName)
     {
         if (empty($this->getFeature($featureName))) {
             return 0;
         }
 
-        $currentConsumption = $this->getTotalConsumptionForAFeature($featureName);
-        $totalCharges = $this->getTotalChargesForAFeature($featureName);
+        $currentConsumption = $this->getCurrentConsumption($featureName);
+        $totalCharges = $this->getTotalCharges($featureName);
 
         return $totalCharges - $currentConsumption;
     }
 
-    public function getTotalConsumptionForAFeature($featureName)
+    public function getCurrentConsumption($featureName)
     {
         if (empty($feature = $this->getFeature($featureName))) {
             return 0;
@@ -94,7 +94,7 @@ trait HasSubscriptions
             ->sum('consumption');
     }
 
-    public function getTotalChargesForAFeature($featureName): float
+    public function getTotalCharges($featureName): float
     {
         if (empty($feature = $this->getFeature($featureName))) {
             return 0;
