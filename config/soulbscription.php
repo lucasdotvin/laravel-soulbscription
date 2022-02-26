@@ -7,6 +7,8 @@ return [
 
         'feature_consumption' => \LucasDotDev\Soulbscription\Models\FeatureConsumption::class,
 
+        'feature_ticket' => \LucasDotDev\Soulbscription\Models\FeatureTicket::class,
+
         'feature_plan' => \LucasDotDev\Soulbscription\Models\FeaturePlan::class,
 
         'plan' => \LucasDotDev\Soulbscription\Models\Plan::class,

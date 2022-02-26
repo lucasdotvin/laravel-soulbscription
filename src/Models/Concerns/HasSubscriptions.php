@@ -2,9 +2,12 @@
 
 namespace LucasDotDev\Soulbscription\Models\Concerns;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use LucasDotDev\Soulbscription\Events\FeatureConsumed;
 use LucasDotDev\Soulbscription\Models\Feature;
+use LucasDotDev\Soulbscription\Models\FeatureTicket;
 use LucasDotDev\Soulbscription\Models\Plan;
 use LucasDotDev\Soulbscription\Models\Subscription;
 use OutOfBoundsException;
@@ -12,11 +15,20 @@ use OverflowException;
 
 trait HasSubscriptions
 {
-    public ?Collection $loadedFeatures = null;
+    private ?Collection $loadedFeatures = null;
+
+    private ?Collection $loadedSubscriptionFeatures = null;
+
+    private ?Collection $loadedTicketFeatures = null;
 
     public function featureConsumptions()
     {
         return $this->morphMany(config('soulbscription.models.feature_consumption'), 'subscriber');
+    }
+
+    public function featureTickets()
+    {
+        return $this->morphMany(config('soulbscription.models.feature_ticket'), 'subscriber');
     }
 
     public function renewals()
@@ -39,11 +51,9 @@ trait HasSubscriptions
             return true;
         }
 
-        $currentConsumption = $this->featureConsumptions()
-            ->whereBelongsTo($feature)
-            ->sum('consumption');
+        $remainingCharges = $this->getRemainingChargesForAFeature($featureName);
 
-        return ($currentConsumption + $consumption) <= $feature->pivot->charges;
+        return $remainingCharges >= $consumption;
     }
 
     public function cantConsume($featureName, ?float $consumption = null): bool
@@ -59,6 +69,69 @@ trait HasSubscriptions
     public function missingFeature($featureName): bool
     {
         return empty($this->getFeature($featureName));
+    }
+
+    public function getRemainingChargesForAFeature($featureName)
+    {
+        if (empty($this->getFeature($featureName))) {
+            return 0;
+        }
+
+        $currentConsumption = $this->getTotalConsumptionForAFeature($featureName);
+        $totalCharges = $this->getTotalChargesForAFeature($featureName);
+
+        return $totalCharges - $currentConsumption;
+    }
+
+    public function getTotalConsumptionForAFeature($featureName)
+    {
+        if (empty($feature = $this->getFeature($featureName))) {
+            return 0;
+        }
+
+        return $this->featureConsumptions()
+            ->whereBelongsTo($feature)
+            ->sum('consumption');
+    }
+
+    public function getTotalChargesForAFeature($featureName): float
+    {
+        if (empty($feature = $this->getFeature($featureName))) {
+            return 0;
+        }
+
+        $subscriptionCharges = $this->getSubscriptionChargesForAFeature($feature);
+        $ticketCharges = $this->getTicketChargesForAFeature($feature);
+
+        return $subscriptionCharges + $ticketCharges;
+    }
+
+    protected function getSubscriptionChargesForAFeature(Model $feature): float
+    {
+        $subscriptionFeature = $this->loadedSubscriptionFeatures
+            ->find($feature);
+
+        if (empty($subscriptionFeature)) {
+            return 0;
+        }
+
+        return $subscriptionFeature
+            ->pivot
+            ->charges;
+    }
+
+    protected function getTicketChargesForAFeature(Model $feature): float
+    {
+        $ticketFeature = $this->loadedTicketFeatures
+            ->find($feature);
+
+        if (empty($ticketFeature)) {
+            return 0;
+        }
+
+        return $ticketFeature
+            ->tickets
+            ->sum('charges');
     }
 
     /**
@@ -135,17 +208,31 @@ trait HasSubscriptions
 
     public function getFeaturesAttribute(): Collection
     {
-        if (! $this->loadedFeatures) {
-            $this->loadFeatures();
+        if (! is_null($this->loadedFeatures)) {
+            return $this->loadedFeatures;
         }
+
+        $this->loadedFeatures = $this->loadSubscriptionFeatures()
+            ->concat($this->loadTicketFeatures());
 
         return $this->loadedFeatures;
     }
 
-    private function loadFeatures()
+    private function loadSubscriptionFeatures(): Collection
     {
         $this->loadMissing('subscription.plan.features');
 
-        $this->loadedFeatures = $this->subscription->plan->features ?? Collection::empty();
+        return $this->loadedSubscriptionFeatures = $this->subscription->plan->features ?? Collection::empty();
+    }
+
+    private function loadTicketFeatures(): Collection
+    {
+        if (! is_null($this->loadedTicketFeatures)) {
+            return $this->loadedTicketFeatures;
+        }
+
+        return $this->loadedTicketFeatures = Feature::with('tickets')
+            ->whereHas('tickets', fn (Builder $query) => $query->withoutExpired()->whereMorphedTo('subscriber', $this))
+            ->get();
     }
 }
