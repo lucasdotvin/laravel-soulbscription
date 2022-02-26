@@ -350,4 +350,187 @@ class HasSubscriptionsTest extends TestCase
 
         $this->assertEquals($initiallyPerformedQueries, $totalPerformedQueries);
     }
+
+    public function testModelHasFeatureTickets()
+    {
+        $feature = Feature::factory()->consumable()->createOne();
+
+        $subscriber = User::factory()->createOne();
+
+        $ticket = $subscriber->featureTickets()->make(['expired_at' => now()->addDay()]);
+        $ticket->feature()->associate($feature);
+        $ticket->save();
+
+        $this->assertSame(
+            $ticket->id,
+            $subscriber->featureTickets->first()->id,
+        );
+    }
+
+    public function testModelFeatureTicketsGetsOnlyNotExpired()
+    {
+        $feature = Feature::factory()->consumable()->createOne();
+
+        $subscriber = User::factory()->createOne();
+
+        $expiredTicket = $subscriber->featureTickets()->make([
+            'expired_at' => now()->subDay(),
+        ]);
+
+        $expiredTicket->feature()->associate($feature);
+        $expiredTicket->save();
+
+        $activeTicket = $subscriber->featureTickets()->make([
+            'expired_at' => now()->addDay(),
+        ]);
+
+        $activeTicket->feature()->associate($feature);
+        $activeTicket->save();
+
+        $this->assertContains(
+            $activeTicket->id,
+            $subscriber->featureTickets->pluck('id'),
+        );
+
+        $this->assertNotContains(
+            $expiredTicket->id,
+            $subscriber->featureTickets->pluck('id'),
+        );
+    }
+
+    public function testModelGetFeaturesFromTickets()
+    {
+        $feature = Feature::factory()->consumable()->createOne();
+
+        $subscriber = User::factory()->createOne();
+
+        $ticket = $subscriber->featureTickets()->make([
+            'expired_at' => now()->addDay(),
+        ]);
+
+        $ticket->feature()->associate($feature);
+        $ticket->save();
+
+        $this->assertContains(
+            $feature->id,
+            $subscriber->features->pluck('id')->toArray(),
+        );
+    }
+
+    public function testModelCanConsumeSomeAmountOfAConsumableFeatureFromATicket()
+    {
+        $charges = $this->faker->numberBetween(5, 10);
+        $consumption = $this->faker->numberBetween(1, $charges);
+
+        $feature = Feature::factory()->consumable()->createOne();
+        $subscriber = User::factory()->createOne();
+
+        $ticket = $subscriber->featureTickets()->make([
+            'charges' => $charges,
+            'expired_at' => now()->addDay(),
+        ]);
+
+        $ticket->feature()->associate($feature);
+        $ticket->save();
+
+        $modelCanUse = $subscriber->canConsume($feature->name, $consumption);
+
+        $this->assertTrue($modelCanUse);
+    }
+
+    public function testModelCanRetrieveTotalChargesForAFeatureConsideringTickets()
+    {
+        $subscriptionFeatureCharges = $this->faker->numberBetween(5, 10);
+        $ticketFeatureCharges = $this->faker->numberBetween(5, 10);
+
+        $feature = Feature::factory()->consumable()->createOne();
+
+        $plan = Plan::factory()->createOne();
+        $feature->plans()->attach($plan, [
+            'charges' => $subscriptionFeatureCharges,
+        ]);
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($plan);
+
+        $ticket = $subscriber->featureTickets()->make([
+            'charges' => $ticketFeatureCharges,
+            'expired_at' => now()->addDay(),
+        ]);
+
+        $ticket->feature()->associate($feature);
+        $ticket->save();
+
+        $totalCharges = $subscriber->getTotalChargesForAFeature($feature->name);
+
+        $this->assertEquals($totalCharges, $subscriptionFeatureCharges + $ticketFeatureCharges);
+    }
+
+    public function testModelCanConsumeANotConsumableFeatureFromATicket()
+    {
+        $feature = Feature::factory()->notConsumable()->createOne();
+        $subscriber = User::factory()->createOne();
+
+        $ticket = $subscriber->featureTickets()->make([
+            'expired_at' => now()->addDay(),
+        ]);
+
+        $ticket->feature()->associate($feature);
+        $ticket->save();
+
+        $modelCanUse = $subscriber->canConsume($feature->name);
+
+        $this->assertTrue($modelCanUse);
+    }
+
+    public function testModelCanRetrieveTotalConsumptionsForAFeature()
+    {
+        $consumption = $this->faker->randomDigitNotNull();
+
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
+        $feature->plans()->attach($plan);
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($plan);
+        $subscriber->featureConsumptions()
+            ->make([
+                'consumption' => $consumption,
+                'expired_at' => now()->addDay(),
+            ])
+            ->feature()
+            ->associate($feature)
+            ->save();
+
+        $receivedConsumption = $subscriber->getTotalConsumptionForAFeature($feature->name);
+
+        $this->assertEquals($consumption, $receivedConsumption);
+    }
+
+    public function testModelCanRetrieveRemainingChargesForAFeature()
+    {
+        $charges = $this->faker->numberBetween(6, 10);
+        $consumption = $this->faker->numberBetween(1, 5);
+
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
+        $feature->plans()->attach($plan, [
+            'charges' => $charges,
+        ]);
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($plan);
+        $subscriber->featureConsumptions()
+            ->make([
+                'consumption' => $consumption,
+                'expired_at' => now()->addDay(),
+            ])
+            ->feature()
+            ->associate($feature)
+            ->save();
+
+        $receivedRemainingCharges = $subscriber->getRemainingChargesForAFeature($feature->name);
+
+        $this->assertEquals($charges - $consumption, $receivedRemainingCharges);
+    }
 }
