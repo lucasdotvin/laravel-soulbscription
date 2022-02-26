@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use LucasDotDev\Soulbscription\Events\FeatureConsumed;
 use LucasDotDev\Soulbscription\Models\Feature;
-use LucasDotDev\Soulbscription\Models\FeatureTicket;
 use LucasDotDev\Soulbscription\Models\Plan;
 use LucasDotDev\Soulbscription\Models\Subscription;
 use OutOfBoundsException;
