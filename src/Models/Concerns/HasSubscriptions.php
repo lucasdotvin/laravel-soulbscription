@@ -14,11 +14,11 @@ use OverflowException;
 
 trait HasSubscriptions
 {
-    private ?Collection $loadedFeatures = null;
+    protected ?Collection $loadedFeatures = null;
 
-    private ?Collection $loadedSubscriptionFeatures = null;
+    protected ?Collection $loadedSubscriptionFeatures = null;
 
-    private ?Collection $loadedTicketFeatures = null;
+    protected ?Collection $loadedTicketFeatures = null;
 
     public function featureConsumptions()
     {
@@ -217,14 +217,14 @@ trait HasSubscriptions
         return $this->loadedFeatures;
     }
 
-    private function loadSubscriptionFeatures(): Collection
+    protected function loadSubscriptionFeatures(): Collection
     {
         $this->loadMissing('subscription.plan.features');
 
         return $this->loadedSubscriptionFeatures = $this->subscription->plan->features ?? Collection::empty();
     }
 
-    private function loadTicketFeatures(): Collection
+    protected function loadTicketFeatures(): Collection
     {
         if (! is_null($this->loadedTicketFeatures)) {
             return $this->loadedTicketFeatures;
