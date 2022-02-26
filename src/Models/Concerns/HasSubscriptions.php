@@ -40,6 +40,71 @@ trait HasSubscriptions
         return $this->morphOne(config('soulbscription.models.subscription'), 'subscriber')->ofMany('started_at', 'MAX');
     }
 
+    /**
+     * @throws OutOfBoundsException
+     * @throws OverflowException
+     */
+    public function consume($featureName, ?float $consumption = null)
+    {
+        throw_if($this->missingFeature($featureName), new OutOfBoundsException(
+            'None of the active plans grants access to this feature.',
+        ));
+
+        throw_if($this->cantConsume($featureName, $consumption), new OverflowException(
+            'The feature has no enough charges to this consumption.',
+        ));
+
+        $feature = $this->getFeature($featureName);
+
+        $consumptionExpiration = $feature->consumable
+            ? $feature->calculateNextRecurrenceEnd($this->subscription->started_at)
+            : null;
+
+        $featureConsumption = $this->featureConsumptions()
+            ->make([
+                'consumption' => $consumption,
+                'expired_at' => $consumptionExpiration,
+            ])
+            ->feature()
+            ->associate($feature);
+
+        $featureConsumption->save();
+
+        event(new FeatureConsumed($this, $feature, $featureConsumption));
+    }
+
+    public function subscribeTo(Plan $plan, $expiration = null, $startDate = null): Subscription
+    {
+        $expiration = $expiration ?? $plan->calculateNextRecurrenceEnd($startDate);
+
+        return $this->subscription()
+            ->make(['expired_at' => $expiration])
+            ->plan()
+            ->associate($plan)
+            ->start($startDate);
+    }
+
+    public function switchTo(Plan $plan, $expiration = null, $immediately = true): Subscription
+    {
+        if ($immediately) {
+            $this->subscription
+                ->markAsSwitched()
+                ->suppress()
+                ->save();
+
+            return $this->subscribeTo($plan, $expiration);
+        }
+
+        $this->subscription
+            ->markAsSwitched()
+            ->save();
+
+        $startDate = $this->subscription->expired_at;
+        $newSubscription = $this->subscribeTo($plan, startDate: $startDate);
+
+        return $newSubscription;
+    }
+
     public function canConsume($featureName, ?float $consumption = null): bool
     {
         if (empty($feature = $this->getFeature($featureName))) {
@@ -131,71 +196,6 @@ trait HasSubscriptions
         return $ticketFeature
             ->tickets
             ->sum('charges');
-    }
-
-    /**
-     * @throws OutOfBoundsException
-     * @throws OverflowException
-     */
-    public function consume($featureName, ?float $consumption = null)
-    {
-        throw_if($this->missingFeature($featureName), new OutOfBoundsException(
-            'None of the active plans grants access to this feature.',
-        ));
-
-        throw_if($this->cantConsume($featureName, $consumption), new OverflowException(
-            'The feature has no enough charges to this consumption.',
-        ));
-
-        $feature = $this->getFeature($featureName);
-
-        $consumptionExpiration = $feature->consumable
-            ? $feature->calculateNextRecurrenceEnd($this->subscription->started_at)
-            : null;
-
-        $featureConsumption = $this->featureConsumptions()
-            ->make([
-                'consumption' => $consumption,
-                'expired_at' => $consumptionExpiration,
-            ])
-            ->feature()
-            ->associate($feature);
-
-        $featureConsumption->save();
-
-        event(new FeatureConsumed($this, $feature, $featureConsumption));
-    }
-
-    public function subscribeTo(Plan $plan, $expiration = null, $startDate = null): Subscription
-    {
-        $expiration = $expiration ?? $plan->calculateNextRecurrenceEnd($startDate);
-
-        return $this->subscription()
-            ->make(['expired_at' => $expiration])
-            ->plan()
-            ->associate($plan)
-            ->start($startDate);
-    }
-
-    public function switchTo(Plan $plan, $expiration = null, $immediately = true): Subscription
-    {
-        if ($immediately) {
-            $this->subscription
-                ->markAsSwitched()
-                ->suppress()
-                ->save();
-
-            return $this->subscribeTo($plan, $expiration);
-        }
-
-        $this->subscription
-            ->markAsSwitched()
-            ->save();
-
-        $startDate = $this->subscription->expired_at;
-        $newSubscription = $this->subscribeTo($plan, startDate: $startDate);
-
-        return $newSubscription;
     }
 
     public function getFeature(string $featureName): ?Feature
