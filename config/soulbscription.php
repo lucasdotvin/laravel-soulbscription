@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'feature_tickets' => true,
+    'feature_tickets' => false,
 
     'models' => [
 
