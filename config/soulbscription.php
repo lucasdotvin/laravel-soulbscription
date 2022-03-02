@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'feature_tickets' => true,
+
     'models' => [
 
         'feature' => \LucasDotDev\Soulbscription\Models\Feature::class,
