@@ -361,6 +361,8 @@ class HasSubscriptionsTest extends TestCase
         $ticket->feature()->associate($feature);
         $ticket->save();
 
+        config()->set('soulbscription.feature_tickets', true);
+
         $this->assertSame(
             $ticket->id,
             $subscriber->featureTickets->first()->id,
@@ -387,6 +389,8 @@ class HasSubscriptionsTest extends TestCase
         $activeTicket->feature()->associate($feature);
         $activeTicket->save();
 
+        config()->set('soulbscription.feature_tickets', true);
+
         $this->assertContains(
             $activeTicket->id,
             $subscriber->featureTickets->pluck('id'),
@@ -411,6 +415,8 @@ class HasSubscriptionsTest extends TestCase
         $ticket->feature()->associate($feature);
         $ticket->save();
 
+        config()->set('soulbscription.feature_tickets', true);
+
         $this->assertContains(
             $feature->id,
             $subscriber->features->pluck('id')->toArray(),
@@ -432,6 +438,8 @@ class HasSubscriptionsTest extends TestCase
 
         $ticket->feature()->associate($feature);
         $ticket->save();
+
+        config()->set('soulbscription.feature_tickets', true);
 
         $modelCanUse = $subscriber->canConsume($feature->name, $consumption);
 
@@ -461,6 +469,8 @@ class HasSubscriptionsTest extends TestCase
         $ticket->feature()->associate($feature);
         $ticket->save();
 
+        config()->set('soulbscription.feature_tickets', true);
+
         $totalCharges = $subscriber->getTotalCharges($feature->name);
 
         $this->assertEquals($totalCharges, $subscriptionFeatureCharges + $ticketFeatureCharges);
@@ -477,6 +487,8 @@ class HasSubscriptionsTest extends TestCase
 
         $ticket->feature()->associate($feature);
         $ticket->save();
+
+        config()->set('soulbscription.feature_tickets', true);
 
         $modelCanUse = $subscriber->canConsume($feature->name);
 
@@ -501,6 +513,8 @@ class HasSubscriptionsTest extends TestCase
             ->feature()
             ->associate($feature)
             ->save();
+
+        config()->set('soulbscription.feature_tickets', true);
 
         $receivedConsumption = $subscriber->getCurrentConsumption($feature->name);
 
@@ -528,6 +542,8 @@ class HasSubscriptionsTest extends TestCase
             ->feature()
             ->associate($feature)
             ->save();
+
+        config()->set('soulbscription.feature_tickets', true);
 
         $receivedRemainingCharges = $subscriber->getRemainingCharges($feature->name);
 
@@ -564,6 +580,8 @@ class HasSubscriptionsTest extends TestCase
 
         $expiredTicket->feature()->associate($feature);
         $expiredTicket->save();
+
+        config()->set('soulbscription.feature_tickets', true);
 
         $totalCharges = $subscriber->getTotalCharges($feature->name);
 
