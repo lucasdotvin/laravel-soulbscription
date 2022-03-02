@@ -219,6 +219,10 @@ trait HasSubscriptions
 
     protected function loadSubscriptionFeatures(): Collection
     {
+        if (! is_null($this->loadedSubscriptionFeatures)) {
+            return $this->loadedSubscriptionFeatures;
+        }
+
         $this->loadMissing('subscription.plan.features');
 
         return $this->loadedSubscriptionFeatures = $this->subscription->plan->features ?? Collection::empty();
