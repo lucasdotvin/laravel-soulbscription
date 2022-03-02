@@ -211,12 +211,8 @@ trait HasSubscriptions
             return $this->loadedFeatures;
         }
 
-        $this->loadedFeatures = $this->loadSubscriptionFeatures();
-
-        if (config('soulbscription.feature_tickets')) {
-            $this->loadedFeatures = $this->loadedFeatures
-                ->concat($this->loadTicketFeatures());
-        }
+        $this->loadedFeatures = $this->loadSubscriptionFeatures()
+            ->concat($this->loadTicketFeatures());
 
         return $this->loadedFeatures;
     }
@@ -230,6 +226,10 @@ trait HasSubscriptions
 
     protected function loadTicketFeatures(): Collection
     {
+        if (! config('soulbscription.feature_tickets')) {
+            return $this->loadedTicketFeatures = Collection::empty();
+        }
+
         if (! is_null($this->loadedTicketFeatures)) {
             return $this->loadedTicketFeatures;
         }
