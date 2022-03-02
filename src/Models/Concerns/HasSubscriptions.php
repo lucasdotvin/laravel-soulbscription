@@ -211,8 +211,12 @@ trait HasSubscriptions
             return $this->loadedFeatures;
         }
 
-        $this->loadedFeatures = $this->loadSubscriptionFeatures()
-            ->concat($this->loadTicketFeatures());
+        $this->loadedFeatures = $this->loadSubscriptionFeatures();
+
+        if (config('soulbscription.feature_tickets')) {
+            $this->loadedFeatures = $this->loadedFeatures
+                ->concat($this->loadTicketFeatures());
+        }
 
         return $this->loadedFeatures;
     }
