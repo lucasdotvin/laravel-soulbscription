@@ -569,4 +569,30 @@ class HasSubscriptionsTest extends TestCase
 
         $this->assertEquals($totalCharges, $subscriptionFeatureCharges + $activeTicketCharges);
     }
+
+    public function testItIgnoresTicketsWhenItIsDisabled()
+    {
+        $feature = Feature::factory()->consumable()->createOne();
+        $subscriber = User::factory()->createOne();
+
+        $plan = Plan::factory()->createOne();
+        $plan->features()->attach($feature);
+        $subscriber->subscribeTo($plan);
+
+        $ticket = $subscriber->featureTickets()->make([
+            'expired_at' => now()->addDay(),
+        ]);
+
+        $ticket->feature()->associate($feature);
+        $ticket->save();
+
+        config()->set('soulbscription.feature_tickets', true);
+        $featuresWithTickets = User::first()->features;
+
+        config()->set('soulbscription.feature_tickets', false);
+        $featuresWithoutTickets = User::first()->features;
+
+        $this->assertCount(2, $featuresWithTickets);
+        $this->assertCount(1, $featuresWithoutTickets);
+    }
 }
