@@ -325,6 +325,42 @@ $subscriber->missingFeature('deploy-minutes');
 
 Similarly to `cantConsume`, it returns the reverse of `hasFeature`.
 
+### Feature Tickets
+
+Tickets are a simple way to allow your subscribers to acquire charges for a feature. When a user receives a ticket, he is allowed to consume its charges, just like he would do in a normal subscription. Tickets can be used to extend regular subscriptions-based systems (so you can, for instance, sell more charges of a given feature) or even to **build a fully pre-paid service**, where your users pay only for what they want to use.
+
+#### Creating Tickets
+
+To create a ticket, you can use the method `giveTicketFor`. This method expects the feature name, the expiration and optionally a number of charges (you can ignore it when creating tickets for not consumable features):
+
+```php
+$subscriber->giveTicketFor('deploy-minutes', today()->addMonth(), 10);
+```
+
+> This method will fire a `FeatureTicketCreated($subscriber, Feature $feature, FeatureTicket $featureTicket)` event.
+
+In the example above, the user will receive ten more minutes to execute deploys until the next month.
+
+#### Not Consumable Features
+
+You can create tickets for not consumable features, so your subscribers will receive access to them just for a certain period:
+
+```php
+class UserFeatureTrialController extends Controller
+{
+    public function store(FeatureTrialRequest $request, User $user)
+    {
+        $featureName = $request->input('feature_name');
+        $expiration = today()->addDays($request->input('trial_days'));
+        $user->giveTicketFor($featureName, $expiration);
+
+        return redirect()->route('admin.users.show', $user);
+    }
+}
+```
+
+In the example above, the user will be able to try a feature for a certain amount of days.
+
 ## Testing
 
 ```bash
