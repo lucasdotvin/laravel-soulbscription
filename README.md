@@ -192,7 +192,7 @@ class StudentController extends Controller
         $student->course()->associate($course);
         $student->save();
 
-        $plan = Plan::find($request->validated('plan_id'));
+        $plan = Plan::find($request->input('plan_id'));
         $student->subscribeTo($plan, startDate: $course->starts_at);
 
         return redirect()->route('admin.students.index');
