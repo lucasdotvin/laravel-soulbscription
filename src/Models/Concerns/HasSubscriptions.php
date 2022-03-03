@@ -128,14 +128,15 @@ trait HasSubscriptions
             ->save();
 
         if (Carbon::make($expiration)->isFuture()) {
-            $this->registerFeatureLoadedManually($feature);
+            $this->registerTicketFeatureLoadedManually($feature);
         }
     }
 
-    protected function registerFeatureLoadedManually(Feature $feature)
+    protected function registerTicketFeatureLoadedManually(Feature $feature)
     {
         if (! is_null($this->loadedFeatures)) {
             $this->loadedFeatures->push($feature);
+            $this->loadedTicketFeatures->push($feature);
         }
     }
 
