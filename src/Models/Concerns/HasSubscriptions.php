@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Carbon;
 use LogicException;
 use LucasDotDev\Soulbscription\Events\FeatureConsumed;
 use LucasDotDev\Soulbscription\Models\Feature;
+use LucasDotDev\Soulbscription\Models\FeatureTicket;
 use LucasDotDev\Soulbscription\Models\Plan;
 use LucasDotDev\Soulbscription\Models\Subscription;
 use OutOfBoundsException;
@@ -112,32 +112,21 @@ trait HasSubscriptions
      * @throws LogicException
      * @throws ModelNotFoundException
      */
-    public function giveTicketFor($featureName, $expiration, ?float $charges = null)
+    public function giveTicketFor($featureName, $expiration, ?float $charges = null): FeatureTicket
     {
         throw_unless(config('soulbscription.feature_tickets'), new LogicException('The tickets are not enabled in the configs.'));
 
         $feature = Feature::whereName($featureName)->firstOrFail();
 
-        $feature->tickets()
+        return tap(
+            $this->featureTickets()
             ->make([
                 'charges' => $charges,
                 'expired_at' => $expiration,
             ])
-            ->subscriber()
-            ->associate($this)
-            ->save();
-
-        if (Carbon::make($expiration)->isFuture()) {
-            $this->registerTicketFeatureLoadedManually($feature);
-        }
-    }
-
-    protected function registerTicketFeatureLoadedManually(Feature $feature)
-    {
-        if (! is_null($this->loadedFeatures)) {
-            $this->loadedFeatures->push($feature);
-            $this->loadedTicketFeatures->push($feature);
-        }
+            ->feature()
+            ->associate($feature),
+        )->save();
     }
 
     public function canConsume($featureName, ?float $consumption = null): bool

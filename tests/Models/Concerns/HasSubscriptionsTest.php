@@ -668,40 +668,4 @@ class HasSubscriptionsTest extends TestCase
 
         $subscriber->giveTicketFor($feature->name, $expiration, $charges);
     }
-
-    public function testItAddsFeatureToLoadedAfterCreatingATicket()
-    {
-        $charges = $this->faker->randomDigitNotNull();
-        $expiration = now()->addDay();
-
-        $feature = Feature::factory()->consumable()->createOne();
-
-        $subscriber = User::factory()->createOne();
-
-        config()->set('soulbscription.feature_tickets', true);
-
-        $this->assertCount(0, $subscriber->features);
-
-        $subscriber->giveTicketFor($feature->name, $expiration, $charges);
-
-        $this->assertCount(1, $subscriber->features);
-    }
-
-    public function testItOnlyAddsNotExpiredTicketsToTheLoadedFeatures()
-    {
-        $charges = $this->faker->randomDigitNotNull();
-        $expiration = now()->subDay();
-
-        $feature = Feature::factory()->consumable()->createOne();
-
-        $subscriber = User::factory()->createOne();
-
-        config()->set('soulbscription.feature_tickets', true);
-
-        $this->assertCount(0, $subscriber->features);
-
-        $subscriber->giveTicketFor($feature->name, $expiration, $charges);
-
-        $this->assertCount(0, $subscriber->features);
-    }
 }
