@@ -2,9 +2,11 @@
 
 namespace LucasDotDev\Soulbscription\Tests\Feature\Models\Concerns;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
+use LogicException;
 use LucasDotDev\DBQueriesCounter\Traits\CountsQueries;
 use LucasDotDev\Soulbscription\Events\FeatureConsumed;
 use LucasDotDev\Soulbscription\Events\SubscriptionScheduled;
@@ -612,5 +614,94 @@ class HasSubscriptionsTest extends TestCase
 
         $this->assertCount(2, $featuresWithTickets);
         $this->assertCount(1, $featuresWithoutTickets);
+    }
+
+    public function testItCanCreateATicket()
+    {
+        $charges = $this->faker->randomDigitNotNull();
+        $expiration = $this->faker->dateTime();
+
+        $feature = Feature::factory()->consumable()->createOne();
+
+        $subscriber = User::factory()->createOne();
+
+        config()->set('soulbscription.feature_tickets', true);
+
+        $subscriber->giveTicketFor($feature->name, $expiration, $charges);
+
+        $this->assertDatabaseHas('feature_tickets', [
+            'charges' => $charges,
+            'expired_at' => $expiration,
+            'subscriber_id' => $subscriber->id,
+        ]);
+    }
+
+    public function testItRaisesAnExceptionWhenCreatingATicketForANonExistingFeature()
+    {
+        $charges = $this->faker->randomDigitNotNull();
+        $expiration = $this->faker->dateTime();
+
+        $unexistingFeatureName = $this->faker->word();
+
+        $subscriber = User::factory()->createOne();
+
+        $this->expectException(ModelNotFoundException::class);
+
+        config()->set('soulbscription.feature_tickets', true);
+
+        $subscriber->giveTicketFor($unexistingFeatureName, $expiration, $charges);
+    }
+
+    public function testItRaisesAnExceptionWhenCreatingATicketDespiteItIsDisabled()
+    {
+        $charges = $this->faker->randomDigitNotNull();
+        $expiration = $this->faker->dateTime();
+
+        $feature = Feature::factory()->consumable()->createOne();
+
+        $subscriber = User::factory()->createOne();
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The tickets are not enabled in the configs.');
+
+        config()->set('soulbscription.feature_tickets', false);
+
+        $subscriber->giveTicketFor($feature->name, $expiration, $charges);
+    }
+
+    public function testItAddsFeatureToLoadedAfterCreatingATicket()
+    {
+        $charges = $this->faker->randomDigitNotNull();
+        $expiration = now()->addDay();
+
+        $feature = Feature::factory()->consumable()->createOne();
+
+        $subscriber = User::factory()->createOne();
+
+        config()->set('soulbscription.feature_tickets', true);
+
+        $this->assertCount(0, $subscriber->features);
+
+        $subscriber->giveTicketFor($feature->name, $expiration, $charges);
+
+        $this->assertCount(1, $subscriber->features);
+    }
+
+    public function testItOnlyAddsNotExpiredTicketsToTheLoadedFeatures()
+    {
+        $charges = $this->faker->randomDigitNotNull();
+        $expiration = now()->subDay();
+
+        $feature = Feature::factory()->consumable()->createOne();
+
+        $subscriber = User::factory()->createOne();
+
+        config()->set('soulbscription.feature_tickets', true);
+
+        $this->assertCount(0, $subscriber->features);
+
+        $subscriber->giveTicketFor($feature->name, $expiration, $charges);
+
+        $this->assertCount(0, $subscriber->features);
     }
 }
