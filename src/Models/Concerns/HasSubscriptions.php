@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use LogicException;
 use LucasDotDev\Soulbscription\Events\FeatureConsumed;
+use LucasDotDev\Soulbscription\Events\FeatureTicketCreated;
 use LucasDotDev\Soulbscription\Models\Feature;
 use LucasDotDev\Soulbscription\Models\FeatureTicket;
 use LucasDotDev\Soulbscription\Models\Plan;
@@ -118,15 +119,18 @@ trait HasSubscriptions
 
         $feature = Feature::whereName($featureName)->firstOrFail();
 
-        return tap(
-            $this->featureTickets()
+        $featureTicket = $this->featureTickets()
             ->make([
                 'charges' => $charges,
                 'expired_at' => $expiration,
-            ])
-            ->feature()
-            ->associate($feature),
-        )->save();
+            ]);
+
+        $featureTicket->feature()->associate($feature);
+        $featureTicket->save();
+
+        event(new FeatureTicketCreated($this, $feature, $featureTicket));
+
+        return $featureTicket;
     }
 
     public function canConsume($featureName, ?float $consumption = null): bool
