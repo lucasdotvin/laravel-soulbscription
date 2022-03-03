@@ -9,6 +9,7 @@ use Illuminate\Support\Carbon;
 use LogicException;
 use LucasDotDev\DBQueriesCounter\Traits\CountsQueries;
 use LucasDotDev\Soulbscription\Events\FeatureConsumed;
+use LucasDotDev\Soulbscription\Events\FeatureTicketCreated;
 use LucasDotDev\Soulbscription\Events\SubscriptionScheduled;
 use LucasDotDev\Soulbscription\Events\SubscriptionStarted;
 use LucasDotDev\Soulbscription\Events\SubscriptionSuppressed;
@@ -634,6 +635,22 @@ class HasSubscriptionsTest extends TestCase
             'expired_at' => $expiration,
             'subscriber_id' => $subscriber->id,
         ]);
+    }
+
+    public function testItFiresEventWhenCreatingATicket()
+    {
+        $charges = $this->faker->randomDigitNotNull();
+        $expiration = $this->faker->dateTime();
+
+        $feature = Feature::factory()->consumable()->createOne();
+
+        $subscriber = User::factory()->createOne();
+
+        config()->set('soulbscription.feature_tickets', true);
+
+        $this->expectsEvents(FeatureTicketCreated::class);
+
+        $subscriber->giveTicketFor($feature->name, $expiration, $charges);
     }
 
     public function testItRaisesAnExceptionWhenCreatingATicketForANonExistingFeature()
