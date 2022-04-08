@@ -18,6 +18,7 @@ return new class() extends Migration {
             $table->foreignIdFor(\LucasDotDev\Soulbscription\Models\Plan::class);
             $table->timestamp('canceled_at')->nullable();
             $table->timestamp('expired_at');
+            $table->timestamp('grace_days_ended_at')->nullable();
             $table->date('started_at');
             $table->timestamp('suppressed_at')->nullable();
             $table->boolean('was_switched')->default(false);
