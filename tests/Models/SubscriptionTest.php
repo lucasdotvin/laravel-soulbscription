@@ -154,4 +154,23 @@ class SubscriptionTest extends TestCase
             'overdue' => true,
         ]);
     }
+
+    public function testModelConsidersGraceDaysOnOverdue()
+    {
+        $subscriber = User::factory()->create();
+        $subscription = Subscription::factory()
+            ->for($subscriber, 'subscriber')
+            ->create([
+                'grace_days_ended_at' => now()->addDay(),
+                'expired_at' => now()->subDay(),
+            ]);
+
+        $subscription->renew();
+
+        $this->assertDatabaseCount('subscription_renewals', 1);
+        $this->assertDatabaseHas('subscription_renewals', [
+            'subscription_id' => $subscription->id,
+            'overdue' => false,
+        ]);
+    }
 }
