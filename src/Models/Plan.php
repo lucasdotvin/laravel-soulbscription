@@ -14,6 +14,7 @@ class Plan extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'grace_days',
         'name',
         'periodicity_type',
         'periodicity',

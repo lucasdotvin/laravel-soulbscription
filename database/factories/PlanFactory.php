@@ -18,6 +18,7 @@ class PlanFactory extends Factory
     public function definition()
     {
         return [
+            'grace_days'       => 0,
             'name'             => $this->faker->words(asText: true),
             'periodicity'      => $this->faker->randomDigitNotNull(),
             'periodicity_type' => $this->faker->randomElement([
@@ -27,5 +28,12 @@ class PlanFactory extends Factory
                 PeriodicityType::Day,
             ]),
         ];
+    }
+
+    public function withGraceDays()
+    {
+        return $this->state([
+            'grace_days' => $this->faker->randomDigitNotNull(),
+        ]);
     }
 }

@@ -14,6 +14,7 @@ return new class extends Migration {
     {
         Schema::create('plans', function (Blueprint $table) {
             $table->id();
+            $table->integer('grace_days')->default(0);
             $table->string('name');
             $table->unsignedInteger('periodicity');
             $table->string('periodicity_type');
