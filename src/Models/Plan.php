@@ -5,6 +5,7 @@ namespace LucasDotDev\Soulbscription\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use LucasDotDev\Soulbscription\Models\Concerns\HandlesRecurrence;
 
 class Plan extends Model
@@ -30,5 +31,10 @@ class Plan extends Model
     public function subscriptions()
     {
         return $this->hasMany(config('soulbscription.models.subscription'));
+    }
+
+    public function calculateNextGraceExpiration(Carbon $recurrenceEnd)
+    {
+        return $recurrenceEnd->copy()->addDays($this->grace_days);
     }
 }
