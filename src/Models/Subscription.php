@@ -103,7 +103,7 @@ class Subscription extends Model
     {
         $this->renewals()->create([
             'renewal' => true,
-            'overdue' => $this->expired_at->isPast(),
+            'overdue' => $this->isOverdue,
         ]);
 
         $expirationDate = $expirationDate ?: $this->plan->calculateNextRecurrenceEnd();
@@ -139,5 +139,15 @@ class Subscription extends Model
         event(new SubscriptionSuppressed($this));
 
         return $this;
+    }
+
+    public function getIsOverdueAttribute(): bool
+    {
+        if ($this->grace_days_ended_at) {
+            return $this->expired_at->isPast()
+                and $this->grace_days_ended_at->isPast();
+        }
+
+        return $this->expired_at->isPast();
     }
 }
