@@ -1,20 +1,20 @@
 <?php
 
-namespace LucasDotDev\Soulbscription\Models;
+namespace LucasDotVin\Soulbscription\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
-use LucasDotDev\Soulbscription\Events\SubscriptionCanceled;
-use LucasDotDev\Soulbscription\Events\SubscriptionRenewed;
-use LucasDotDev\Soulbscription\Events\SubscriptionScheduled;
-use LucasDotDev\Soulbscription\Events\SubscriptionStarted;
-use LucasDotDev\Soulbscription\Events\SubscriptionSuppressed;
-use LucasDotDev\Soulbscription\Models\Concerns\Expires;
-use LucasDotDev\Soulbscription\Models\Concerns\Starts;
-use LucasDotDev\Soulbscription\Models\Concerns\Suppresses;
+use LucasDotVin\Soulbscription\Events\SubscriptionCanceled;
+use LucasDotVin\Soulbscription\Events\SubscriptionRenewed;
+use LucasDotVin\Soulbscription\Events\SubscriptionScheduled;
+use LucasDotVin\Soulbscription\Events\SubscriptionStarted;
+use LucasDotVin\Soulbscription\Events\SubscriptionSuppressed;
+use LucasDotVin\Soulbscription\Models\Concerns\Expires;
+use LucasDotVin\Soulbscription\Models\Concerns\Starts;
+use LucasDotVin\Soulbscription\Models\Concerns\Suppresses;
 
 class Subscription extends Model
 {

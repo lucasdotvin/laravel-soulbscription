@@ -1,8 +1,8 @@
 <?php
 
-namespace LucasDotDev\Soulbscription\Models\Concerns;
+namespace LucasDotVin\Soulbscription\Models\Concerns;
 
-use LucasDotDev\Soulbscription\Models\Scopes\SuppressingScope;
+use LucasDotVin\Soulbscription\Models\Scopes\SuppressingScope;
 
 trait Suppresses
 {

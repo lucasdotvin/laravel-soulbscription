@@ -1,10 +1,10 @@
 <?php
 
-namespace LucasDotDev\Soulbscription\Database\Factories;
+namespace LucasDotVin\Soulbscription\Database\Factories;
 
-use LucasDotDev\Soulbscription\Enums\PeriodicityType;
+use LucasDotVin\Soulbscription\Enums\PeriodicityType;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use LucasDotDev\Soulbscription\Models\Feature;
+use LucasDotVin\Soulbscription\Models\Feature;
 
 class FeatureFactory extends Factory
 {

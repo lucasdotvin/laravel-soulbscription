@@ -1,13 +1,13 @@
 <?php
 
-namespace LucasDotDev\Soulbscription\Tests\Feature\Models;
+namespace LucasDotVin\Soulbscription\Tests\Feature\Models;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
-use LucasDotDev\Soulbscription\Enums\PeriodicityType;
-use LucasDotDev\Soulbscription\Models\Plan;
-use LucasDotDev\Soulbscription\Tests\TestCase;
+use LucasDotVin\Soulbscription\Enums\PeriodicityType;
+use LucasDotVin\Soulbscription\Models\Plan;
+use LucasDotVin\Soulbscription\Tests\TestCase;
 
 class PlanTest extends TestCase
 {

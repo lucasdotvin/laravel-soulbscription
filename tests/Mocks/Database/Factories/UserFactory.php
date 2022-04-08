@@ -1,8 +1,8 @@
 <?php
 
-namespace LucasDotDev\Soulbscription\Tests\Mocks\Database\Factories;
+namespace LucasDotVin\Soulbscription\Tests\Mocks\Database\Factories;
 
-use LucasDotDev\Soulbscription\Tests\Mocks\Models\User;
+use LucasDotVin\Soulbscription\Tests\Mocks\Models\User;
 use Orchestra\Testbench\Factories\UserFactory as OrchestraUserFactory;
 
 class UserFactory extends OrchestraUserFactory

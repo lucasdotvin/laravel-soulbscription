@@ -1,9 +1,9 @@
 <?php
 
-namespace LucasDotDev\Soulbscription\Tests;
+namespace LucasDotVin\Soulbscription\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use LucasDotDev\Soulbscription\SoulbscriptionServiceProvider;
+use LucasDotVin\Soulbscription\SoulbscriptionServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
@@ -16,7 +16,7 @@ class TestCase extends Orchestra
 
         Factory::guessFactoryNamesUsing(
             fn (string $modelName) =>
-                'LucasDotDev\\Soulbscription\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
+                'LucasDotVin\\Soulbscription\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
         );
     }
 

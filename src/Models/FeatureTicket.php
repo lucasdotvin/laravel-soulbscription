@@ -1,9 +1,9 @@
 <?php
 
-namespace LucasDotDev\Soulbscription\Models;
+namespace LucasDotVin\Soulbscription\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use LucasDotDev\Soulbscription\Models\Concerns\Expires;
+use LucasDotVin\Soulbscription\Models\Concerns\Expires;
 
 class FeatureTicket extends Model
 {

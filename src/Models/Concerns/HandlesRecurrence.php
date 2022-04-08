@@ -1,9 +1,9 @@
 <?php
 
-namespace LucasDotDev\Soulbscription\Models\Concerns;
+namespace LucasDotVin\Soulbscription\Models\Concerns;
 
 use Illuminate\Support\Carbon;
-use LucasDotDev\Soulbscription\Enums\PeriodicityType;
+use LucasDotVin\Soulbscription\Enums\PeriodicityType;
 
 trait HandlesRecurrence
 {

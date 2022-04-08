@@ -5,18 +5,18 @@ return [
 
     'models' => [
 
-        'feature' => \LucasDotDev\Soulbscription\Models\Feature::class,
+        'feature' => \LucasDotVin\Soulbscription\Models\Feature::class,
 
-        'feature_consumption' => \LucasDotDev\Soulbscription\Models\FeatureConsumption::class,
+        'feature_consumption' => \LucasDotVin\Soulbscription\Models\FeatureConsumption::class,
 
-        'feature_ticket' => \LucasDotDev\Soulbscription\Models\FeatureTicket::class,
+        'feature_ticket' => \LucasDotVin\Soulbscription\Models\FeatureTicket::class,
 
-        'feature_plan' => \LucasDotDev\Soulbscription\Models\FeaturePlan::class,
+        'feature_plan' => \LucasDotVin\Soulbscription\Models\FeaturePlan::class,
 
-        'plan' => \LucasDotDev\Soulbscription\Models\Plan::class,
+        'plan' => \LucasDotVin\Soulbscription\Models\Plan::class,
 
-        'subscription' => \LucasDotDev\Soulbscription\Models\Subscription::class,
+        'subscription' => \LucasDotVin\Soulbscription\Models\Subscription::class,
 
-        'subscription_renewal' => \LucasDotDev\Soulbscription\Models\SubscriptionRenewal::class,
+        'subscription_renewal' => \LucasDotVin\Soulbscription\Models\SubscriptionRenewal::class,
     ],
 ];
