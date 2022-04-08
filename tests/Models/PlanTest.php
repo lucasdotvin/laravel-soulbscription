@@ -80,7 +80,7 @@ class PlanTest extends TestCase
 
         $this->assertEquals(
             now()->addDays($days)->addDays($graceDays),
-            $plan->calculateNextGraceExpiration($plan->calculateNextRecurrenceEnd()),
+            $plan->calculateGraceExpiration($plan->calculateNextRecurrenceEnd()),
         );
     }
 }

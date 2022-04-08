@@ -33,7 +33,7 @@ class Plan extends Model
         return $this->hasMany(config('soulbscription.models.subscription'));
     }
 
-    public function calculateNextGraceExpiration(Carbon $recurrenceEnd)
+    public function calculateGraceExpiration(Carbon $recurrenceEnd)
     {
         return $recurrenceEnd->copy()->addDays($this->grace_days);
     }
