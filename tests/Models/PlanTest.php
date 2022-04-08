@@ -65,4 +65,22 @@ class PlanTest extends TestCase
 
         $this->assertEquals(now()->addDays($days), $plan->calculateNextRecurrenceEnd());
     }
+
+    public function testModelCanCalculateGraceExpiration()
+    {
+        Carbon::setTestNow(now());
+
+        $days = $this->faker->randomDigitNotNull();
+        $graceDays = $this->faker->randomDigitNotNull();
+        $plan = Plan::factory()->create([
+            'grace_days' => $graceDays,
+            'periodicity_type' => PeriodicityType::Day,
+            'periodicity' => $days,
+        ]);
+
+        $this->assertEquals(
+            now()->addDays($days)->addDays($graceDays),
+            $plan->calculateNextGraceExpiration($plan->calculateNextRecurrenceEnd()),
+        );
+    }
 }
