@@ -44,6 +44,21 @@ class HasSubscriptionsTest extends TestCase
             'subscriber_id' => $subscriber->id,
             'started_at' => today(),
             'expired_at' => $plan->calculateNextRecurrenceEnd(),
+            'grace_days_ended_at' => null,
+        ]);
+    }
+
+    public function testModelDefinesGraceDaysEnd()
+    {
+        $plan = Plan::factory()
+            ->withGraceDays()
+            ->createOne();
+
+        $subscriber = User::factory()->createOne();
+        $subscription = $subscriber->subscribeTo($plan);
+
+        $this->assertDatabaseHas('subscriptions', [
+            'grace_days_ended_at' => $plan->calculateGraceDaysEnd($subscription->expired_at),
         ]);
     }
 
