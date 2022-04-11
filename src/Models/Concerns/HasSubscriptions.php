@@ -81,8 +81,15 @@ trait HasSubscriptions
     {
         $expiration = $expiration ?? $plan->calculateNextRecurrenceEnd($startDate);
 
+        $graceDaysEnd = $plan->hasGraceDays
+            ? $plan->calculateGraceDaysEnd($expiration)
+            : null;
+
         return $this->subscription()
-            ->make(['expired_at' => $expiration])
+            ->make([
+                'expired_at' => $expiration,
+                'grace_days_ended_at' => $graceDaysEnd,
+            ])
             ->plan()
             ->associate($plan)
             ->start($startDate);
