@@ -37,4 +37,9 @@ class Plan extends Model
     {
         return $recurrenceEnd->copy()->addDays($this->grace_days);
     }
+
+    public function getHasGraceDaysAttribute()
+    {
+        return !empty($this->grace_days);
+    }
 }
