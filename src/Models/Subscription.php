@@ -12,13 +12,13 @@ use LucasDotVin\Soulbscription\Events\SubscriptionRenewed;
 use LucasDotVin\Soulbscription\Events\SubscriptionScheduled;
 use LucasDotVin\Soulbscription\Events\SubscriptionStarted;
 use LucasDotVin\Soulbscription\Events\SubscriptionSuppressed;
-use LucasDotVin\Soulbscription\Models\Concerns\Expires;
+use LucasDotVin\Soulbscription\Models\Concerns\ExpiresAndHasGraceDays;
 use LucasDotVin\Soulbscription\Models\Concerns\Starts;
 use LucasDotVin\Soulbscription\Models\Concerns\Suppresses;
 
 class Subscription extends Model
 {
-    use Expires;
+    use ExpiresAndHasGraceDays;
     use HasFactory;
     use SoftDeletes;
     use Starts;
