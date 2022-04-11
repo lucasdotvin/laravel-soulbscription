@@ -40,6 +40,6 @@ class Plan extends Model
 
     public function getHasGraceDaysAttribute()
     {
-        return !empty($this->grace_days);
+        return ! empty($this->grace_days);
     }
 }
