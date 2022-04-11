@@ -66,7 +66,7 @@ class PlanTest extends TestCase
         $this->assertEquals(now()->addDays($days), $plan->calculateNextRecurrenceEnd());
     }
 
-    public function testModelCanCalculateGraceExpiration()
+    public function testModelCancalculateGraceDaysEnd()
     {
         Carbon::setTestNow(now());
 
@@ -80,7 +80,7 @@ class PlanTest extends TestCase
 
         $this->assertEquals(
             now()->addDays($days)->addDays($graceDays),
-            $plan->calculateGraceExpiration($plan->calculateNextRecurrenceEnd()),
+            $plan->calculateGraceDaysEnd($plan->calculateNextRecurrenceEnd()),
         );
     }
 }
