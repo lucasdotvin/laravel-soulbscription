@@ -20,7 +20,7 @@ class SoulbscriptionServiceProvider extends ServiceProvider
         ], 'soulbscription-migrations');
 
         $this->publishes([
-            __DIR__ . '/../database/migrations/upgrades/v2' => database_path('migrations'),
+            __DIR__ . '/../database/migrations/upgrades/v2.0' => database_path('migrations'),
         ], 'soulbscription-migrations-upgrades');
     }
 }
