@@ -124,6 +124,21 @@ class PlanSeeder extends Seeder
 
 Everything here is quite simple, but it is worth to emphasize: by receiving the periodicity options above, the two plans are defined as monthly.
 
+#### Grace Days
+
+You can define a number of grace days to each plan, so your users will not loose access to their features immediately on expiration:
+
+```php
+$gold = Plan::create([
+    'name'             => 'gold',
+    'periodicity_type' => PeriodicityType::Month,
+    'periodicity'      => 1,
+    'grace_days'       => 7,
+]);
+```
+
+With the configuration above, the subscribers of the "gold" plan will have seven days between the plan expiration and their access being suspended.
+
 ### Associating Plans with Features
 
 As each feature can belong to multiple plans (and they can have multiple features), you have to associate them:
