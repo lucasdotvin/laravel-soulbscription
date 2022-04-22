@@ -24,6 +24,15 @@ php artisan vendor:publish --tag="laravel-soulbscription-migrations"
 php artisan migrate
 ```
 
+## Upgrades
+
+If you already use this package and need to move to a newer version, don't forget to publish the upgrade migrations:
+
+```bash
+php artisan vendor:publish --tag="laravel-soulbscription-migrations-upgrades"
+php artisan migrate
+```
+
 ## Usage
 
 To start using it, you just have to add the given trait to your `User` model (or any entity you want to have subscriptions):
