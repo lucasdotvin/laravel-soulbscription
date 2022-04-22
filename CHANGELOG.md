@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-soulbscription` will be documented in this file.
 
+## v2.0.0 - 2022-04-22
+
+- [x] Grace days feature
+
 ## v2.0 - 2022-04-22
 
 - [x] Grace days feature
@@ -10,6 +14,7 @@ All notable changes to `laravel-soulbscription` will be documented in this file.
 
 - [x] Implemented feature tickets
 - - [x] Made feature tickets an optional feature
+- 
 - 
 - 
 
