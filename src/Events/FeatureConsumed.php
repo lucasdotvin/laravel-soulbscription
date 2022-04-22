@@ -1,12 +1,12 @@
 <?php
 
-namespace LucasDotDev\Soulbscription\Events;
+namespace LucasDotVin\Soulbscription\Events;
 
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use LucasDotDev\Soulbscription\Models\Feature;
-use LucasDotDev\Soulbscription\Models\FeatureConsumption;
+use LucasDotVin\Soulbscription\Models\Feature;
+use LucasDotVin\Soulbscription\Models\FeatureConsumption;
 
 class FeatureConsumed
 {

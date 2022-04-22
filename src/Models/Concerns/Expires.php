@@ -1,8 +1,8 @@
 <?php
 
-namespace LucasDotDev\Soulbscription\Models\Concerns;
+namespace LucasDotVin\Soulbscription\Models\Concerns;
 
-use LucasDotDev\Soulbscription\Models\Scopes\ExpiringScope;
+use LucasDotVin\Soulbscription\Models\Scopes\ExpiringScope;
 
 trait Expires
 {

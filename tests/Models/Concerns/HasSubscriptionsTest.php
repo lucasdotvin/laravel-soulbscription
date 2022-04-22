@@ -1,25 +1,25 @@
 <?php
 
-namespace LucasDotDev\Soulbscription\Tests\Feature\Models\Concerns;
+namespace LucasDotVin\Soulbscription\Tests\Feature\Models\Concerns;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use LogicException;
-use LucasDotDev\DBQueriesCounter\Traits\CountsQueries;
-use LucasDotDev\Soulbscription\Events\FeatureConsumed;
-use LucasDotDev\Soulbscription\Events\FeatureTicketCreated;
-use LucasDotDev\Soulbscription\Events\SubscriptionScheduled;
-use LucasDotDev\Soulbscription\Events\SubscriptionStarted;
-use LucasDotDev\Soulbscription\Events\SubscriptionSuppressed;
-use LucasDotDev\Soulbscription\Models\Feature;
-use LucasDotDev\Soulbscription\Models\FeatureConsumption;
-use LucasDotDev\Soulbscription\Models\Plan;
-use LucasDotDev\Soulbscription\Models\Subscription;
-use LucasDotDev\Soulbscription\Models\SubscriptionRenewal;
-use LucasDotDev\Soulbscription\Tests\Mocks\Models\User;
-use LucasDotDev\Soulbscription\Tests\TestCase;
+use LucasDotVin\DBQueriesCounter\Traits\CountsQueries;
+use LucasDotVin\Soulbscription\Events\FeatureConsumed;
+use LucasDotVin\Soulbscription\Events\FeatureTicketCreated;
+use LucasDotVin\Soulbscription\Events\SubscriptionScheduled;
+use LucasDotVin\Soulbscription\Events\SubscriptionStarted;
+use LucasDotVin\Soulbscription\Events\SubscriptionSuppressed;
+use LucasDotVin\Soulbscription\Models\Feature;
+use LucasDotVin\Soulbscription\Models\FeatureConsumption;
+use LucasDotVin\Soulbscription\Models\Plan;
+use LucasDotVin\Soulbscription\Models\Subscription;
+use LucasDotVin\Soulbscription\Models\SubscriptionRenewal;
+use LucasDotVin\Soulbscription\Tests\Mocks\Models\User;
+use LucasDotVin\Soulbscription\Tests\TestCase;
 use OutOfBoundsException;
 use OverflowException;
 
@@ -44,6 +44,21 @@ class HasSubscriptionsTest extends TestCase
             'subscriber_id' => $subscriber->id,
             'started_at' => today(),
             'expired_at' => $plan->calculateNextRecurrenceEnd(),
+            'grace_days_ended_at' => null,
+        ]);
+    }
+
+    public function testModelDefinesGraceDaysEnd()
+    {
+        $plan = Plan::factory()
+            ->withGraceDays()
+            ->createOne();
+
+        $subscriber = User::factory()->createOne();
+        $subscription = $subscriber->subscribeTo($plan);
+
+        $this->assertDatabaseHas('subscriptions', [
+            'grace_days_ended_at' => $plan->calculateGraceDaysEnd($subscription->expired_at),
         ]);
     }
 

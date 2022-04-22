@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Copyright (c) lucasdotdev <lucasvinicius211@yahoo.com>
+Copyright (c) lucasdotvin <lucasvinicius211@yahoo.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

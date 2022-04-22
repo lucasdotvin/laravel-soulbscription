@@ -1,6 +1,6 @@
 <?php
 
-namespace LucasDotDev\Soulbscription;
+namespace LucasDotVin\Soulbscription;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -18,5 +18,9 @@ class SoulbscriptionServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../database/migrations' => database_path('migrations'),
         ], 'soulbscription-migrations');
+
+        $this->publishes([
+            __DIR__ . '/../database/migrations/upgrades/v2.0' => database_path('migrations'),
+        ], 'soulbscription-migrations-upgrades');
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace LucasDotDev\Soulbscription\Models\Concerns;
+namespace LucasDotVin\Soulbscription\Models\Concerns;
 
-use LucasDotDev\Soulbscription\Models\Scopes\StartingScope;
+use LucasDotVin\Soulbscription\Models\Scopes\StartingScope;
 
 trait Starts
 {

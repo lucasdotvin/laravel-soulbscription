@@ -1,9 +1,9 @@
 <h1 align="center">Laravel Soulbscription</h1>
 
-<p align="center"><a href="https://packagist.org/packages/lucasdotdev/laravel-soulbscription"><img alt="Latest Version on Packagist" src="https://img.shields.io/packagist/v/lucasdotdev/laravel-soulbscription.svg?style=flat-square"></a>
-<a href="https://github.com/lucasdotdev/laravel-soulbscription/actions?query=workflow%3Arun-tests+branch%3Amain"><img alt="GitHub Tests Action Status" src="https://img.shields.io/github/workflow/status/lucasdotdev/laravel-soulbscription/run-tests?label=tests"></a>
-<a href="https://github.com/lucasdotdev/laravel-soulbscription/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain"><img alt="GitHub Code Style Action Status" src="https://img.shields.io/github/workflow/status/lucasdotdev/laravel-soulbscription/Check%20&%20fix%20styling?label=code%20style"></a>
-<a href="https://packagist.org/packages/lucasdotdev/laravel-soulbscription"><img alt="Total Downloads" src="https://img.shields.io/packagist/dt/lucasdotdev/laravel-soulbscription.svg?style=flat-square"></a></p>
+<p align="center"><a href="https://packagist.org/packages/lucasdotvin/laravel-soulbscription"><img alt="Latest Version on Packagist" src="https://img.shields.io/packagist/v/lucasdotvin/laravel-soulbscription.svg?style=flat-square"></a>
+<a href="https://github.com/lucasdotvin/laravel-soulbscription/actions?query=workflow%3Arun-tests+branch%3Amain"><img alt="GitHub Tests Action Status" src="https://img.shields.io/github/workflow/status/lucasdotvin/laravel-soulbscription/run-tests?label=tests"></a>
+<a href="https://github.com/lucasdotvin/laravel-soulbscription/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain"><img alt="GitHub Code Style Action Status" src="https://img.shields.io/github/workflow/status/lucasdotvin/laravel-soulbscription/Check%20&%20fix%20styling?label=code%20style"></a>
+<a href="https://packagist.org/packages/lucasdotvin/laravel-soulbscription"><img alt="Total Downloads" src="https://img.shields.io/packagist/dt/lucasdotvin/laravel-soulbscription.svg?style=flat-square"></a></p>
 
 ## About
 
@@ -14,13 +14,22 @@ This package provides a straightforward interface to handle subscriptions and fe
 You can install the package via composer:
 
 ```bash
-composer require lucasdotdev/laravel-soulbscription
+composer require lucasdotvin/laravel-soulbscription
 ```
 
 The package migrations are loaded automatically, but you can still publish them with this command:
 
 ```bash
 php artisan vendor:publish --tag="laravel-soulbscription-migrations"
+php artisan migrate
+```
+
+## Upgrades
+
+If you already use this package and need to move to a newer version, don't forget to publish the upgrade migrations:
+
+```bash
+php artisan vendor:publish --tag="laravel-soulbscription-migrations-upgrades"
 php artisan migrate
 ```
 
@@ -33,7 +42,7 @@ To start using it, you just have to add the given trait to your `User` model (or
 
 namespace App\Models;
 
-use LucasDotDev\Soulbscription\Models\Concerns\HasSubscriptions;
+use LucasDotVin\Soulbscription\Models\Concerns\HasSubscriptions;
 
 class User
 {
@@ -53,8 +62,8 @@ First things first, you have to define the features you'll offer. In the example
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use LucasDotDev\Soulbscription\Enums\PeriodicityType;
-use LucasDotDev\Soulbscription\Models\Feature;
+use LucasDotVin\Soulbscription\Enums\PeriodicityType;
+use LucasDotVin\Soulbscription\Models\Feature;
 
 class FeatureSeeder extends Seeder
 {
@@ -91,8 +100,8 @@ Now you need to define the plans available to subscription in your app:
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use LucasDotDev\Soulbscription\Enums\PeriodicityType;
-use LucasDotDev\Soulbscription\Models\Plan;
+use LucasDotVin\Soulbscription\Enums\PeriodicityType;
+use LucasDotVin\Soulbscription\Models\Plan;
 
 class PlanSeeder extends Seeder
 {
@@ -115,12 +124,27 @@ class PlanSeeder extends Seeder
 
 Everything here is quite simple, but it is worth to emphasize: by receiving the periodicity options above, the two plans are defined as monthly.
 
+#### Grace Days
+
+You can define a number of grace days to each plan, so your users will not loose access to their features immediately on expiration:
+
+```php
+$gold = Plan::create([
+    'name'             => 'gold',
+    'periodicity_type' => PeriodicityType::Month,
+    'periodicity'      => 1,
+    'grace_days'       => 7,
+]);
+```
+
+With the configuration above, the subscribers of the "gold" plan will have seven days between the plan expiration and their access being suspended.
+
 ### Associating Plans with Features
 
 As each feature can belong to multiple plans (and they can have multiple features), you have to associate them:
 
 ```php
-use LucasDotDev\Soulbscription\Models\Feature;
+use LucasDotVin\Soulbscription\Models\Feature;
 
 // ...
 
@@ -182,7 +206,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StudentStoreFormRequest;
 use App\Models\Course;
 use App\Models\User;
-use LucasDotDev\Soulbscription\Models\Plan;
+use LucasDotVin\Soulbscription\Models\Plan;
 
 class StudentController extends Controller
 {
@@ -381,7 +405,7 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## Credits
 
-- [Lucas Vinicius](https://github.com/lucasdotdev)
+- [Lucas Vinicius](https://github.com/lucasdotvin)
 - [All Contributors](../../contributors)
 
 ## License

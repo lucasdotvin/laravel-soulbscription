@@ -1,11 +1,11 @@
 <?php
 
-namespace LucasDotDev\Soulbscription\Events;
+namespace LucasDotVin\Soulbscription\Events;
 
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use LucasDotDev\Soulbscription\Models\Subscription;
+use LucasDotVin\Soulbscription\Models\Subscription;
 
 class SubscriptionRenewed
 {

@@ -1,24 +1,24 @@
 <?php
 
-namespace LucasDotDev\Soulbscription\Models;
+namespace LucasDotVin\Soulbscription\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
-use LucasDotDev\Soulbscription\Events\SubscriptionCanceled;
-use LucasDotDev\Soulbscription\Events\SubscriptionRenewed;
-use LucasDotDev\Soulbscription\Events\SubscriptionScheduled;
-use LucasDotDev\Soulbscription\Events\SubscriptionStarted;
-use LucasDotDev\Soulbscription\Events\SubscriptionSuppressed;
-use LucasDotDev\Soulbscription\Models\Concerns\Expires;
-use LucasDotDev\Soulbscription\Models\Concerns\Starts;
-use LucasDotDev\Soulbscription\Models\Concerns\Suppresses;
+use LucasDotVin\Soulbscription\Events\SubscriptionCanceled;
+use LucasDotVin\Soulbscription\Events\SubscriptionRenewed;
+use LucasDotVin\Soulbscription\Events\SubscriptionScheduled;
+use LucasDotVin\Soulbscription\Events\SubscriptionStarted;
+use LucasDotVin\Soulbscription\Events\SubscriptionSuppressed;
+use LucasDotVin\Soulbscription\Models\Concerns\ExpiresAndHasGraceDays;
+use LucasDotVin\Soulbscription\Models\Concerns\Starts;
+use LucasDotVin\Soulbscription\Models\Concerns\Suppresses;
 
 class Subscription extends Model
 {
-    use Expires;
+    use ExpiresAndHasGraceDays;
     use HasFactory;
     use SoftDeletes;
     use Starts;
@@ -31,6 +31,7 @@ class Subscription extends Model
     protected $fillable = [
         'canceled_at',
         'expired_at',
+        'grace_days_ended_at',
         'started_at',
         'suppressed_at',
         'was_switched',
@@ -102,7 +103,7 @@ class Subscription extends Model
     {
         $this->renewals()->create([
             'renewal' => true,
-            'overdue' => $this->expired_at->isPast(),
+            'overdue' => $this->isOverdue,
         ]);
 
         $expirationDate = $expirationDate ?: $this->plan->calculateNextRecurrenceEnd();
@@ -138,5 +139,15 @@ class Subscription extends Model
         event(new SubscriptionSuppressed($this));
 
         return $this;
+    }
+
+    public function getIsOverdueAttribute(): bool
+    {
+        if ($this->grace_days_ended_at) {
+            return $this->expired_at->isPast()
+                and $this->grace_days_ended_at->isPast();
+        }
+
+        return $this->expired_at->isPast();
     }
 }

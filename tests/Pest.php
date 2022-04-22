@@ -1,5 +1,5 @@
 <?php
 
-use LucasDotDev\Soulbscription\Tests\TestCase;
+use LucasDotVin\Soulbscription\Tests\TestCase;
 
 uses(TestCase::class)->in(__DIR__);

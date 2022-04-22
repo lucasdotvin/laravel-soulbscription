@@ -1,6 +1,6 @@
 <?php
 
-namespace LucasDotDev\Soulbscription\Models\Scopes;
+namespace LucasDotVin\Soulbscription\Models\Scopes;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;

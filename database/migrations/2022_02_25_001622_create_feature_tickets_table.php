@@ -16,7 +16,7 @@ return new class() extends Migration {
             $table->id();
             $table->decimal('charges')->nullable();
             $table->timestamp('expired_at');
-            $table->foreignIdFor(\LucasDotDev\Soulbscription\Models\Feature::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\LucasDotVin\Soulbscription\Models\Feature::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
 
             if (config('soulbscription.models.subscriber.uses_uuid')) {

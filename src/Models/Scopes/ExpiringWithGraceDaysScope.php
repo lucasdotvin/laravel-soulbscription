@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 
-class ExpiringScope implements Scope
+class ExpiringWithGraceDaysScope implements Scope
 {
     protected $extensions = [
         'OnlyExpired',
@@ -16,7 +16,11 @@ class ExpiringScope implements Scope
 
     public function apply(Builder $builder, Model $model)
     {
-        $builder->where('expired_at', '>', now());
+        $builder->where(
+            fn (Builder $query) => $query
+            ->where('expired_at', '>', now())
+            ->orWhere('grace_days_ended_at', '>', now())
+        );
     }
 
     public function extend(Builder $builder)

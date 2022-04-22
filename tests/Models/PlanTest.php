@@ -1,13 +1,13 @@
 <?php
 
-namespace LucasDotDev\Soulbscription\Tests\Feature\Models;
+namespace LucasDotVin\Soulbscription\Tests\Feature\Models;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
-use LucasDotDev\Soulbscription\Enums\PeriodicityType;
-use LucasDotDev\Soulbscription\Models\Plan;
-use LucasDotDev\Soulbscription\Tests\TestCase;
+use LucasDotVin\Soulbscription\Enums\PeriodicityType;
+use LucasDotVin\Soulbscription\Models\Plan;
+use LucasDotVin\Soulbscription\Tests\TestCase;
 
 class PlanTest extends TestCase
 {
@@ -64,5 +64,23 @@ class PlanTest extends TestCase
         ]);
 
         $this->assertEquals(now()->addDays($days), $plan->calculateNextRecurrenceEnd());
+    }
+
+    public function testModelCancalculateGraceDaysEnd()
+    {
+        Carbon::setTestNow(now());
+
+        $days = $this->faker->randomDigitNotNull();
+        $graceDays = $this->faker->randomDigitNotNull();
+        $plan = Plan::factory()->create([
+            'grace_days' => $graceDays,
+            'periodicity_type' => PeriodicityType::Day,
+            'periodicity' => $days,
+        ]);
+
+        $this->assertEquals(
+            now()->addDays($days)->addDays($graceDays),
+            $plan->calculateGraceDaysEnd($plan->calculateNextRecurrenceEnd()),
+        );
     }
 }

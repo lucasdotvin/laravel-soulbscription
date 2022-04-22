@@ -1,6 +1,6 @@
 <?php
 
-namespace LucasDotDev\Soulbscription\Models;
+namespace LucasDotVin\Soulbscription\Models;
 
 use Illuminate\Database\Eloquent\Relations\Pivot;
 

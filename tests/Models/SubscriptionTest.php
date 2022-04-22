@@ -1,17 +1,17 @@
 <?php
 
-namespace LucasDotDev\Soulbscription\Tests\Feature\Models;
+namespace LucasDotVin\Soulbscription\Tests\Feature\Models;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
-use LucasDotDev\Soulbscription\Events\SubscriptionCanceled;
-use LucasDotDev\Soulbscription\Events\SubscriptionRenewed;
-use LucasDotDev\Soulbscription\Events\SubscriptionStarted;
-use LucasDotDev\Soulbscription\Events\SubscriptionSuppressed;
-use LucasDotDev\Soulbscription\Models\Plan;
-use LucasDotDev\Soulbscription\Models\Subscription;
-use LucasDotDev\Soulbscription\Tests\Mocks\Models\User;
-use LucasDotDev\Soulbscription\Tests\TestCase;
+use LucasDotVin\Soulbscription\Events\SubscriptionCanceled;
+use LucasDotVin\Soulbscription\Events\SubscriptionRenewed;
+use LucasDotVin\Soulbscription\Events\SubscriptionStarted;
+use LucasDotVin\Soulbscription\Events\SubscriptionSuppressed;
+use LucasDotVin\Soulbscription\Models\Plan;
+use LucasDotVin\Soulbscription\Models\Subscription;
+use LucasDotVin\Soulbscription\Tests\Mocks\Models\User;
+use LucasDotVin\Soulbscription\Tests\TestCase;
 
 class SubscriptionTest extends TestCase
 {
@@ -152,6 +152,25 @@ class SubscriptionTest extends TestCase
         $this->assertDatabaseHas('subscription_renewals', [
             'subscription_id' => $subscription->id,
             'overdue' => true,
+        ]);
+    }
+
+    public function testModelConsidersGraceDaysOnOverdue()
+    {
+        $subscriber = User::factory()->create();
+        $subscription = Subscription::factory()
+            ->for($subscriber, 'subscriber')
+            ->create([
+                'grace_days_ended_at' => now()->addDay(),
+                'expired_at' => now()->subDay(),
+            ]);
+
+        $subscription->renew();
+
+        $this->assertDatabaseCount('subscription_renewals', 1);
+        $this->assertDatabaseHas('subscription_renewals', [
+            'subscription_id' => $subscription->id,
+            'overdue' => false,
         ]);
     }
 }

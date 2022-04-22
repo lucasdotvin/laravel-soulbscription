@@ -1,18 +1,18 @@
 <?php
 
-namespace LucasDotDev\Soulbscription\Models\Concerns;
+namespace LucasDotVin\Soulbscription\Models\Concerns;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use LogicException;
-use LucasDotDev\Soulbscription\Events\FeatureConsumed;
-use LucasDotDev\Soulbscription\Events\FeatureTicketCreated;
-use LucasDotDev\Soulbscription\Models\Feature;
-use LucasDotDev\Soulbscription\Models\FeatureTicket;
-use LucasDotDev\Soulbscription\Models\Plan;
-use LucasDotDev\Soulbscription\Models\Subscription;
+use LucasDotVin\Soulbscription\Events\FeatureConsumed;
+use LucasDotVin\Soulbscription\Events\FeatureTicketCreated;
+use LucasDotVin\Soulbscription\Models\Feature;
+use LucasDotVin\Soulbscription\Models\FeatureTicket;
+use LucasDotVin\Soulbscription\Models\Plan;
+use LucasDotVin\Soulbscription\Models\Subscription;
 use OutOfBoundsException;
 use OverflowException;
 
@@ -81,8 +81,15 @@ trait HasSubscriptions
     {
         $expiration = $expiration ?? $plan->calculateNextRecurrenceEnd($startDate);
 
+        $graceDaysEnd = $plan->hasGraceDays
+            ? $plan->calculateGraceDaysEnd($expiration)
+            : null;
+
         return $this->subscription()
-            ->make(['expired_at' => $expiration])
+            ->make([
+                'expired_at' => $expiration,
+                'grace_days_ended_at' => $graceDaysEnd,
+            ])
             ->plan()
             ->associate($plan)
             ->start($startDate);
