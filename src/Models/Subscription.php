@@ -52,11 +52,6 @@ class Subscription extends Model
         return $this->morphTo('subscriber');
     }
 
-    public function scopeActive(Builder $query)
-    {
-        return $query->withoutNotStarted();
-    }
-
     public function scopeNotActive(Builder $query)
     {
         return $query->where(function (Builder $query) {
