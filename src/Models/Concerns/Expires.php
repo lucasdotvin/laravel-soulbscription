@@ -25,6 +25,6 @@ trait Expires
 
     public function notExpired()
     {
-        return $this->expired_at->isFuture();
+        return ! $this->expired();
     }
 }

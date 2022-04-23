@@ -34,11 +34,6 @@ trait ExpiresAndHasGraceDays
 
     public function notExpired()
     {
-        if (is_null($this->grace_days_ended_at)) {
-            return $this->expired_at->isFuture();
-        }
-
-        return $this->expired_at->isFuture()
-            or $this->grace_days_ended_at->isFuture();
+        return ! $this->expired();
     }
 }
