@@ -247,4 +247,56 @@ class SubscriptionTest extends TestCase
             fn ($subscription) => $this->assertContains($subscription->id, $returnedSubscriptions->pluck('id'))
         );
     }
+
+    public function testModelReturnsOnlyCanceledSubscriptionsWithTheScope()
+    {
+        Subscription::factory()
+            ->count($this->faker()->randomDigitNotNull())
+            ->started()
+            ->notExpired()
+            ->notSuppressed()
+            ->notCanceled()
+            ->create();
+
+        $canceledSubscription = Subscription::factory()
+            ->count($canceledSubscriptionCount = $this->faker()->randomDigitNotNull())
+            ->started()
+            ->notExpired()
+            ->notSuppressed()
+            ->canceled()
+            ->create();
+
+        $returnedSubscriptions = Subscription::canceled()->get();
+
+        $this->assertCount($canceledSubscriptionCount, $returnedSubscriptions);
+        $canceledSubscription->each(
+            fn ($subscription) => $this->assertContains($subscription->id, $returnedSubscriptions->pluck('id'))
+        );
+    }
+
+    public function testModelReturnsOnlyNotCanceledSubscriptionsWithTheScope()
+    {
+        Subscription::factory()
+            ->count($this->faker()->randomDigitNotNull())
+            ->started()
+            ->notExpired()
+            ->notSuppressed()
+            ->canceled()
+            ->create();
+
+        $notCanceledSubscription = Subscription::factory()
+            ->count($notCanceledSubscriptionCount = $this->faker()->randomDigitNotNull())
+            ->started()
+            ->notExpired()
+            ->notSuppressed()
+            ->notCanceled()
+            ->create();
+
+        $returnedSubscriptions = Subscription::notCanceled()->get();
+
+        $this->assertCount($notCanceledSubscriptionCount, $returnedSubscriptions);
+        $notCanceledSubscription->each(
+            fn ($subscription) => $this->assertContains($subscription->id, $returnedSubscriptions->pluck('id'))
+        );
+    }
 }
