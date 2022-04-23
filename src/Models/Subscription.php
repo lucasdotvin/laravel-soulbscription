@@ -15,6 +15,9 @@ use LucasDotVin\Soulbscription\Events\SubscriptionSuppressed;
 use LucasDotVin\Soulbscription\Models\Concerns\ExpiresAndHasGraceDays;
 use LucasDotVin\Soulbscription\Models\Concerns\Starts;
 use LucasDotVin\Soulbscription\Models\Concerns\Suppresses;
+use LucasDotVin\Soulbscription\Models\Scopes\ExpiringWithGraceDaysScope;
+use LucasDotVin\Soulbscription\Models\Scopes\StartingScope;
+use LucasDotVin\Soulbscription\Models\Scopes\SuppressingScope;
 
 class Subscription extends Model
 {
@@ -54,11 +57,16 @@ class Subscription extends Model
 
     public function scopeNotActive(Builder $query)
     {
-        return $query->where(function (Builder $query) {
-            return $query->onlyExpired()
-                ->onlyNotStarted()
-                ->onlySuppressed();
-        });
+        return $query->withoutGlobalScopes([
+                ExpiringWithGraceDaysScope::class,
+                StartingScope::class,
+                SuppressingScope::class,
+            ])
+            ->where(function (Builder $query) {
+                $query->where(fn (Builder $query) => $query->onlyExpired())
+                    ->orWhere(fn (Builder $query) => $query->onlyNotStarted())
+                    ->orWhere(fn (Builder $query) => $query->onlySuppressed());
+            });
     }
 
     public function scopeCanceled(Builder $query)
