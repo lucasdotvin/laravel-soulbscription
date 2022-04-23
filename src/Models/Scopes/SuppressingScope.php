@@ -49,7 +49,7 @@ class SuppressingScope implements Scope
     protected function addOnlySuppressed(Builder $builder)
     {
         $builder->macro('onlySuppressed', function (Builder $builder) {
-            $builder->withoutGlobalScope($this)->whereNotNull();
+            $builder->withoutGlobalScope($this)->whereNotNull('suppressed_at');
 
             return $builder;
         });
