@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use LucasDotVin\Soulbscription\Enums\PeriodicityType;
 use LucasDotVin\Soulbscription\Models\Plan;
+use LucasDotVin\Soulbscription\Models\Subscription;
 use LucasDotVin\Soulbscription\Tests\TestCase;
 
 class PlanTest extends TestCase
@@ -82,5 +83,24 @@ class PlanTest extends TestCase
             now()->addDays($days)->addDays($graceDays),
             $plan->calculateGraceDaysEnd($plan->calculateNextRecurrenceEnd()),
         );
+    }
+
+    public function testModelCanRetrieveSubscriptions()
+    {
+        $plan = Plan::factory()
+            ->create();
+
+        $subscriptions = Subscription::factory()
+            ->for($plan)
+            ->count($subscriptionsCount = $this->faker->randomDigitNotNull())
+            ->started()
+            ->notExpired()
+            ->notSuppressed()
+            ->create();
+
+        $this->assertEquals($subscriptionsCount, $plan->subscriptions()->count());
+        $subscriptions->each(function ($subscription) use ($plan) {
+            $this->assertTrue($plan->subscriptions->contains($subscription));
+        });
     }
 }
