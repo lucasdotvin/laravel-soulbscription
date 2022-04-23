@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use LucasDotVin\Soulbscription\Models\FeatureConsumption;
 use LucasDotVin\Soulbscription\Tests\TestCase;
 
-class ExpiringScopeScopeTest extends TestCase
+class ExpiringScopeTest extends TestCase
 {
     use RefreshDatabase;
     use WithFaker;
