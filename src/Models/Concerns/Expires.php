@@ -20,11 +20,11 @@ trait Expires
 
     public function expired()
     {
-        return ! is_null($this->expired_at);
+        return $this->expired_at->isPast();
     }
 
     public function notExpired()
     {
-        return is_null($this->expired_at);
+        return $this->expired_at->isFuture();
     }
 }
