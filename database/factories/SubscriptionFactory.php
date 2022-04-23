@@ -50,6 +50,13 @@ class SubscriptionFactory extends Factory
         ]);
     }
 
+    public function notExpired()
+    {
+        return $this->state(fn (array $attributes) => [
+            'expired_at' => now()->addDays($this->faker->randomDigitNotNull()),
+        ]);
+    }
+
     public function started()
     {
         return $this->state(fn (array $attributes) => [
