@@ -56,6 +56,26 @@ class ExpiringScopeTest extends TestCase
         );
     }
 
+    public function testExpiredModelsAreNotReturnedWhenCallingMethodWithExpiredAndPassingFalse()
+    {
+        $expiredModelsCount = $this->faker()->randomDigitNotNull();
+        self::MODEL::factory()->count($expiredModelsCount)->create([
+            'expired_at' => now()->subDay(),
+        ]);
+
+        $unexpiredModelsCount = $this->faker()->randomDigitNotNull();
+        $unexpiredModels = self::MODEL::factory()->count($unexpiredModelsCount)->create([
+            'expired_at' => now()->addDay(),
+        ]);
+
+        $returnedFeatureConsumptions = self::MODEL::withExpired(false)->get();
+
+        $this->assertEqualsCanonicalizing(
+            $unexpiredModels->pluck('id')->toArray(),
+            $returnedFeatureConsumptions->pluck('id')->toArray(),
+        );
+    }
+
     public function testOnlyExpiredModelsAreReturnedWhenCallingMethodOnlyExpired()
     {
         $expiredModelsCount = $this->faker()->randomDigitNotNull();
