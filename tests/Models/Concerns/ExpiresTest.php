@@ -75,4 +75,32 @@ class ExpiresTest extends TestCase
             $returnedSubscriptions->pluck('id')->toArray(),
         );
     }
+
+    public function testModelReturnsExpiredStatus()
+    {
+        $expiredModel = self::MODEL::factory()
+            ->expired()
+            ->create();
+
+        $notExpiredModel = self::MODEL::factory()
+            ->notExpired()
+            ->create();
+
+        $this->assertTrue($expiredModel->expired());
+        $this->assertFalse($notExpiredModel->expired());
+    }
+
+    public function testModelReturnsNotExpiredStatus()
+    {
+        $expiredModel = self::MODEL::factory()
+            ->expired()
+            ->create();
+
+        $notExpiredModel = self::MODEL::factory()
+            ->notExpired()
+            ->create();
+
+        $this->assertFalse($expiredModel->notExpired());
+        $this->assertTrue($notExpiredModel->notExpired());
+    }
 }

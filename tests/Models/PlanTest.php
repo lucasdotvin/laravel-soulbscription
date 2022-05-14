@@ -7,64 +7,13 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use LucasDotVin\Soulbscription\Enums\PeriodicityType;
 use LucasDotVin\Soulbscription\Models\Plan;
+use LucasDotVin\Soulbscription\Models\Subscription;
 use LucasDotVin\Soulbscription\Tests\TestCase;
 
 class PlanTest extends TestCase
 {
     use RefreshDatabase;
     use WithFaker;
-
-    public function testModelCalculateYearlyExpiration()
-    {
-        Carbon::setTestNow(now());
-
-        $years = $this->faker->randomDigitNotNull();
-        $plan = Plan::factory()->create([
-            'periodicity_type' => PeriodicityType::Year,
-            'periodicity' => $years,
-        ]);
-
-        $this->assertEquals(now()->addYears($years), $plan->calculateNextRecurrenceEnd());
-    }
-
-    public function testModelCalculateMonthlyExpiration()
-    {
-        Carbon::setTestNow(now());
-
-        $months = $this->faker->randomDigitNotNull();
-        $plan = Plan::factory()->create([
-            'periodicity_type' => PeriodicityType::Month,
-            'periodicity' => $months,
-        ]);
-
-        $this->assertEquals(now()->addMonths($months), $plan->calculateNextRecurrenceEnd());
-    }
-
-    public function testModelCalculateWeeklyExpiration()
-    {
-        Carbon::setTestNow(now());
-
-        $weeks = $this->faker->randomDigitNotNull();
-        $plan = Plan::factory()->create([
-            'periodicity_type' => PeriodicityType::Week,
-            'periodicity' => $weeks,
-        ]);
-
-        $this->assertEquals(now()->addWeeks($weeks), $plan->calculateNextRecurrenceEnd());
-    }
-
-    public function testModelCalculateDailyExpiration()
-    {
-        Carbon::setTestNow(now());
-
-        $days = $this->faker->randomDigitNotNull();
-        $plan = Plan::factory()->create([
-            'periodicity_type' => PeriodicityType::Day,
-            'periodicity' => $days,
-        ]);
-
-        $this->assertEquals(now()->addDays($days), $plan->calculateNextRecurrenceEnd());
-    }
 
     public function testModelCancalculateGraceDaysEnd()
     {
@@ -82,5 +31,24 @@ class PlanTest extends TestCase
             now()->addDays($days)->addDays($graceDays),
             $plan->calculateGraceDaysEnd($plan->calculateNextRecurrenceEnd()),
         );
+    }
+
+    public function testModelCanRetrieveSubscriptions()
+    {
+        $plan = Plan::factory()
+            ->create();
+
+        $subscriptions = Subscription::factory()
+            ->for($plan)
+            ->count($subscriptionsCount = $this->faker->randomDigitNotNull())
+            ->started()
+            ->notExpired()
+            ->notSuppressed()
+            ->create();
+
+        $this->assertEquals($subscriptionsCount, $plan->subscriptions()->count());
+        $subscriptions->each(function ($subscription) use ($plan) {
+            $this->assertTrue($plan->subscriptions->contains($subscription));
+        });
     }
 }

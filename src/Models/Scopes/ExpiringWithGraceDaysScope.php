@@ -44,7 +44,8 @@ class ExpiringWithGraceDaysScope implements Scope
     protected function addWithoutExpired(Builder $builder)
     {
         $builder->macro('withoutExpired', function (Builder $builder) {
-            $builder->withoutGlobalScope($this)->where('expired_at', '>', now());
+            $builder->withoutGlobalScope($this)->where('expired_at', '>', now())
+                ->orWhere('grace_days_ended_at', '>', now());
 
             return $builder;
         });
@@ -53,7 +54,12 @@ class ExpiringWithGraceDaysScope implements Scope
     protected function addOnlyExpired(Builder $builder)
     {
         $builder->macro('onlyExpired', function (Builder $builder) {
-            $builder->withoutGlobalScope($this)->where('expired_at', '<=', now());
+            $builder->withoutGlobalScope($this)
+                ->where('expired_at', '<=', now())
+                ->where(
+                    fn (Builder $query) => $query->where('grace_days_ended_at', '<=', now())
+                        ->orWhereNull('grace_days_ended_at')
+                );
 
             return $builder;
         });

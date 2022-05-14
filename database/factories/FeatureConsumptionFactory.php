@@ -25,4 +25,18 @@ class FeatureConsumptionFactory extends Factory
             'subscriber_type' => $this->faker->word(),
         ];
     }
+
+    public function expired()
+    {
+        return $this->state(fn (array $attributes) => [
+            'expired_at' => $this->faker->dateTime(),
+        ]);
+    }
+
+    public function notExpired()
+    {
+        return $this->state(fn (array $attributes) => [
+            'expired_at' => now()->addDays($this->faker->randomDigitNotNull()),
+        ]);
+    }
 }

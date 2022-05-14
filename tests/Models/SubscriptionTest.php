@@ -3,6 +3,7 @@
 namespace LucasDotVin\Soulbscription\Tests\Feature\Models;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use LucasDotVin\Soulbscription\Events\SubscriptionCanceled;
 use LucasDotVin\Soulbscription\Events\SubscriptionRenewed;
@@ -16,6 +17,7 @@ use LucasDotVin\Soulbscription\Tests\TestCase;
 class SubscriptionTest extends TestCase
 {
     use RefreshDatabase;
+    use WithFaker;
 
     public function testModelRenews()
     {
@@ -172,5 +174,129 @@ class SubscriptionTest extends TestCase
             'subscription_id' => $subscription->id,
             'overdue' => false,
         ]);
+    }
+
+    public function testModelReturnsNotStartedSubscriptionsInNotActiveScope()
+    {
+        Subscription::factory()
+            ->count($this->faker()->randomDigitNotNull())
+            ->started()
+            ->notExpired()
+            ->notSuppressed()
+            ->create();
+
+        $notStartedSubscription = Subscription::factory()
+            ->count($notStartedSubscriptionCount = $this->faker()->randomDigitNotNull())
+            ->notStarted()
+            ->notExpired()
+            ->notSuppressed()
+            ->create();
+
+        $returnedSubscriptions = Subscription::notActive()->get();
+
+        $this->assertCount($notStartedSubscriptionCount, $returnedSubscriptions);
+        $notStartedSubscription->each(
+            fn ($subscription) => $this->assertContains($subscription->id, $returnedSubscriptions->pluck('id'))
+        );
+    }
+
+    public function testModelReturnsExpiredSubscriptionsInNotActiveScope()
+    {
+        Subscription::factory()
+            ->count($this->faker()->randomDigitNotNull())
+            ->started()
+            ->notExpired()
+            ->notSuppressed()
+            ->create();
+
+        $expiredSubscription = Subscription::factory()
+            ->count($expiredSubscriptionCount = $this->faker()->randomDigitNotNull())
+            ->started()
+            ->expired()
+            ->notSuppressed()
+            ->create();
+
+        $returnedSubscriptions = Subscription::notActive()->get();
+
+        $this->assertCount($expiredSubscriptionCount, $returnedSubscriptions);
+        $expiredSubscription->each(
+            fn ($subscription) => $this->assertContains($subscription->id, $returnedSubscriptions->pluck('id'))
+        );
+    }
+
+    public function testModelReturnsSuppressedSubscriptionsInNotActiveScope()
+    {
+        Subscription::factory()
+            ->count($this->faker()->randomDigitNotNull())
+            ->started()
+            ->notExpired()
+            ->notSuppressed()
+            ->create();
+
+        $suppressedSubscription = Subscription::factory()
+            ->count($suppressedSubscriptionCount = $this->faker()->randomDigitNotNull())
+            ->started()
+            ->notExpired()
+            ->suppressed()
+            ->create();
+
+        $returnedSubscriptions = Subscription::notActive()->get();
+
+        $this->assertCount($suppressedSubscriptionCount, $returnedSubscriptions);
+        $suppressedSubscription->each(
+            fn ($subscription) => $this->assertContains($subscription->id, $returnedSubscriptions->pluck('id'))
+        );
+    }
+
+    public function testModelReturnsOnlyCanceledSubscriptionsWithTheScope()
+    {
+        Subscription::factory()
+            ->count($this->faker()->randomDigitNotNull())
+            ->started()
+            ->notExpired()
+            ->notSuppressed()
+            ->notCanceled()
+            ->create();
+
+        $canceledSubscription = Subscription::factory()
+            ->count($canceledSubscriptionCount = $this->faker()->randomDigitNotNull())
+            ->started()
+            ->notExpired()
+            ->notSuppressed()
+            ->canceled()
+            ->create();
+
+        $returnedSubscriptions = Subscription::canceled()->get();
+
+        $this->assertCount($canceledSubscriptionCount, $returnedSubscriptions);
+        $canceledSubscription->each(
+            fn ($subscription) => $this->assertContains($subscription->id, $returnedSubscriptions->pluck('id'))
+        );
+    }
+
+    public function testModelReturnsOnlyNotCanceledSubscriptionsWithTheScope()
+    {
+        Subscription::factory()
+            ->count($this->faker()->randomDigitNotNull())
+            ->started()
+            ->notExpired()
+            ->notSuppressed()
+            ->canceled()
+            ->create();
+
+        $notCanceledSubscription = Subscription::factory()
+            ->count($notCanceledSubscriptionCount = $this->faker()->randomDigitNotNull())
+            ->started()
+            ->notExpired()
+            ->notSuppressed()
+            ->notCanceled()
+            ->create();
+
+        $returnedSubscriptions = Subscription::notCanceled()->get();
+
+        $this->assertCount($notCanceledSubscriptionCount, $returnedSubscriptions);
+        $notCanceledSubscription->each(
+            fn ($subscription) => $this->assertContains($subscription->id, $returnedSubscriptions->pluck('id'))
+        );
     }
 }

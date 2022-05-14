@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use LucasDotVin\Soulbscription\Models\FeatureConsumption;
 use LucasDotVin\Soulbscription\Tests\TestCase;
 
-class ExpiringScopeScopeTest extends TestCase
+class ExpiringScopeTest extends TestCase
 {
     use RefreshDatabase;
     use WithFaker;
@@ -52,6 +52,26 @@ class ExpiringScopeScopeTest extends TestCase
 
         $this->assertEqualsCanonicalizing(
             $expectedFeatureConsumptions->pluck('id')->toArray(),
+            $returnedFeatureConsumptions->pluck('id')->toArray(),
+        );
+    }
+
+    public function testExpiredModelsAreNotReturnedWhenCallingMethodWithExpiredAndPassingFalse()
+    {
+        $expiredModelsCount = $this->faker()->randomDigitNotNull();
+        self::MODEL::factory()->count($expiredModelsCount)->create([
+            'expired_at' => now()->subDay(),
+        ]);
+
+        $unexpiredModelsCount = $this->faker()->randomDigitNotNull();
+        $unexpiredModels = self::MODEL::factory()->count($unexpiredModelsCount)->create([
+            'expired_at' => now()->addDay(),
+        ]);
+
+        $returnedFeatureConsumptions = self::MODEL::withExpired(false)->get();
+
+        $this->assertEqualsCanonicalizing(
+            $unexpiredModels->pluck('id')->toArray(),
             $returnedFeatureConsumptions->pluck('id')->toArray(),
         );
     }
