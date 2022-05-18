@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
 use LogicException;
 use LucasDotVin\DBQueriesCounter\Traits\CountsQueries;
 use LucasDotVin\Soulbscription\Events\FeatureConsumed;
@@ -34,9 +35,11 @@ class HasSubscriptionsTest extends TestCase
         $plan = Plan::factory()->createOne();
         $subscriber = User::factory()->createOne();
 
-        $this->expectsEvents(SubscriptionStarted::class);
+        Event::fake();
 
         $subscription = $subscriber->subscribeTo($plan);
+
+        Event::assertDispatched(SubscriptionStarted::class);
 
         $this->assertDatabaseHas('subscriptions', [
             'id' => $subscription->id,
@@ -72,9 +75,12 @@ class HasSubscriptionsTest extends TestCase
         $subscriber = User::factory()->createOne();
         $oldSubscription = $subscriber->subscribeTo($oldPlan);
 
-        $this->expectsEvents([SubscriptionStarted::class, SubscriptionSuppressed::class]);
+        Event::fake();
 
         $newSubscription = $subscriber->switchTo($newPlan);
+
+        Event::assertDispatched(SubscriptionStarted::class);
+        Event::assertDispatched(SubscriptionSuppressed::class);
 
         $this->assertDatabaseHas('subscriptions', [
             'id' => $newSubscription->id,
@@ -101,10 +107,12 @@ class HasSubscriptionsTest extends TestCase
         $subscriber = User::factory()->createOne();
         $oldSubscription = $subscriber->subscribeTo($oldPlan);
 
-        $this->expectsEvents(SubscriptionScheduled::class);
-        $this->doesntExpectEvents(SubscriptionStarted::class);
+        Event::fake();
 
         $newSubscription = $subscriber->switchTo($newPlan, immediately: false);
+
+        Event::assertDispatched(SubscriptionScheduled::class);
+        Event::assertNotDispatched(SubscriptionStarted::class);
 
         $this->assertDatabaseHas('subscriptions', [
             'id' => $newSubscription->id,
@@ -161,9 +169,11 @@ class HasSubscriptionsTest extends TestCase
         $subscriber = User::factory()->createOne();
         $subscription = $subscriber->subscribeTo($plan);
 
-        $this->expectsEvents(FeatureConsumed::class);
+        Event::fake();
 
         $subscriber->consume($feature->name, $consumption);
+
+        Event::assertDispatched(FeatureConsumed::class);
 
         $this->assertDatabaseHas('feature_consumptions', [
             'consumption' => $consumption,
@@ -663,9 +673,11 @@ class HasSubscriptionsTest extends TestCase
 
         config()->set('soulbscription.feature_tickets', true);
 
-        $this->expectsEvents(FeatureTicketCreated::class);
+        Event::fake();
 
         $subscriber->giveTicketFor($feature->name, $expiration, $charges);
+
+        Event::assertDispatched(FeatureTicketCreated::class);
     }
 
     public function testItRaisesAnExceptionWhenCreatingATicketForANonExistingFeature()
