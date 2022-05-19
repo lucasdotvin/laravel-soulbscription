@@ -79,4 +79,18 @@ class FeatureTest extends TestCase
 
         $this->assertEquals(now()->addDays(3), $feature->calculateNextRecurrenceEnd($startDate));
     }
+
+    public function testModelIsNotQuoteByDefault()
+    {
+        $creationPayload = Feature::factory()->raw();
+
+        unset($creationPayload['quote']);
+
+        $feature = Feature::create($creationPayload);
+
+        $this->assertDatabaseHas('features', [
+            'id' => $feature->id,
+            'quote' => false,
+        ]);
+    }
 }
