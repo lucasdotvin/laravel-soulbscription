@@ -27,6 +27,7 @@ class FeatureFactory extends Factory
                 PeriodicityType::Week,
                 PeriodicityType::Day,
             ]),
+            'quote'            => false,
         ];
     }
 
@@ -40,9 +41,27 @@ class FeatureFactory extends Factory
     public function notConsumable()
     {
         return $this->state(fn (array $attributes) => [
+            'quote' => false,
             'consumable' => false,
             'periodicity' => null,
             'periodicity_type' => null,
+        ]);
+    }
+
+    public function quote()
+    {
+        return $this->state(fn (array $attributes) => [
+            'consumable' => true,
+            'quote' => true,
+            'periodicity' => null,
+            'periodicity_type' => null,
+        ]);
+    }
+
+    public function notQuote()
+    {
+        return $this->state(fn (array $attributes) => [
+            'quote' => false,
         ]);
     }
 }
