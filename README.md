@@ -128,7 +128,7 @@ class PhotoController extends Seeder
 }
 ```
 
-In the example above, we set `storage` as a quota feature inside the seeder. Then, on the controller, our code store an uploaded file on a folder, calculate the folder size by retrieving all of its subfiles, and, finally, set the consumed `storage` quota as the directory total size.
+In the example above, we set `storage` as a quota feature inside the seeder. Then, on the controller, our code store an uploaded file on a folder, calculate this folder size by retrieving all of its subfiles, and, finally, set the consumed `storage` quota as the directory total size.
 
 ### Creating Plans
 
