@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-soulbscription` will be documented in this file.
 
+## v2.1.0 - 2022-05-18
+
+- [x] Updated dependencies and dev-dependencies
+
 ## v2.0.1 - 2022-05-14
 
 - [x] Inreased test coverage
@@ -15,6 +19,7 @@ All notable changes to `laravel-soulbscription` will be documented in this file.
 
 - [x] Implemented feature tickets
 - - [x] Made feature tickets an optional feature
+- 
 - 
 
 ## 1.0.0 - 202X-XX-XX
