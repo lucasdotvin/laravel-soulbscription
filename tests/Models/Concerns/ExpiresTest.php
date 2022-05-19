@@ -103,4 +103,24 @@ class ExpiresTest extends TestCase
         $this->assertFalse($expiredModel->notExpired());
         $this->assertTrue($notExpiredModel->notExpired());
     }
+
+    public function testModelsWithoutExpirationDateAreReturnedByDefault()
+    {
+        $expiredModelsCount = $this->faker()->randomDigitNotNull();
+        self::MODEL::factory()->count($expiredModelsCount)->create([
+            'expired_at' => now()->subDay(),
+        ]);
+
+        $unexpiredModelsCount = $this->faker()->randomDigitNotNull();
+        $unexpiredModels = self::MODEL::factory()->count($unexpiredModelsCount)->create([
+            'expired_at' => null,
+        ]);
+
+        $returnedSubscriptions = self::MODEL::all();
+
+        $this->assertEqualsCanonicalizing(
+            $unexpiredModels->pluck('id')->toArray(),
+            $returnedSubscriptions->pluck('id')->toArray(),
+        );
+    }
 }

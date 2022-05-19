@@ -16,7 +16,11 @@ class ExpiringScope implements Scope
 
     public function apply(Builder $builder, Model $model)
     {
-        $builder->where('expired_at', '>', now());
+        $builder->where(
+            fn (Builder $query) =>
+            $query->where('expired_at', '>', now())
+                ->orWhereNull('expired_at')
+        );
     }
 
     public function extend(Builder $builder)
@@ -40,7 +44,11 @@ class ExpiringScope implements Scope
     protected function addWithoutExpired(Builder $builder)
     {
         $builder->macro('withoutExpired', function (Builder $builder) {
-            $builder->withoutGlobalScope($this)->where('expired_at', '>', now());
+            $builder->withoutGlobalScope($this)->where(
+                fn (Builder $query) =>
+                $query->where('expired_at', '>', now())
+                    ->orWhereNull('expired_at')
+            );
 
             return $builder;
         });
@@ -49,7 +57,11 @@ class ExpiringScope implements Scope
     protected function addOnlyExpired(Builder $builder)
     {
         $builder->macro('onlyExpired', function (Builder $builder) {
-            $builder->withoutGlobalScope($this)->where('expired_at', '<=', now());
+            $builder->withoutGlobalScope($this)->where(
+                fn (Builder $query) =>
+                $query->where('expired_at', '<=', now())
+                    ->whereNotNull('expired_at')
+            );
 
             return $builder;
         });

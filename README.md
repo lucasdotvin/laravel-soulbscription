@@ -90,6 +90,46 @@ By saying the `deploy-minutes` is a consumable feature, we are telling the users
 
 The other feature we defined was `$customDomain`, which was a not consumable feature. By being not consumable, this feature implies only that the users with access to it can perform a given action (in this case, use a custom domain).
 
+#### Quota Features
+
+When creating, for instance, a file storage system, you'll have to increase and decrease feature consumption as your users upload and delete files. To achieve this easily, you can use quota features. These features have an unique, unexpirable consumption, so they can reflect a constant value (as used system storage in this example).
+
+```php
+class FeatureSeeder extends Seeder
+{
+    public function run()
+    {
+        $storage = Feature::create([
+            'consumable' => true,
+            'quota'      => true,
+            'name'       => 'storage',
+        ]);
+    }
+}
+
+...
+
+class PhotoController extends Seeder
+{
+    public function store(Request $request)
+    {
+        $userFolder = auth()->id() . '-files';
+
+        $request->file->store($userFolder);
+
+        $usedSpace = collect(Storage::allFiles($userFolder))
+            ->map(fn (string $subFile) => Storage::size($subFile))
+            ->sum();
+
+        auth()->user()->setConsumedQuota('storage', $usedSpace);
+
+        return redirect()->route('files.index');
+    }
+}
+```
+
+In the example above, we set `storage` as a quota feature inside the seeder. Then, on the controller, our code store an uploaded file on a folder, calculate this folder size by retrieving all of its subfiles, and, finally, set the consumed `storage` quota as the directory total size.
+
 ### Creating Plans
 
 Now you need to define the plans available to subscription in your app:
