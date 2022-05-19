@@ -78,7 +78,7 @@ trait HasSubscriptions
             'None of the active plans grants access to this feature.',
         ));
 
-        throw_if($this->cantConsume($featureName, $consumption), new OverflowException(
+        throw_if($this->getTotalCharges($featureName) < $consumption, new OverflowException(
             'The feature has no enough charges to this consumption.',
         ));
 
