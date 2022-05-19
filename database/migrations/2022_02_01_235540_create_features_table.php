@@ -16,7 +16,7 @@ return new class() extends Migration {
             $table->id();
             $table->string('name');
             $table->boolean('consumable');
-            $table->boolean('quote')->default(false);
+            $table->boolean('quota')->default(false);
             $table->unsignedInteger('periodicity')->nullable();
             $table->string('periodicity_type')->nullable();
             $table->softDeletes();

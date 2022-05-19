@@ -18,7 +18,7 @@ class Feature extends Model
         'name',
         'periodicity_type',
         'periodicity',
-        'quote',
+        'quota',
     ];
 
     public function plans()
