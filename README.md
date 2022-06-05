@@ -20,7 +20,7 @@ composer require lucasdotvin/laravel-soulbscription
 The package migrations are loaded automatically, but you can still publish them with this command:
 
 ```bash
-php artisan vendor:publish --tag="laravel-soulbscription-migrations"
+php artisan vendor:publish --tag="soulbscription-migrations"
 php artisan migrate
 ```
 
@@ -29,9 +29,11 @@ php artisan migrate
 If you already use this package and need to move to a newer version, don't forget to publish the upgrade migrations:
 
 ```bash
-php artisan vendor:publish --tag="laravel-soulbscription-migrations-upgrades"
+php artisan vendor:publish --tag="soulbscription-migrations-upgrades-1.x-2.x"
 php artisan migrate
 ```
+
+> Check out the available upgrade migrations by looking at the [upgrades folder](https://github.com/lucasdotvin/laravel-soulbscription/tree/develop/database/migrations/upgrades).
 
 ## Usage
 
