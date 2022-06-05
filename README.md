@@ -393,6 +393,16 @@ Similarly to `cantConsume`, it returns the reverse of `hasFeature`.
 
 Tickets are a simple way to allow your subscribers to acquire charges for a feature. When a user receives a ticket, he is allowed to consume its charges, just like he would do in a normal subscription. Tickets can be used to extend regular subscriptions-based systems (so you can, for instance, sell more charges of a given feature) or even to **build a fully pre-paid service**, where your users pay only for what they want to use.
 
+#### Enabling Tickets
+
+In order to use this feature, you have to enable tickets in your configuration files. First, publish the package configs:
+
+```bash
+php artisan vendor:publish --tag="soulbscription-config"
+```
+
+Finally, open the `soulbscription.php` file and set the `feature_tickets` flag to `true`. That's it, you now can use tickets!
+
 #### Creating Tickets
 
 To create a ticket, you can use the method `giveTicketFor`. This method expects the feature name, the expiration and optionally a number of charges (you can ignore it when creating tickets for not consumable features):
