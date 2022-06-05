@@ -20,7 +20,7 @@ composer require lucasdotvin/laravel-soulbscription
 The package migrations are loaded automatically, but you can still publish them with this command:
 
 ```bash
-php artisan vendor:publish --tag="laravel-soulbscription-migrations"
+php artisan vendor:publish --tag="soulbscription-migrations"
 php artisan migrate
 ```
 
@@ -29,9 +29,11 @@ php artisan migrate
 If you already use this package and need to move to a newer version, don't forget to publish the upgrade migrations:
 
 ```bash
-php artisan vendor:publish --tag="laravel-soulbscription-migrations-upgrades"
+php artisan vendor:publish --tag="soulbscription-migrations-upgrades-1.x-2.x"
 php artisan migrate
 ```
+
+> Check out the available upgrade migrations by looking at the [upgrades folder](https://github.com/lucasdotvin/laravel-soulbscription/tree/develop/database/migrations/upgrades).
 
 ## Usage
 
@@ -392,6 +394,16 @@ Similarly to `cantConsume`, it returns the reverse of `hasFeature`.
 ### Feature Tickets
 
 Tickets are a simple way to allow your subscribers to acquire charges for a feature. When a user receives a ticket, he is allowed to consume its charges, just like he would do in a normal subscription. Tickets can be used to extend regular subscriptions-based systems (so you can, for instance, sell more charges of a given feature) or even to **build a fully pre-paid service**, where your users pay only for what they want to use.
+
+#### Enabling Tickets
+
+In order to use this feature, you have to enable tickets in your configuration files. First, publish the package configs:
+
+```bash
+php artisan vendor:publish --tag="soulbscription-config"
+```
+
+Finally, open the `soulbscription.php` file and set the `feature_tickets` flag to `true`. That's it, you now can use tickets!
 
 #### Creating Tickets
 
