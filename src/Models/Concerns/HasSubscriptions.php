@@ -121,11 +121,26 @@ trait HasSubscriptions
             ->start($startDate);
     }
 
-    public function hasSubscription(Plan $plan): bool
+    public function hasSubscriptionTo(Plan $plan): bool
     {
         return $this->subscription()
             ->where('plan_id', $plan->id)
             ->exists();
+    }
+
+    public function isSubscribedTo(Plan $plan): bool
+    {
+        return $this->hasSubscriptionTo($plan);
+    }
+
+    public function missingSubscriptionTo(Plan $plan): bool
+    {
+        return !$this->hasSubscriptionTo($plan);
+    }
+
+    public function isNotSubscribedTo(Plan $plan): bool
+    {
+        return !$this->isSubscribedTo($plan);
     }
 
     public function switchTo(Plan $plan, $expiration = null, $immediately = true): Subscription
