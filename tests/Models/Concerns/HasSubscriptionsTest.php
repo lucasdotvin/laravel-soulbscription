@@ -809,4 +809,32 @@ class HasSubscriptionsTest extends TestCase
 
         $subscriber->setConsumedQuota($feature->name, $consumption);
     }
+
+    public function testItChecksIfTheUserHasSubscriptionToAPlan()
+    {
+        $plan = Plan::factory()->createOne();
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($plan);
+
+        $hasSubscription = $subscriber->hasSubscriptionTo($plan);
+        $isSubscribed = $subscriber->isSubscribedTo($plan);
+
+        $this->assertTrue($hasSubscription);
+        $this->assertTrue($isSubscribed);
+    }
+
+    public function testItChecksIfTheUserDoesNotHaveSubscriptionToAPlan()
+    {
+        $plan = Plan::factory()->createOne();
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($plan);
+
+        $hasSubscription = $subscriber->missingSubscriptionTo($plan);
+        $isSubscribed = $subscriber->isNotSubscribedTo($plan);
+
+        $this->assertFalse($hasSubscription);
+        $this->assertFalse($isSubscribed);
+    }
 }
