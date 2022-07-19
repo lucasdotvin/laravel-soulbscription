@@ -22,12 +22,18 @@ class SubscriptionTest extends TestCase
 
     public function testModelRenews()
     {
+        Carbon::setTestNow(now());
+
         $plan = Plan::factory()->create();
         $subscriber = User::factory()->create();
         $subscription = Subscription::factory()
             ->for($plan)
             ->for($subscriber, 'subscriber')
-            ->create();
+            ->create([
+                'expired_at' => now()->addDays(1),
+            ]);
+
+        $expectedExpiredAt = $plan->calculateNextRecurrenceEnd($subscription->expired_at)->toDateTimeString();
 
         Event::fake();
 
@@ -39,7 +45,36 @@ class SubscriptionTest extends TestCase
             'plan_id' => $plan->id,
             'subscriber_id' => $subscriber->id,
             'subscriber_type' => User::class,
-            'expired_at' => $plan->calculateNextRecurrenceEnd(),
+            'expired_at' => $expectedExpiredAt,
+        ]);
+    }
+
+    public function testModelRenewsBasedOnCurrentDateIfOverdue()
+    {
+        Carbon::setTestNow(now());
+
+        $plan = Plan::factory()->create();
+        $subscriber = User::factory()->create();
+        $subscription = Subscription::factory()
+            ->for($plan)
+            ->for($subscriber, 'subscriber')
+            ->create([
+                'expired_at' => now()->subDay(),
+            ]);
+
+        $expectedExpiredAt = $plan->calculateNextRecurrenceEnd()->toDateTimeString();
+
+        Event::fake();
+
+        $subscription->renew();
+
+        Event::assertDispatched(SubscriptionRenewed::class);
+
+        $this->assertDatabaseHas('subscriptions', [
+            'plan_id' => $plan->id,
+            'subscriber_id' => $subscriber->id,
+            'subscriber_type' => User::class,
+            'expired_at' => $expectedExpiredAt,
         ]);
     }
 
