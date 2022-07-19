@@ -135,12 +135,12 @@ trait HasSubscriptions
 
     public function missingSubscriptionTo(Plan $plan): bool
     {
-        return !$this->hasSubscriptionTo($plan);
+        return ! $this->hasSubscriptionTo($plan);
     }
 
     public function isNotSubscribedTo(Plan $plan): bool
     {
-        return !$this->isSubscribedTo($plan);
+        return ! $this->isSubscribedTo($plan);
     }
 
     public function switchTo(Plan $plan, $expiration = null, $immediately = true): Subscription

@@ -156,7 +156,7 @@ class Subscription extends Model
 
     private function getRenewedExpiration(?Carbon $expirationDate = null)
     {
-        if (!empty($expirationDate)) {
+        if (! empty($expirationDate)) {
             return $expirationDate;
         }
 
