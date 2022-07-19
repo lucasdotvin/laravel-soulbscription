@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-soulbscription` will be documented in this file.
 
+## v2.2.1 - 2022-06-05
+
+- Fix migration tags
+- Document tickets activation process
+
+## v2.2.0 - 2022-05-19
+
+- [x] Quota features
+
 ## v2.1.0 - 2022-05-18
 
 - [x] Updated dependencies and dev-dependencies
@@ -19,6 +28,8 @@ All notable changes to `laravel-soulbscription` will be documented in this file.
 
 - [x] Implemented feature tickets
 - - [x] Made feature tickets an optional feature
+- 
+- 
 - 
 - 
 
