@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'database' => [
+        'cancel_migrations_autoloading' => false,
+    ],
+
     'feature_tickets' => env('SOULBSCRIPTION_FEATURE_TICKETS', false),
 
     'models' => [
@@ -14,7 +18,7 @@ return [
         'feature_plan' => \LucasDotVin\Soulbscription\Models\FeaturePlan::class,
 
         'plan' => \LucasDotVin\Soulbscription\Models\Plan::class,
-        
+
         'subscriber' => [
             'uses_uuid' => env('SOULBSCRIPTION_SUBSCRIBER_USES_UUID', false),
         ],
