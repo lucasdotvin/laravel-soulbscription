@@ -229,6 +229,10 @@ trait HasSubscriptions
 
         return $totalCharges - $currentConsumption;
     }
+    
+    public function balance($featureName){
+        return $this->getRemainingCharges($featureName);
+    }
 
     public function getCurrentConsumption($featureName): float
     {
