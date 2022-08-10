@@ -1,6 +1,6 @@
 {
     "name": "lucasdotvin/laravel-soulbscription",
-    "description": "This package provides a straightforward interface to handle subscriptions and features consumption.",
+    "description": "A straightforward interface to handle subscriptions and features consumption.",
     "keywords": [
         "lucasdotvin",
         "laravel",
