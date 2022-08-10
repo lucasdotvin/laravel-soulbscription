@@ -280,6 +280,15 @@ If you don't pass any arguments, the method will suppress the current subscripti
 
 > This call will fire a `SubscriptionStarted(Subscription $subscription)` event.
 
+### Fetching Current Balance
+
+If you need remaining charges of a user, simply call the method `balance`. Imagine a scenario where a student has consumable feature named `notes-download`. To get remaining downloads limit:
+```php
+$student->balance('notes-download');
+```
+
+> This is just an alias of `getRemainingCharges` added to enrich the developer experience. 
+
 #### Scheduling a Switch
 
 If you want to keep your user with the current plan until its expiration, pass the `$immediately` parameter as `false`:
