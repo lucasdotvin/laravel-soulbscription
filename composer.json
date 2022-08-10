@@ -39,8 +39,7 @@
     },
     "scripts": {
         "analyse": "vendor/bin/phpcs --standard=phpcs.xml",
-        "test": "vendor/bin/pest",
-        "test-coverage": "vendor/bin/pest --coverage"
+        "test": "vendor/bin/phpunit"
     },
     "config": {
         "sort-packages": true,
