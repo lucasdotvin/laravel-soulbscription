@@ -37,7 +37,11 @@ trait HasSubscriptions
 
     public function renewals()
     {
-        return $this->hasManyThrough(config('soulbscription.models.subscription_renewal'), config('soulbscription.models.subscription'), 'subscriber_id');
+        return $this->hasManyThrough(
+            config('soulbscription.models.subscription_renewal'),
+            config('soulbscription.models.subscription'),
+            'subscriber_id',
+        );
     }
 
     public function subscription()
@@ -170,7 +174,10 @@ trait HasSubscriptions
      */
     public function giveTicketFor($featureName, $expiration, ?float $charges = null): FeatureTicket
     {
-        throw_unless(config('soulbscription.feature_tickets'), new LogicException('The tickets are not enabled in the configs.'));
+        throw_unless(
+            config('soulbscription.feature_tickets'),
+            new LogicException('The tickets are not enabled in the configs.'),
+        );
 
         $feature = Feature::whereName($featureName)->firstOrFail();
 
