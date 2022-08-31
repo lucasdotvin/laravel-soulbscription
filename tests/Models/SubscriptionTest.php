@@ -343,4 +343,25 @@ class SubscriptionTest extends TestCase
             fn ($subscription) => $this->assertContains($subscription->id, $returnedSubscriptions->pluck('id'))
         );
     }
+    
+    public function testModelHasExpired()
+    {
+        Carbon::setTestNow(now());
+
+        $plan = Plan::factory()->create();
+        $subscriber = User::factory()->create();
+        $subscription = Subscription::factory()
+            ->for($plan)
+            ->for($subscriber, 'subscriber')
+            ->create([
+                'expired_at' => now()->subDays(5),
+            ]);
+
+     
+        Event::fake();
+
+       $hasExpired = $subscription->hasExpired();   
+        
+       $this->assertTrue($hasExpired);      
+    }
 }
