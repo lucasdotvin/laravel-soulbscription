@@ -166,9 +166,4 @@ class Subscription extends Model
 
         return $this->plan->calculateNextRecurrenceEnd($this->expired_at);
     }
-    
-     public function hasExpired()
-    {
-        return empty($this->subscription);
-    }
 }
