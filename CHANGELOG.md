@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-soulbscription` will be documented in this file.
 
+## v2.2.3 - 2022-07-24
+
+- [x] Create a flag to ignore migrations autoloading
+
+## v2.2.2 - 2022-07-19
+
+- [x] Fixed database migrations to avoid errors on fresh installs
+- [x] Improved renew process to calculate expiration properly on not-overdue subscriptions
+
 ## v2.2.1 - 2022-06-05
 
 - Fix migration tags
@@ -28,6 +37,8 @@ All notable changes to `laravel-soulbscription` will be documented in this file.
 
 - [x] Implemented feature tickets
 - - [x] Made feature tickets an optional feature
+- 
+- 
 - 
 - 
 - 
