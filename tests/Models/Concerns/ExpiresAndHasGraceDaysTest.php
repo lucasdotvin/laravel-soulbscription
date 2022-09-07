@@ -80,7 +80,6 @@ class ExpiresAndHasGraceDaysTest extends TestCase
         $this->assertTrue($notExpiredModel->notExpired());
     }
 
-
     public function testModelReturnsIfItHasExpired()
     {
         $expiredModel = self::MODEL::factory()
