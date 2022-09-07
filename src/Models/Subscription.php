@@ -109,7 +109,7 @@ class Subscription extends Model
             'overdue' => $this->isOverdue,
         ]);
 
-        $expirationDate = $expirationDate ?: $this->plan->calculateNextRecurrenceEnd();
+        $expirationDate = $this->getRenewedExpiration($expirationDate);
 
         $this->update([
             'expired_at' => $expirationDate,
@@ -152,5 +152,18 @@ class Subscription extends Model
         }
 
         return $this->expired_at->isPast();
+    }
+
+    private function getRenewedExpiration(?Carbon $expirationDate = null)
+    {
+        if (! empty($expirationDate)) {
+            return $expirationDate;
+        }
+
+        if ($this->isOverdue) {
+            return $this->plan->calculateNextRecurrenceEnd();
+        }
+
+        return $this->plan->calculateNextRecurrenceEnd($this->expired_at);
     }
 }

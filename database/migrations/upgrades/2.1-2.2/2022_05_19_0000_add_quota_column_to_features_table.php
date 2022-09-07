@@ -12,15 +12,8 @@ return new class() extends Migration {
      */
     public function up()
     {
-        Schema::create('features', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->boolean('consumable');
+        Schema::table('features', function (Blueprint $table) {
             $table->boolean('quota')->default(false);
-            $table->unsignedInteger('periodicity')->nullable();
-            $table->string('periodicity_type')->nullable();
-            $table->softDeletes();
-            $table->timestamps();
         });
     }
 
@@ -31,6 +24,8 @@ return new class() extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('features');
+        Schema::table('features', function (Blueprint $table) {
+            $table->dropColumn('quota');
+        });
     }
 };

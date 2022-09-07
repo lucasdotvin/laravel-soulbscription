@@ -20,7 +20,7 @@ composer require lucasdotvin/laravel-soulbscription
 The package migrations are loaded automatically, but you can still publish them with this command:
 
 ```bash
-php artisan vendor:publish --tag="laravel-soulbscription-migrations"
+php artisan vendor:publish --tag="soulbscription-migrations"
 php artisan migrate
 ```
 
@@ -29,9 +29,11 @@ php artisan migrate
 If you already use this package and need to move to a newer version, don't forget to publish the upgrade migrations:
 
 ```bash
-php artisan vendor:publish --tag="laravel-soulbscription-migrations-upgrades"
+php artisan vendor:publish --tag="soulbscription-migrations-upgrades-1.x-2.x"
 php artisan migrate
 ```
+
+> Check out the available upgrade migrations by looking at the [upgrades folder](https://github.com/lucasdotvin/laravel-soulbscription/tree/develop/database/migrations/upgrades).
 
 ## Usage
 
@@ -89,6 +91,46 @@ By saying the `deploy-minutes` is a consumable feature, we are telling the users
 > It is important to keep in mind that both plans and consumable features have its periodicity, so your users can, for instance, have a monthly plan with weekly features.
 
 The other feature we defined was `$customDomain`, which was a not consumable feature. By being not consumable, this feature implies only that the users with access to it can perform a given action (in this case, use a custom domain).
+
+#### Quota Features
+
+When creating, for instance, a file storage system, you'll have to increase and decrease feature consumption as your users upload and delete files. To achieve this easily, you can use quota features. These features have an unique, unexpirable consumption, so they can reflect a constant value (as used system storage in this example).
+
+```php
+class FeatureSeeder extends Seeder
+{
+    public function run()
+    {
+        $storage = Feature::create([
+            'consumable' => true,
+            'quota'      => true,
+            'name'       => 'storage',
+        ]);
+    }
+}
+
+...
+
+class PhotoController extends Seeder
+{
+    public function store(Request $request)
+    {
+        $userFolder = auth()->id() . '-files';
+
+        $request->file->store($userFolder);
+
+        $usedSpace = collect(Storage::allFiles($userFolder))
+            ->map(fn (string $subFile) => Storage::size($subFile))
+            ->sum();
+
+        auth()->user()->setConsumedQuota('storage', $usedSpace);
+
+        return redirect()->route('files.index');
+    }
+}
+```
+
+In the example above, we set `storage` as a quota feature inside the seeder. Then, on the controller, our code store an uploaded file on a folder, calculate this folder size by retrieving all of its subfiles, and, finally, set the consumed `storage` quota as the directory total size.
 
 ### Creating Plans
 
@@ -238,6 +280,15 @@ If you don't pass any arguments, the method will suppress the current subscripti
 
 > This call will fire a `SubscriptionStarted(Subscription $subscription)` event.
 
+### Fetching Current Balance
+
+If you need remaining charges of a user, simply call the method `balance`. Imagine a scenario where a student has consumable feature named `notes-download`. To get remaining downloads limit:
+```php
+$student->balance('notes-download');
+```
+
+> This is just an alias of `getRemainingCharges` added to enrich the developer experience. 
+
 #### Scheduling a Switch
 
 If you want to keep your user with the current plan until its expiration, pass the `$immediately` parameter as `false`:
@@ -352,6 +403,16 @@ Similarly to `cantConsume`, it returns the reverse of `hasFeature`.
 ### Feature Tickets
 
 Tickets are a simple way to allow your subscribers to acquire charges for a feature. When a user receives a ticket, he is allowed to consume its charges, just like he would do in a normal subscription. Tickets can be used to extend regular subscriptions-based systems (so you can, for instance, sell more charges of a given feature) or even to **build a fully pre-paid service**, where your users pay only for what they want to use.
+
+#### Enabling Tickets
+
+In order to use this feature, you have to enable tickets in your configuration files. First, publish the package configs:
+
+```bash
+php artisan vendor:publish --tag="soulbscription-config"
+```
+
+Finally, open the `soulbscription.php` file and set the `feature_tickets` flag to `true`. That's it, you now can use tickets!
 
 #### Creating Tickets
 

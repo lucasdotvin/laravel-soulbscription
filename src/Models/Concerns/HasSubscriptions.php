@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use InvalidArgumentException;
 use LogicException;
 use LucasDotVin\Soulbscription\Events\FeatureConsumed;
 use LucasDotVin\Soulbscription\Events\FeatureTicketCreated;
@@ -36,7 +37,11 @@ trait HasSubscriptions
 
     public function renewals()
     {
-        return $this->hasManyThrough(config('soulbscription.models.subscription_renewal'), config('soulbscription.models.subscription'), 'subscriber_id');
+        return $this->hasManyThrough(
+            config('soulbscription.models.subscription_renewal'),
+            config('soulbscription.models.subscription'),
+            'subscriber_id',
+        );
     }
 
     public function subscription()
@@ -60,18 +65,43 @@ trait HasSubscriptions
 
         $feature = $this->getFeature($featureName);
 
-        $consumptionExpiration = $feature->consumable
-            ? $feature->calculateNextRecurrenceEnd($this->subscription->started_at)
-            : null;
+        $featureConsumption = $feature->quota
+            ? $this->consumeQuotaFeature($feature, $consumption)
+            : $this->consumeNotQuotaFeature($feature, $consumption);
+
+        event(new FeatureConsumed($this, $feature, $featureConsumption));
+    }
+
+    /**
+     * @throws OutOfBoundsException
+     * @throws OverflowException
+     */
+    public function setConsumedQuota($featureName, float $consumption)
+    {
+        throw_if($this->missingFeature($featureName), new OutOfBoundsException(
+            'None of the active plans grants access to this feature.',
+        ));
+
+        throw_if($this->getTotalCharges($featureName) < $consumption, new OverflowException(
+            'The feature has no enough charges to this consumption.',
+        ));
+
+        $feature = $this->getFeature($featureName);
+
+        throw_unless($feature->quota, new InvalidArgumentException(
+            'The feature is not a quota feature.',
+        ));
 
         $featureConsumption = $this->featureConsumptions()
-            ->make([
-                'consumption' => $consumption,
-                'expired_at' => $consumptionExpiration,
-            ])
-            ->feature()
-            ->associate($feature);
+            ->whereFeatureId($feature->id)
+            ->firstOrNew();
 
+        if ($featureConsumption->consumption === $consumption) {
+            return;
+        }
+
+        $featureConsumption->feature()->associate($feature);
+        $featureConsumption->consumption = $consumption;
         $featureConsumption->save();
 
         event(new FeatureConsumed($this, $feature, $featureConsumption));
@@ -93,6 +123,28 @@ trait HasSubscriptions
             ->plan()
             ->associate($plan)
             ->start($startDate);
+    }
+
+    public function hasSubscriptionTo(Plan $plan): bool
+    {
+        return $this->subscription()
+            ->where('plan_id', $plan->id)
+            ->exists();
+    }
+
+    public function isSubscribedTo(Plan $plan): bool
+    {
+        return $this->hasSubscriptionTo($plan);
+    }
+
+    public function missingSubscriptionTo(Plan $plan): bool
+    {
+        return ! $this->hasSubscriptionTo($plan);
+    }
+
+    public function isNotSubscribedTo(Plan $plan): bool
+    {
+        return ! $this->isSubscribedTo($plan);
     }
 
     public function switchTo(Plan $plan, $expiration = null, $immediately = true): Subscription
@@ -122,7 +174,10 @@ trait HasSubscriptions
      */
     public function giveTicketFor($featureName, $expiration, ?float $charges = null): FeatureTicket
     {
-        throw_unless(config('soulbscription.feature_tickets'), new LogicException('The tickets are not enabled in the configs.'));
+        throw_unless(
+            config('soulbscription.feature_tickets'),
+            new LogicException('The tickets are not enabled in the configs.'),
+        );
 
         $feature = Feature::whereName($featureName)->firstOrFail();
 
@@ -182,6 +237,11 @@ trait HasSubscriptions
         return $totalCharges - $currentConsumption;
     }
 
+    public function balance($featureName)
+    {
+        return $this->getRemainingCharges($featureName);
+    }
+
     public function getCurrentConsumption($featureName): float
     {
         if (empty($feature = $this->getFeature($featureName))) {
@@ -203,6 +263,38 @@ trait HasSubscriptions
         $ticketCharges = $this->getTicketChargesForAFeature($feature);
 
         return $subscriptionCharges + $ticketCharges;
+    }
+
+    protected function consumeNotQuotaFeature(Feature $feature, ?float $consumption = null)
+    {
+        $consumptionExpiration = $feature->consumable
+            ? $feature->calculateNextRecurrenceEnd($this->subscription->started_at)
+            : null;
+
+        $featureConsumption = $this->featureConsumptions()
+            ->make([
+                'consumption' => $consumption,
+                'expired_at' => $consumptionExpiration,
+            ])
+            ->feature()
+            ->associate($feature);
+
+        $featureConsumption->save();
+
+        return $featureConsumption;
+    }
+
+    protected function consumeQuotaFeature(Feature $feature, float $consumption)
+    {
+        $featureConsumption = $this->featureConsumptions()
+            ->whereFeatureId($feature->id)
+            ->firstOrNew();
+
+        $featureConsumption->feature()->associate($feature);
+        $featureConsumption->consumption += $consumption;
+        $featureConsumption->save();
+
+        return $featureConsumption;
     }
 
     protected function getSubscriptionChargesForAFeature(Model $feature): float

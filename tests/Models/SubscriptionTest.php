@@ -5,6 +5,7 @@ namespace LucasDotVin\Soulbscription\Tests\Feature\Models;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
 use LucasDotVin\Soulbscription\Events\SubscriptionCanceled;
 use LucasDotVin\Soulbscription\Events\SubscriptionRenewed;
 use LucasDotVin\Soulbscription\Events\SubscriptionStarted;
@@ -21,22 +22,59 @@ class SubscriptionTest extends TestCase
 
     public function testModelRenews()
     {
+        Carbon::setTestNow(now());
+
         $plan = Plan::factory()->create();
         $subscriber = User::factory()->create();
         $subscription = Subscription::factory()
             ->for($plan)
             ->for($subscriber, 'subscriber')
-            ->create();
+            ->create([
+                'expired_at' => now()->addDays(1),
+            ]);
 
-        $this->expectsEvents(SubscriptionRenewed::class);
+        $expectedExpiredAt = $plan->calculateNextRecurrenceEnd($subscription->expired_at)->toDateTimeString();
+
+        Event::fake();
 
         $subscription->renew();
+
+        Event::assertDispatched(SubscriptionRenewed::class);
 
         $this->assertDatabaseHas('subscriptions', [
             'plan_id' => $plan->id,
             'subscriber_id' => $subscriber->id,
             'subscriber_type' => User::class,
-            'expired_at' => $plan->calculateNextRecurrenceEnd(),
+            'expired_at' => $expectedExpiredAt,
+        ]);
+    }
+
+    public function testModelRenewsBasedOnCurrentDateIfOverdue()
+    {
+        Carbon::setTestNow(now());
+
+        $plan = Plan::factory()->create();
+        $subscriber = User::factory()->create();
+        $subscription = Subscription::factory()
+            ->for($plan)
+            ->for($subscriber, 'subscriber')
+            ->create([
+                'expired_at' => now()->subDay(),
+            ]);
+
+        $expectedExpiredAt = $plan->calculateNextRecurrenceEnd()->toDateTimeString();
+
+        Event::fake();
+
+        $subscription->renew();
+
+        Event::assertDispatched(SubscriptionRenewed::class);
+
+        $this->assertDatabaseHas('subscriptions', [
+            'plan_id' => $plan->id,
+            'subscriber_id' => $subscriber->id,
+            'subscriber_type' => User::class,
+            'expired_at' => $expectedExpiredAt,
         ]);
     }
 
@@ -52,9 +90,11 @@ class SubscriptionTest extends TestCase
             ->notStarted()
             ->create();
 
-        $this->expectsEvents(SubscriptionCanceled::class);
+        Event::fake();
 
         $subscription->cancel();
+
+        Event::assertDispatched(SubscriptionCanceled::class);
 
         $this->assertDatabaseHas('subscriptions', [
             'id' => $subscription->id,
@@ -74,9 +114,11 @@ class SubscriptionTest extends TestCase
             ->notStarted()
             ->create();
 
-        $this->expectsEvents(SubscriptionStarted::class);
+        Event::fake();
 
         $subscription->start();
+
+        Event::assertDispatched(SubscriptionStarted::class);
 
         $this->assertDatabaseHas('subscriptions', [
             'id' => $subscription->id,
@@ -95,9 +137,11 @@ class SubscriptionTest extends TestCase
             ->for($subscriber, 'subscriber')
             ->create();
 
-        $this->expectsEvents(SubscriptionSuppressed::class);
+        Event::fake();
 
         $subscription->suppress();
+
+        Event::assertDispatched(SubscriptionSuppressed::class);
 
         $this->assertDatabaseHas('subscriptions', [
             'id' => $subscription->id,

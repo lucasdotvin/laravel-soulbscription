@@ -1,6 +1,6 @@
 {
     "name": "lucasdotvin/laravel-soulbscription",
-    "description": "This package provides a straightforward interface to handle subscriptions and features consumption.",
+    "description": "A straightforward interface to handle subscriptions and features consumption.",
     "keywords": [
         "lucasdotvin",
         "laravel",
@@ -17,15 +17,12 @@
         }
     ],
     "require": {
-        "php": "^8.0",
-        "illuminate/contracts": "^8.73"
+        "php": "^8.0|^8.1",
+        "illuminate/contracts": "^8.0|^9.0"
     },
     "require-dev": {
-        "lucasdotvin/laravel-database-queries-counter": "^0.3.0",
-        "nunomaduro/collision": "^5.10",
-        "orchestra/testbench": "^6.22",
-        "pestphp/pest": "^1.21",
-        "pestphp/pest-plugin-laravel": "^1.1",
+        "lucasdotvin/laravel-database-queries-counter": "^0.5.0",
+        "orchestra/testbench": "^6.22|^7.0",
         "phpunit/phpunit": "^9.5",
         "squizlabs/php_codesniffer": "*"
     },
@@ -42,8 +39,7 @@
     },
     "scripts": {
         "analyse": "vendor/bin/phpcs --standard=phpcs.xml",
-        "test": "vendor/bin/pest",
-        "test-coverage": "vendor/bin/pest --coverage"
+        "test": "vendor/bin/phpunit"
     },
     "config": {
         "sort-packages": true,

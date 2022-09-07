@@ -36,4 +36,14 @@ trait ExpiresAndHasGraceDays
     {
         return ! $this->expired();
     }
+
+    public function hasExpired()
+    {
+        return $this->expired();
+    }
+
+    public function hasNotExpired()
+    {
+        return $this->notExpired();
+    }
 }
