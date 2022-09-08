@@ -49,6 +49,15 @@ trait HasSubscriptions
         return $this->morphOne(config('soulbscription.models.subscription'), 'subscriber')->ofMany('started_at', 'MAX');
     }
 
+    public function lastSubscription()
+    {
+        return app(config('soulbscription.models.subscription'))
+            ->withExpired()
+            ->whereMorphedTo('subscriber', $this)
+            ->orderBy('started_at', 'DESC')
+            ->first();
+    }
+
     /**
      * @throws OutOfBoundsException
      * @throws OverflowException
