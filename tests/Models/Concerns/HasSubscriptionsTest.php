@@ -837,4 +837,17 @@ class HasSubscriptionsTest extends TestCase
         $this->assertFalse($hasSubscription);
         $this->assertFalse($isSubscribed);
     }
+
+    public function testItReturnsTheLastSubscriptionWhenRetrievingExpired()
+    {
+        $plan = Plan::factory()->createOne();
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($plan, now()->subDay(), now()->subDay());
+        $expectedSubscription = $subscriber->subscribeTo($plan, now()->subHour(), now()->subHour());
+
+        $returnedSubscription = $subscriber->lastSubscription();
+
+        $this->assertEquals($expectedSubscription->id, $returnedSubscription->id);
+    }
 }
