@@ -92,6 +92,20 @@ By saying the `deploy-minutes` is a consumable feature, we are telling the users
 
 The other feature we defined was `$customDomain`, which was a not consumable feature. By being not consumable, this feature implies only that the users with access to it can perform a given action (in this case, use a custom domain).
 
+#### Postpaid Features
+
+You can set a feature so it can be used over its charges. To do so, you just have to set the `postpaid` attribute to `true`:
+
+```php
+$cpuUsage = Feature::create([
+    'consumable' => true,
+    'postpaid'   => true,
+    'name'       => 'cpu-usage',
+]);
+```
+
+This way, the user will be able to use the feature until the end of the period, even if he doesn't have enough charges to use it (and you can charge him later, for instance).
+
 #### Quota Features
 
 When creating, for instance, a file storage system, you'll have to increase and decrease feature consumption as your users upload and delete files. To achieve this easily, you can use quota features. These features have an unique, unexpirable consumption, so they can reflect a constant value (as used system storage in this example).
