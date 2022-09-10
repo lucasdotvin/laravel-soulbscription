@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-soulbscription` will be documented in this file.
 
+## v2.4 - 2022-09-08
+
+- [x] Added a method to retrieve the last subscription
+
+## v2.3 - 2022-09-07
+
+- [x] Added `hasExpired` and `hasNotExpired` aliases
+
 ## v2.2.3 - 2022-07-24
 
 - [x] Create a flag to ignore migrations autoloading
@@ -37,6 +45,8 @@ All notable changes to `laravel-soulbscription` will be documented in this file.
 
 - [x] Implemented feature tickets
 - - [x] Made feature tickets an optional feature
+- 
+- 
 - 
 - 
 - 
