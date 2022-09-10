@@ -321,6 +321,20 @@ $subscriber->subscription->renew();
 
 It will calculate a new expiration based on the current date.
 
+#### Expired Subscriptions
+
+In order to retrieve an expired subscription, you can use the `lastSubscription` method:
+
+```php
+$subscriber->lastSubscription();
+```
+
+This method will return the last subscription of the user, regardless of its status, so you can, for instance, get an expired subscription to renew it.:
+
+```php
+$subscriber->lastSubscription()->renew();
+```
+
 #### Canceling
 
 > There is a thing to keep in mind when canceling a subscription: it won't revoke the access immediately. To avoid making you need to handle refunds of any kind, we keep the subscription active and just mark it as canceled, so you just have to not renew it in the future. If you need to suppress a subscription immediately, give a look on the method `suppress()`.

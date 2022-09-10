@@ -850,4 +850,27 @@ class HasSubscriptionsTest extends TestCase
 
         $this->assertEquals($expectedSubscription->id, $returnedSubscription->id);
     }
+
+    public function testItCanConsumeAFeatureAfterItsChargesIfThisFeatureIsPostpaid()
+    {
+        $charges = $this->faker->numberBetween(5, 10);
+        $consumption = $this->faker->numberBetween(1, $charges * 2);
+
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->postpaid()->createOne();
+        $feature->plans()->attach($plan, [
+            'charges' => $charges,
+        ]);
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($plan);
+
+        $subscriber->consume($feature->name, $consumption);
+
+        $this->assertDatabaseHas('feature_consumptions', [
+            'consumption' => $consumption,
+            'feature_id' => $feature->id,
+            'subscriber_id' => $subscriber->id,
+        ]);
+    }
 }

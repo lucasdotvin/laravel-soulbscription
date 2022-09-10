@@ -214,6 +214,10 @@ trait HasSubscriptions
             return true;
         }
 
+        if ($feature->postpaid) {
+            return true;
+        }
+
         $remainingCharges = $this->getRemainingCharges($featureName);
 
         return $remainingCharges >= $consumption;
