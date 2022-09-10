@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-soulbscription` will be documented in this file.
 
+## v2.5 - 2022-09-10
+
+- [x] Postpaid features were added
+
 ## v2.4 - 2022-09-08
 
 - [x] Added a method to retrieve the last subscription
@@ -45,6 +49,7 @@ All notable changes to `laravel-soulbscription` will be documented in this file.
 
 - [x] Implemented feature tickets
 - - [x] Made feature tickets an optional feature
+- 
 - 
 - 
 - 
