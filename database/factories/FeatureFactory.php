@@ -28,6 +28,7 @@ class FeatureFactory extends Factory
                 PeriodicityType::Day,
             ]),
             'quota'            => false,
+            'postpaid'         => false,
         ];
     }
 
@@ -62,6 +63,20 @@ class FeatureFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'quota' => false,
+        ]);
+    }
+
+    public function postpaid()
+    {
+        return $this->state(fn (array $attributes) => [
+            'postpaid' => true,
+        ]);
+    }
+
+    public function prepaid()
+    {
+        return $this->state(fn (array $attributes) => [
+            'postpaid' => false,
         ]);
     }
 }
