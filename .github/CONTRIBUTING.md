@@ -4,6 +4,10 @@ Contributions are **welcome** and will be fully **credited**.
 
 Please read and understand the contribution guide before creating an issue or pull request.
 
+## Scope
+
+It is important to keep in mind that **payments are out of our scope**, so any contribution to integrate with any payment gateway won't be accepted. Our goal here is to keep an agnostic structure capable of coexist with any payment service.
+
 ## Etiquette
 
 This project is open source, and as such, the maintainers give their free time to build and maintain the source code
@@ -37,8 +41,6 @@ Before submitting a pull request:
 - Check the pull requests to ensure that another person hasn't already submitted the feature or fix.
 
 ## Requirements
-
-If the project maintainer has any additional requirements, you will find them listed here.
 
 - **[PSR-2 Coding Standard](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md)** - The easiest way to apply the conventions is to install [PHP Code Sniffer](https://pear.php.net/package/PHP_CodeSniffer).
 
