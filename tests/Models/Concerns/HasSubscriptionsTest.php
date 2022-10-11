@@ -452,6 +452,27 @@ class HasSubscriptionsTest extends TestCase
         );
     }
 
+    public function testModelGetFeaturesFromNonExpirableTickets()
+    {
+        $feature = Feature::factory()->consumable()->createOne();
+
+        $subscriber = User::factory()->createOne();
+
+        $ticket = $subscriber->featureTickets()->make([
+            'expired_at' => null,
+        ]);
+
+        $ticket->feature()->associate($feature);
+        $ticket->save();
+
+        config()->set('soulbscription.feature_tickets', true);
+
+        $this->assertContains(
+            $feature->id,
+            $subscriber->features->pluck('id')->toArray(),
+        );
+    }
+
     public function testModelCanConsumeSomeAmountOfAConsumableFeatureFromATicket()
     {
         $charges = $this->faker->numberBetween(5, 10);
@@ -659,6 +680,25 @@ class HasSubscriptionsTest extends TestCase
         $this->assertDatabaseHas('feature_tickets', [
             'charges' => $charges,
             'expired_at' => $expiration,
+            'subscriber_id' => $subscriber->id,
+        ]);
+    }
+
+    public function testItCanCreateANonExpirableTicket()
+    {
+        $charges = $this->faker->randomDigitNotNull();
+
+        $feature = Feature::factory()->consumable()->createOne();
+
+        $subscriber = User::factory()->createOne();
+
+        config()->set('soulbscription.feature_tickets', true);
+
+        $subscriber->giveTicketFor($feature->name, null, $charges);
+
+        $this->assertDatabaseHas('feature_tickets', [
+            'charges' => $charges,
+            'expired_at' => null,
             'subscriber_id' => $subscriber->id,
         ]);
     }

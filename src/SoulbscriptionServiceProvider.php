@@ -33,5 +33,9 @@ class SoulbscriptionServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../database/migrations/upgrades/2.4-2.5' => database_path('migrations'),
         ], 'soulbscription-migrations-upgrades-2.4-2.5');
+
+        $this->publishes([
+            __DIR__ . '/../database/migrations/upgrades/2.5-2.6' => database_path('migrations'),
+        ], 'soulbscription-migrations-upgrades-2.5-2.6');
     }
 }
