@@ -663,6 +663,25 @@ class HasSubscriptionsTest extends TestCase
         ]);
     }
 
+    public function testItCanCreateANonExpirableTicket()
+    {
+        $charges = $this->faker->randomDigitNotNull();
+
+        $feature = Feature::factory()->consumable()->createOne();
+
+        $subscriber = User::factory()->createOne();
+
+        config()->set('soulbscription.feature_tickets', true);
+
+        $subscriber->giveTicketFor($feature->name, null, $charges);
+
+        $this->assertDatabaseHas('feature_tickets', [
+            'charges' => $charges,
+            'expired_at' => null,
+            'subscriber_id' => $subscriber->id,
+        ]);
+    }
+
     public function testItFiresEventWhenCreatingATicket()
     {
         $charges = $this->faker->randomDigitNotNull();
