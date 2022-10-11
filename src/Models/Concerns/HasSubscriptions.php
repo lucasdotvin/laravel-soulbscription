@@ -181,7 +181,7 @@ trait HasSubscriptions
      * @throws LogicException
      * @throws ModelNotFoundException
      */
-    public function giveTicketFor($featureName, $expiration, ?float $charges = null): FeatureTicket
+    public function giveTicketFor($featureName, $expiration = null, ?float $charges = null): FeatureTicket
     {
         throw_unless(
             config('soulbscription.feature_tickets'),
