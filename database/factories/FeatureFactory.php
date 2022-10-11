@@ -27,6 +27,8 @@ class FeatureFactory extends Factory
                 PeriodicityType::Week,
                 PeriodicityType::Day,
             ]),
+            'quota'            => false,
+            'postpaid'         => false,
         ];
     }
 
@@ -40,9 +42,41 @@ class FeatureFactory extends Factory
     public function notConsumable()
     {
         return $this->state(fn (array $attributes) => [
+            'quota' => false,
             'consumable' => false,
             'periodicity' => null,
             'periodicity_type' => null,
+        ]);
+    }
+
+    public function quota()
+    {
+        return $this->state(fn (array $attributes) => [
+            'consumable' => true,
+            'quota' => true,
+            'periodicity' => null,
+            'periodicity_type' => null,
+        ]);
+    }
+
+    public function notQuota()
+    {
+        return $this->state(fn (array $attributes) => [
+            'quota' => false,
+        ]);
+    }
+
+    public function postpaid()
+    {
+        return $this->state(fn (array $attributes) => [
+            'postpaid' => true,
+        ]);
+    }
+
+    public function prepaid()
+    {
+        return $this->state(fn (array $attributes) => [
+            'postpaid' => false,
         ]);
     }
 }

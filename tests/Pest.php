@@ -1,5 +1,0 @@
-<?php
-
-use LucasDotVin\Soulbscription\Tests\TestCase;
-
-uses(TestCase::class)->in(__DIR__);

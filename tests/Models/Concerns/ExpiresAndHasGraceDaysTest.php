@@ -79,4 +79,60 @@ class ExpiresAndHasGraceDaysTest extends TestCase
         $this->assertFalse($expiredModelWithPastGraceDays->notExpired());
         $this->assertTrue($notExpiredModel->notExpired());
     }
+
+    public function testModelReturnsIfItHasExpired()
+    {
+        $expiredModel = self::MODEL::factory()
+            ->expired()
+            ->create();
+
+        $expiredModelWithFutureGraceDays = self::MODEL::factory()
+            ->expired()
+            ->create([
+                'grace_days_ended_at' => now()->addDay(),
+            ]);
+
+        $expiredModelWithPastGraceDays = self::MODEL::factory()
+            ->expired()
+            ->create([
+                'grace_days_ended_at' => now()->subDay(),
+            ]);
+
+        $notExpiredModel = self::MODEL::factory()
+            ->notExpired()
+            ->create();
+
+        $this->assertTrue($expiredModel->hasExpired());
+        $this->assertFalse($expiredModelWithFutureGraceDays->hasExpired());
+        $this->assertTrue($expiredModelWithPastGraceDays->hasExpired());
+        $this->assertFalse($notExpiredModel->hasExpired());
+    }
+
+    public function testModelReturnsIfItHasNotExpired()
+    {
+        $expiredModel = self::MODEL::factory()
+            ->expired()
+            ->create();
+
+        $expiredModelWithFutureGraceDays = self::MODEL::factory()
+            ->expired()
+            ->create([
+                'grace_days_ended_at' => now()->addDay(),
+            ]);
+
+        $expiredModelWithPastGraceDays = self::MODEL::factory()
+            ->expired()
+            ->create([
+                'grace_days_ended_at' => now()->subDay(),
+            ]);
+
+        $notExpiredModel = self::MODEL::factory()
+            ->notExpired()
+            ->create();
+
+        $this->assertFalse($expiredModel->hasNotExpired());
+        $this->assertTrue($expiredModelWithFutureGraceDays->hasNotExpired());
+        $this->assertFalse($expiredModelWithPastGraceDays->hasNotExpired());
+        $this->assertTrue($notExpiredModel->hasNotExpired());
+    }
 }

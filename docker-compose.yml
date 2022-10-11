@@ -1,0 +1,17 @@
+version: '3'
+services:
+  composer:
+    image: composer/composer
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: install
+    entrypoint: composer
+  php:
+    build:
+        context: .
+        dockerfile: .docker/php/Dockerfile
+    volumes:
+      - .:/app
+    working_dir: /app
+    entrypoint: php

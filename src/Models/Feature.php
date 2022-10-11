@@ -18,6 +18,8 @@ class Feature extends Model
         'name',
         'periodicity_type',
         'periodicity',
+        'quota',
+        'postpaid',
     ];
 
     public function plans()

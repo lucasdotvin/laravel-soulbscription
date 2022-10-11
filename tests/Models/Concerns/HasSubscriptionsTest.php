@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
+use InvalidArgumentException;
 use LogicException;
 use LucasDotVin\DBQueriesCounter\Traits\CountsQueries;
 use LucasDotVin\Soulbscription\Events\FeatureConsumed;
@@ -34,9 +36,11 @@ class HasSubscriptionsTest extends TestCase
         $plan = Plan::factory()->createOne();
         $subscriber = User::factory()->createOne();
 
-        $this->expectsEvents(SubscriptionStarted::class);
+        Event::fake();
 
         $subscription = $subscriber->subscribeTo($plan);
+
+        Event::assertDispatched(SubscriptionStarted::class);
 
         $this->assertDatabaseHas('subscriptions', [
             'id' => $subscription->id,
@@ -72,9 +76,12 @@ class HasSubscriptionsTest extends TestCase
         $subscriber = User::factory()->createOne();
         $oldSubscription = $subscriber->subscribeTo($oldPlan);
 
-        $this->expectsEvents([SubscriptionStarted::class, SubscriptionSuppressed::class]);
+        Event::fake();
 
         $newSubscription = $subscriber->switchTo($newPlan);
+
+        Event::assertDispatched(SubscriptionStarted::class);
+        Event::assertDispatched(SubscriptionSuppressed::class);
 
         $this->assertDatabaseHas('subscriptions', [
             'id' => $newSubscription->id,
@@ -101,10 +108,12 @@ class HasSubscriptionsTest extends TestCase
         $subscriber = User::factory()->createOne();
         $oldSubscription = $subscriber->subscribeTo($oldPlan);
 
-        $this->expectsEvents(SubscriptionScheduled::class);
-        $this->doesntExpectEvents(SubscriptionStarted::class);
+        Event::fake();
 
         $newSubscription = $subscriber->switchTo($newPlan, immediately: false);
+
+        Event::assertDispatched(SubscriptionScheduled::class);
+        Event::assertNotDispatched(SubscriptionStarted::class);
 
         $this->assertDatabaseHas('subscriptions', [
             'id' => $newSubscription->id,
@@ -161,9 +170,11 @@ class HasSubscriptionsTest extends TestCase
         $subscriber = User::factory()->createOne();
         $subscription = $subscriber->subscribeTo($plan);
 
-        $this->expectsEvents(FeatureConsumed::class);
+        Event::fake();
 
         $subscriber->consume($feature->name, $consumption);
+
+        Event::assertDispatched(FeatureConsumed::class);
 
         $this->assertDatabaseHas('feature_consumptions', [
             'consumption' => $consumption,
@@ -441,6 +452,27 @@ class HasSubscriptionsTest extends TestCase
         );
     }
 
+    public function testModelGetFeaturesFromNonExpirableTickets()
+    {
+        $feature = Feature::factory()->consumable()->createOne();
+
+        $subscriber = User::factory()->createOne();
+
+        $ticket = $subscriber->featureTickets()->make([
+            'expired_at' => null,
+        ]);
+
+        $ticket->feature()->associate($feature);
+        $ticket->save();
+
+        config()->set('soulbscription.feature_tickets', true);
+
+        $this->assertContains(
+            $feature->id,
+            $subscriber->features->pluck('id')->toArray(),
+        );
+    }
+
     public function testModelCanConsumeSomeAmountOfAConsumableFeatureFromATicket()
     {
         $charges = $this->faker->numberBetween(5, 10);
@@ -652,6 +684,25 @@ class HasSubscriptionsTest extends TestCase
         ]);
     }
 
+    public function testItCanCreateANonExpirableTicket()
+    {
+        $charges = $this->faker->randomDigitNotNull();
+
+        $feature = Feature::factory()->consumable()->createOne();
+
+        $subscriber = User::factory()->createOne();
+
+        config()->set('soulbscription.feature_tickets', true);
+
+        $subscriber->giveTicketFor($feature->name, null, $charges);
+
+        $this->assertDatabaseHas('feature_tickets', [
+            'charges' => $charges,
+            'expired_at' => null,
+            'subscriber_id' => $subscriber->id,
+        ]);
+    }
+
     public function testItFiresEventWhenCreatingATicket()
     {
         $charges = $this->faker->randomDigitNotNull();
@@ -663,9 +714,11 @@ class HasSubscriptionsTest extends TestCase
 
         config()->set('soulbscription.feature_tickets', true);
 
-        $this->expectsEvents(FeatureTicketCreated::class);
+        Event::fake();
 
         $subscriber->giveTicketFor($feature->name, $expiration, $charges);
+
+        Event::assertDispatched(FeatureTicketCreated::class);
     }
 
     public function testItRaisesAnExceptionWhenCreatingATicketForANonExistingFeature()
@@ -699,5 +752,165 @@ class HasSubscriptionsTest extends TestCase
         config()->set('soulbscription.feature_tickets', false);
 
         $subscriber->giveTicketFor($feature->name, $expiration, $charges);
+    }
+
+    public function testItCreateANotExpirableConsumptionForQuotaFeatures()
+    {
+        $charges = $this->faker->numberBetween(5, 10);
+        $consumption = $this->faker->numberBetween(1, $charges);
+
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->quota()->createOne();
+        $feature->plans()->attach($plan, [
+            'charges' => $charges,
+        ]);
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($plan);
+
+        $subscriber->consume($feature->name, $consumption);
+
+        $this->assertDatabaseHas('feature_consumptions', [
+            'consumption' => $consumption,
+            'feature_id' => $feature->id,
+            'subscriber_id' => $subscriber->id,
+            'expired_at' => null,
+        ]);
+    }
+
+    public function testItDoesNotCreateNewConsumptionsForQuoeFeatures()
+    {
+        $charges = $this->faker->numberBetween(5, 10);
+        $consumption = $this->faker->numberBetween(1, $charges / 2);
+
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->quota()->createOne();
+        $feature->plans()->attach($plan, [
+            'charges' => $charges,
+        ]);
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($plan);
+
+        $subscriber->consume($feature->name, $consumption);
+        $subscriber->consume($feature->name, $consumption);
+
+        $this->assertDatabaseCount('feature_consumptions', 1);
+        $this->assertDatabaseHas('feature_consumptions', [
+            'consumption' => $consumption * 2,
+            'feature_id' => $feature->id,
+            'subscriber_id' => $subscriber->id,
+            'expired_at' => null,
+        ]);
+    }
+
+    public function testItCanSetQuotaFeatureConsumption()
+    {
+        $charges = $this->faker->numberBetween(5, 10);
+        $consumption = $this->faker->numberBetween(1, $charges / 2);
+
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->quota()->createOne();
+        $feature->plans()->attach($plan, [
+            'charges' => $charges,
+        ]);
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($plan);
+
+        $subscriber->consume($feature->name, $consumption);
+        $subscriber->consume($feature->name, $consumption);
+        $subscriber->setConsumedQuota($feature->name, $consumption);
+
+        $this->assertDatabaseHas('feature_consumptions', [
+            'consumption' => $consumption,
+            'feature_id' => $feature->id,
+            'subscriber_id' => $subscriber->id,
+            'expired_at' => null,
+        ]);
+    }
+
+    public function testItRaisesAnExceptionWhenSettingConsumedQuotaForANotQuotaFeature()
+    {
+        $charges = $this->faker->numberBetween(5, 10);
+        $consumption = $this->faker->numberBetween(1, $charges / 2);
+
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->notQuota()->createOne();
+        $feature->plans()->attach($plan, [
+            'charges' => $charges,
+        ]);
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($plan);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The feature is not a quota feature.');
+
+        $subscriber->setConsumedQuota($feature->name, $consumption);
+    }
+
+    public function testItChecksIfTheUserHasSubscriptionToAPlan()
+    {
+        $plan = Plan::factory()->createOne();
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($plan);
+
+        $hasSubscription = $subscriber->hasSubscriptionTo($plan);
+        $isSubscribed = $subscriber->isSubscribedTo($plan);
+
+        $this->assertTrue($hasSubscription);
+        $this->assertTrue($isSubscribed);
+    }
+
+    public function testItChecksIfTheUserDoesNotHaveSubscriptionToAPlan()
+    {
+        $plan = Plan::factory()->createOne();
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($plan);
+
+        $hasSubscription = $subscriber->missingSubscriptionTo($plan);
+        $isSubscribed = $subscriber->isNotSubscribedTo($plan);
+
+        $this->assertFalse($hasSubscription);
+        $this->assertFalse($isSubscribed);
+    }
+
+    public function testItReturnsTheLastSubscriptionWhenRetrievingExpired()
+    {
+        $plan = Plan::factory()->createOne();
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($plan, now()->subDay(), now()->subDay());
+        $expectedSubscription = $subscriber->subscribeTo($plan, now()->subHour(), now()->subHour());
+
+        $returnedSubscription = $subscriber->lastSubscription();
+
+        $this->assertEquals($expectedSubscription->id, $returnedSubscription->id);
+    }
+
+    public function testItCanConsumeAFeatureAfterItsChargesIfThisFeatureIsPostpaid()
+    {
+        $charges = $this->faker->numberBetween(5, 10);
+        $consumption = $this->faker->numberBetween(1, $charges * 2);
+
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->postpaid()->createOne();
+        $feature->plans()->attach($plan, [
+            'charges' => $charges,
+        ]);
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($plan);
+
+        $subscriber->consume($feature->name, $consumption);
+
+        $this->assertDatabaseHas('feature_consumptions', [
+            'consumption' => $consumption,
+            'feature_id' => $feature->id,
+            'subscriber_id' => $subscriber->id,
+        ]);
     }
 }
