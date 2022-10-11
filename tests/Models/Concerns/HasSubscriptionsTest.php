@@ -913,4 +913,42 @@ class HasSubscriptionsTest extends TestCase
             'subscriber_id' => $subscriber->id,
         ]);
     }
+
+    public function testItDoesNotReturnNegativeChargesForFeatures()
+    {
+        $charges = $this->faker->numberBetween(5, 10);
+        $consumption = $this->faker->numberBetween($charges, $charges * 2);
+
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->postpaid()->createOne();
+        $feature->plans()->attach($plan, [
+            'charges' => $charges,
+        ]);
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($plan);
+
+        $subscriber->consume($feature->name, $consumption);
+
+        $this->assertEquals(0, $subscriber->getRemainingCharges($feature->name));
+    }
+
+    public function testItReturnsNegativeBalanceForFeatures()
+    {
+        $charges = $this->faker->numberBetween(5, 10);
+        $consumption = $this->faker->numberBetween($charges, $charges * 2);
+
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->postpaid()->createOne();
+        $feature->plans()->attach($plan, [
+            'charges' => $charges,
+        ]);
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($plan);
+
+        $subscriber->consume($feature->name, $consumption);
+
+        $this->assertLessThan(0, $subscriber->balance($feature->name));
+    }
 }
