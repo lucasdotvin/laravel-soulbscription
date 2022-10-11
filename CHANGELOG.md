@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-soulbscription` will be documented in this file.
 
+## v2.6 - 2022-10-11
+
+- [x] Non-expirable tickets
+
 ## v2.5 - 2022-09-10
 
 - [x] Postpaid features were added
@@ -49,6 +53,7 @@ All notable changes to `laravel-soulbscription` will be documented in this file.
 
 - [x] Implemented feature tickets
 - - [x] Made feature tickets an optional feature
+- 
 - 
 - 
 - 
