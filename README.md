@@ -472,7 +472,15 @@ class UserFeatureTrialController extends Controller
 }
 ```
 
-In the example above, the user will be able to try a feature for a certain amount of days.
+#### Non-Expirable Tickets
+
+You can create tickets that never expire, so your subscribers will receive access to them forever:
+
+```php
+$subscriber->giveTicketFor('deploy-minutes', null, 10);
+```
+
+> Don't forget to remove these tickets when your user cancels his subscription. Otherwise, they will be able to consume the charges forever.
 
 ## Testing
 
