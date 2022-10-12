@@ -380,7 +380,7 @@ trait HasSubscriptions
             return $this->loadedTicketFeatures;
         }
 
-        return $this->loadedTicketFeatures = Feature::with('tickets')
+        return $this->loadedTicketFeatures = Feature::with(['tickets' => fn ($query) => $query->withoutExpired()->whereMorphedTo('subscriber', $this)])
             ->whereHas('tickets', fn (Builder $query) => $query->withoutExpired()->whereMorphedTo('subscriber', $this))
             ->get();
     }
