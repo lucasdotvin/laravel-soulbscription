@@ -240,6 +240,13 @@ trait HasSubscriptions
 
     public function getRemainingCharges($featureName): float
     {
+        $balance = $this->balance($featureName);
+
+        return max($balance, 0);
+    }
+
+    public function balance($featureName)
+    {
         if (empty($this->getFeature($featureName))) {
             return 0;
         }
@@ -248,11 +255,6 @@ trait HasSubscriptions
         $totalCharges = $this->getTotalCharges($featureName);
 
         return $totalCharges - $currentConsumption;
-    }
-
-    public function balance($featureName)
-    {
-        return $this->getRemainingCharges($featureName);
     }
 
     public function getCurrentConsumption($featureName): float
