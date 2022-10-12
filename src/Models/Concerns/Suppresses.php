@@ -20,11 +20,15 @@ trait Suppresses
 
     public function suppressed()
     {
-        return ! is_null($this->suppressed_at);
+        if (empty($this->suppressed_at)) {
+            return false;
+        }
+
+        return $this->suppressed_at->isPast();
     }
 
     public function notSuppressed()
     {
-        return is_null($this->suppressed_at);
+        return ! $this->suppressed();
     }
 }

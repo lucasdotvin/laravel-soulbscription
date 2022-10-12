@@ -20,11 +20,15 @@ trait Starts
 
     public function started()
     {
-        return ! is_null($this->started_at);
+        if (empty($this->started_at)) {
+            return false;
+        }
+
+        return $this->started_at->isPast();
     }
 
     public function notStarted()
     {
-        return is_null($this->started_at);
+        return ! $this->started();
     }
 }
