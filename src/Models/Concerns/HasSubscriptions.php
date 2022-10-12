@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use InvalidArgumentException;
 use LogicException;
 use LucasDotVin\Soulbscription\Events\FeatureConsumed;
@@ -380,8 +381,13 @@ trait HasSubscriptions
             return $this->loadedTicketFeatures;
         }
 
-        return $this->loadedTicketFeatures = Feature::with(['tickets' => fn ($query) => $query->withoutExpired()->whereMorphedTo('subscriber', $this)])
-            ->whereHas('tickets', fn (Builder $query) => $query->withoutExpired()->whereMorphedTo('subscriber', $this))
+        return $this->loadedTicketFeatures = Feature::with([
+                'tickets' => fn (HasMany $query) => $query->withoutExpired()->whereMorphedTo('subscriber', $this),
+            ])
+            ->whereHas(
+                'tickets',
+                fn (Builder $query) => $query->withoutExpired()->whereMorphedTo('subscriber', $this),
+            )
             ->get();
     }
 }
