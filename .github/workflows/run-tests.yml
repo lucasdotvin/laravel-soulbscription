@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
 
 jobs:
   test:
@@ -46,12 +46,7 @@ jobs:
       - name: Execute tests
         run: vendor/bin/phpunit
 
-      - name: Send coverage report to Codecov
-        if: ${{ success() }}
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./build/logs/clover.xml
-          fail_ci_if_error: true
-          verbose: true
-          # see https://github.com/codecov/codecov-action/issues/557
-          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Codecov
+        # You may pin to the exact commit or the version.
+        # uses: codecov/codecov-action@d9f34f8cd5cb3b3eb79b3e4b5dae3a16df499a70
+        uses: codecov/codecov-action@v3.1.1
