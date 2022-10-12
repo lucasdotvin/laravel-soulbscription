@@ -917,7 +917,7 @@ class HasSubscriptionsTest extends TestCase
     public function testItDoesNotReturnNegativeChargesForFeatures()
     {
         $charges = $this->faker->numberBetween(5, 10);
-        $consumption = $this->faker->numberBetween($charges, $charges * 2);
+        $consumption = $this->faker->numberBetween($charges + 1, $charges * 2);
 
         $plan = Plan::factory()->createOne();
         $feature = Feature::factory()->postpaid()->createOne();
@@ -936,7 +936,7 @@ class HasSubscriptionsTest extends TestCase
     public function testItReturnsNegativeBalanceForFeatures()
     {
         $charges = $this->faker->numberBetween(5, 10);
-        $consumption = $this->faker->numberBetween($charges, $charges * 2);
+        $consumption = $this->faker->numberBetween($charges + 1, $charges * 2);
 
         $plan = Plan::factory()->createOne();
         $feature = Feature::factory()->postpaid()->createOne();
@@ -950,5 +950,22 @@ class HasSubscriptionsTest extends TestCase
         $subscriber->consume($feature->name, $consumption);
 
         $this->assertLessThan(0, $subscriber->balance($feature->name));
+    }
+
+    public function testItReturnsRemainingChargesOnlyForTheGivenUser()
+    {
+        config(['soulbscription.feature_tickets' => true]);
+
+        $charges = $this->faker->numberBetween(5, 10);
+
+        $feature = Feature::factory()->createOne();
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->giveTicketFor($feature->name, null, $charges);
+
+        $otherSubscriber = User::factory()->createOne();
+        $otherSubscriber->giveTicketFor($feature->name, null, $charges);
+
+        $this->assertEquals($charges, $subscriber->getRemainingCharges($feature->name));
     }
 }
