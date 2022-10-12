@@ -951,4 +951,21 @@ class HasSubscriptionsTest extends TestCase
 
         $this->assertLessThan(0, $subscriber->balance($feature->name));
     }
+
+    public function testItReturnsRemainingChargesOnlyForTheGivenUser()
+    {
+        config(['soulbscription.feature_tickets' => true]);
+
+        $charges = $this->faker->numberBetween(5, 10);
+
+        $feature = Feature::factory()->createOne();
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->giveTicketFor($feature->name, null, $charges);
+
+        $otherSubscriber = User::factory()->createOne();
+        $otherSubscriber->giveTicketFor($feature->name, null, $charges);
+
+        $this->assertEquals($charges, $subscriber->getRemainingCharges($feature->name));
+    }
 }
