@@ -18,6 +18,9 @@ return new class extends Migration {
             $table->string('name');
             $table->unsignedInteger('periodicity');
             $table->string('periodicity_type');
+            $table->integer('price');
+            $table->integer('discounted_price')->nullable();
+            $table->date('discount_period')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
