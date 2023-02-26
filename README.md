@@ -1,9 +1,9 @@
 <h1 align="center">Laravel Soulbscription</h1>
 
 <p align="center"><a href="https://packagist.org/packages/lucasdotvin/laravel-soulbscription"><img alt="Latest Version on Packagist" src="https://img.shields.io/packagist/v/lucasdotvin/laravel-soulbscription.svg?style=flat-square"></a>
-<a href="https://github.com/lucasdotvin/laravel-soulbscription/actions?query=workflow%3Arun-tests+branch%3Amain"><img alt="GitHub Tests Action Status" src="https://img.shields.io/github/workflow/status/lucasdotvin/laravel-soulbscription/run-tests?label=tests"></a>
+<a href="https://github.com/lucasdotvin/laravel-soulbscription/actions/workflows/run-tests.yml"><img src="https://github.com/lucasdotvin/laravel-soulbscription/actions/workflows/run-tests.yml/badge.svg?branch=main" alt="run-tests"></a>
 <a href="https://codecov.io/gh/lucasdotvin/laravel-soulbscription"><img src="https://codecov.io/gh/lucasdotvin/laravel-soulbscription/branch/develop/graph/badge.svg?token=9NUYY1E28D"/></a>
-<a href="https://github.com/lucasdotvin/laravel-soulbscription/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain"><img alt="GitHub Code Style Action Status" src="https://img.shields.io/github/workflow/status/lucasdotvin/laravel-soulbscription/Check%20&%20fix%20styling?label=code%20style"></a>
+<a href="https://github.com/lucasdotvin/laravel-soulbscription/actions/workflows/php-cs-fixer.yml"><img src="https://github.com/lucasdotvin/laravel-soulbscription/actions/workflows/php-cs-fixer.yml/badge.svg?branch=main" alt="Check &amp; fix styling"></a>
 <a href="https://packagist.org/packages/lucasdotvin/laravel-soulbscription"><img alt="Total Downloads" src="https://img.shields.io/packagist/dt/lucasdotvin/laravel-soulbscription.svg?style=flat-square"></a></p>
 
 ## About
