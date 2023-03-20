@@ -285,7 +285,7 @@ Above, we are simulating an application for a school. It has to subscribe studen
 
 ### Switching Plans
 
-Users change their mind all the time and you have to deal with it. If you need to change the current plan o a user, simply call the method `switchTo`:
+Users change their mind all the time and you have to deal with it. If you need to change the current plan of a user, simply call the method `switchTo`:
 
 ```php
 $student->switchTo($newPlan);
