@@ -1,6 +1,6 @@
 <?php
 
-namespace LucasDotVin\Soulbscription\Tests\Feature\Models;
+namespace Tests\Feature\Models;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -12,8 +12,8 @@ use LucasDotVin\Soulbscription\Events\SubscriptionStarted;
 use LucasDotVin\Soulbscription\Events\SubscriptionSuppressed;
 use LucasDotVin\Soulbscription\Models\Plan;
 use LucasDotVin\Soulbscription\Models\Subscription;
-use LucasDotVin\Soulbscription\Tests\Mocks\Models\User;
-use LucasDotVin\Soulbscription\Tests\TestCase;
+use Tests\Mocks\Models\User;
+use Tests\TestCase;
 
 class SubscriptionTest extends TestCase
 {

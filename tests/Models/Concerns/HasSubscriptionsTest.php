@@ -1,6 +1,6 @@
 <?php
 
-namespace LucasDotVin\Soulbscription\Tests\Feature\Models\Concerns;
+namespace Tests\Feature\Models\Concerns;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -19,8 +19,8 @@ use LucasDotVin\Soulbscription\Models\FeatureConsumption;
 use LucasDotVin\Soulbscription\Models\Plan;
 use LucasDotVin\Soulbscription\Models\Subscription;
 use LucasDotVin\Soulbscription\Models\SubscriptionRenewal;
-use LucasDotVin\Soulbscription\Tests\Mocks\Models\User;
-use LucasDotVin\Soulbscription\Tests\TestCase;
+use Tests\Mocks\Models\User;
+use Tests\TestCase;
 use OutOfBoundsException;
 use OverflowException;
 

@@ -1,13 +1,13 @@
 <?php
 
-namespace LucasDotVin\Soulbscription\Tests\Feature\Models;
+namespace Tests\Feature\Models;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use LucasDotVin\Soulbscription\Enums\PeriodicityType;
 use LucasDotVin\Soulbscription\Models\Feature;
-use LucasDotVin\Soulbscription\Tests\TestCase;
+use Tests\TestCase;
 
 class FeatureTest extends TestCase
 {

@@ -33,7 +33,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "LucasDotVin\\Soulbscription\\Tests\\": "tests"
+            "Tests\\": "tests"
         }
     },
     "scripts": {

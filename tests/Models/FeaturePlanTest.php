@@ -1,13 +1,13 @@
 <?php
 
-namespace LucasDotVin\Soulbscription\Tests\Feature\Models;
+namespace Tests\Feature\Models;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use LucasDotVin\Soulbscription\Models\Feature;
 use LucasDotVin\Soulbscription\Models\FeaturePlan;
 use LucasDotVin\Soulbscription\Models\Plan;
-use LucasDotVin\Soulbscription\Tests\TestCase;
+use Tests\TestCase;
 
 class FeaturePlanTest extends TestCase
 {

@@ -1,13 +1,13 @@
 <?php
 
-namespace LucasDotVin\Soulbscription\Tests\Feature\Models\Concerns;
+namespace Tests\Feature\Models\Concerns;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use LucasDotVin\Soulbscription\Models\Subscription;
-use LucasDotVin\Soulbscription\Tests\TestCase;
+use Tests\TestCase;
 
-class SuppresssTest extends TestCase
+class SuppressesTest extends TestCase
 {
     use RefreshDatabase;
     use WithFaker;

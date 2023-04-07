@@ -1,13 +1,13 @@
 <?php
 
-namespace LucasDotVin\Soulbscription\Tests\Feature\Models\Concerns;
+namespace Tests\Feature\Models\Concerns;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use LucasDotVin\Soulbscription\Enums\PeriodicityType;
 use LucasDotVin\Soulbscription\Models\Plan;
-use LucasDotVin\Soulbscription\Tests\TestCase;
+use Tests\TestCase;
 
 class HandlesRecurrenceTest extends TestCase
 {
