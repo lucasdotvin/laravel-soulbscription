@@ -2,8 +2,8 @@
 
 namespace Tests\Mocks\Database\Factories;
 
-use Tests\Mocks\Models\User;
 use Orchestra\Testbench\Factories\UserFactory as OrchestraUserFactory;
+use Tests\Mocks\Models\User;
 
 class UserFactory extends OrchestraUserFactory
 {

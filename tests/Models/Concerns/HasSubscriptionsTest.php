@@ -19,10 +19,10 @@ use LucasDotVin\Soulbscription\Models\FeatureConsumption;
 use LucasDotVin\Soulbscription\Models\Plan;
 use LucasDotVin\Soulbscription\Models\Subscription;
 use LucasDotVin\Soulbscription\Models\SubscriptionRenewal;
-use Tests\Mocks\Models\User;
-use Tests\TestCase;
 use OutOfBoundsException;
 use OverflowException;
+use Tests\Mocks\Models\User;
+use Tests\TestCase;
 
 class HasSubscriptionsTest extends TestCase
 {
