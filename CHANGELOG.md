@@ -2,6 +2,22 @@
 
 All notable changes to `laravel-soulbscription` will be documented in this file.
 
+## v4.0.0 - 2023-04-07
+
+### What's Changed
+
+- Bump dependabot/fetch-metadata from 1.3.4 to 1.3.5 by @dependabot in https://github.com/lucasdotvin/laravel-soulbscription/pull/45
+- Bump dependabot/fetch-metadata from 1.3.5 to 1.3.6 by @dependabot in https://github.com/lucasdotvin/laravel-soulbscription/pull/53
+- fixed typo by @AbdoulBaguiM in https://github.com/lucasdotvin/laravel-soulbscription/pull/59
+- Add support for laravel 10 by @omaressaouaf in https://github.com/lucasdotvin/laravel-soulbscription/pull/57
+
+### New Contributors
+
+- @AbdoulBaguiM made their first contribution in https://github.com/lucasdotvin/laravel-soulbscription/pull/59
+- @omaressaouaf made their first contribution in https://github.com/lucasdotvin/laravel-soulbscription/pull/57
+
+**Full Changelog**: https://github.com/lucasdotvin/laravel-soulbscription/compare/3.0.1...v4.0.0
+
 ## v2.6 - 2022-10-11
 
 - [x] Non-expirable tickets
@@ -53,6 +69,7 @@ All notable changes to `laravel-soulbscription` will be documented in this file.
 
 - [x] Implemented feature tickets
 - - [x] Made feature tickets an optional feature
+- 
 - 
 - 
 - 
