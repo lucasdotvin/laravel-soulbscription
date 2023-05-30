@@ -15,19 +15,19 @@ class TestCase extends Orchestra
         $this->loadLaravelMigrations();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) =>
-                'LucasDotVin\\Soulbscription\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
+            fn(string $modelName): string
+                => 'LucasDotVin\\Soulbscription\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
         );
     }
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
             SoulbscriptionServiceProvider::class,
         ];
     }
 
-    public function getEnvironmentSetUp($app)
+    public function getEnvironmentSetUp($app): void
     {
         config()->set('database.default', 'testing');
     }

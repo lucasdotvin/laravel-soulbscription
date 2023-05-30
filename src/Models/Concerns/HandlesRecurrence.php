@@ -18,8 +18,7 @@ trait HandlesRecurrence
         }
 
         $recurrences = PeriodicityType::getDateDifference(from: now(), to: $start, unit: $this->periodicity_type);
-        $expirationDate = $start->copy()->add($this->periodicity_type, $this->periodicity + $recurrences);
 
-        return $expirationDate;
+        return $start->copy()->add($this->periodicity_type, $this->periodicity + $recurrences);
     }
 }

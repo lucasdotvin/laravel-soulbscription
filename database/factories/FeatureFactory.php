@@ -13,69 +13,70 @@ class FeatureFactory extends Factory
     /**
      * Define the model's default state.
      *
-     * @return array
+     * @return array{consumable: bool, name: string, periodicity: int|null,
+     *      periodicity_type: string|null, quota: bool, postpaid: bool}
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'consumable'       => $this->faker->boolean(),
             'name'             => $this->faker->words(asText: true),
             'periodicity'      => $this->faker->randomDigitNotNull(),
             'periodicity_type' => $this->faker->randomElement([
-                PeriodicityType::Year,
-                PeriodicityType::Month,
-                PeriodicityType::Week,
-                PeriodicityType::Day,
+                PeriodicityType::YEAR,
+                PeriodicityType::MONTH,
+                PeriodicityType::WEEK,
+                PeriodicityType::DAY,
             ]),
             'quota'            => false,
             'postpaid'         => false,
         ];
     }
 
-    public function consumable()
+    public function consumable(): FeatureFactory
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes): array => [
             'consumable' => true,
         ]);
     }
 
-    public function notConsumable()
+    public function notConsumable(): FeatureFactory
     {
-        return $this->state(fn (array $attributes) => [
-            'quota' => false,
-            'consumable' => false,
-            'periodicity' => null,
+        return $this->state(fn(array $attributes): array => [
+            'quota'            => false,
+            'consumable'       => false,
+            'periodicity'      => null,
             'periodicity_type' => null,
         ]);
     }
 
-    public function quota()
+    public function quota(): FeatureFactory
     {
-        return $this->state(fn (array $attributes) => [
-            'consumable' => true,
-            'quota' => true,
-            'periodicity' => null,
+        return $this->state(fn(array $attributes): array => [
+            'consumable'       => true,
+            'quota'            => true,
+            'periodicity'      => null,
             'periodicity_type' => null,
         ]);
     }
 
-    public function notQuota()
+    public function notQuota(): FeatureFactory
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes): array => [
             'quota' => false,
         ]);
     }
 
-    public function postpaid()
+    public function postpaid(): FeatureFactory
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes): array => [
             'postpaid' => true,
         ]);
     }
 
-    public function prepaid()
+    public function prepaid(): FeatureFactory
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes): array => [
             'postpaid' => false,
         ]);
     }

@@ -14,10 +14,10 @@ class StartingScopeTest extends TestCase
 
     public const MODEL = Subscription::class;
 
-    public function testNotStartedModelsAreNotReturnedByDefault()
+    public function testNotStartedModelsAreNotReturnedByDefault(): void
     {
         $startedModelsCount = $this->faker()->randomDigitNotNull();
-        $startedModels = self::MODEL::factory()->count($startedModelsCount)->create([
+        $startedModels      = self::MODEL::factory()->count($startedModelsCount)->create([
             'expired_at' => now()->addDay(),
             'started_at' => now()->subDay(),
         ]);
@@ -36,10 +36,10 @@ class StartingScopeTest extends TestCase
         );
     }
 
-    public function testNotStartedModelsAreNotReturnedWhenCallingWithoutNotStarted()
+    public function testNotStartedModelsAreNotReturnedWhenCallingWithoutNotStarted(): void
     {
         $startedModelsCount = $this->faker()->randomDigitNotNull();
-        $startedModels = self::MODEL::factory()->count($startedModelsCount)->create([
+        $startedModels      = self::MODEL::factory()->count($startedModelsCount)->create([
             'expired_at' => now()->addDay(),
             'started_at' => now()->subDay(),
         ]);
@@ -58,16 +58,16 @@ class StartingScopeTest extends TestCase
         );
     }
 
-    public function testStartedModelsAreReturnedWhenCallingMethodWithNotStarted()
+    public function testStartedModelsAreReturnedWhenCallingMethodWithNotStarted(): void
     {
         $startedModelsCount = $this->faker()->randomDigitNotNull();
-        $startedModels = self::MODEL::factory()->count($startedModelsCount)->create([
+        $startedModels      = self::MODEL::factory()->count($startedModelsCount)->create([
             'expired_at' => now()->addDay(),
             'started_at' => now()->subDay(),
         ]);
 
         $notStartedModelsCount = $this->faker()->randomDigitNotNull();
-        $notStartedModels = self::MODEL::factory()->count($notStartedModelsCount)->create([
+        $notStartedModels      = self::MODEL::factory()->count($notStartedModelsCount)->create([
             'expired_at' => now()->addDay(),
             'started_at' => now()->addDay(),
         ]);
@@ -82,10 +82,10 @@ class StartingScopeTest extends TestCase
         );
     }
 
-    public function testNotStartedModelsAreReturnedWhenCallingMethodWithNotStartedAndPassingAFalse()
+    public function testNotStartedModelsAreReturnedWhenCallingMethodWithNotStartedAndPassingAFalse(): void
     {
         $startedModelsCount = $this->faker()->randomDigitNotNull();
-        $startedModels = self::MODEL::factory()->count($startedModelsCount)->create([
+        $startedModels      = self::MODEL::factory()->count($startedModelsCount)->create([
             'expired_at' => now()->addDay(),
             'started_at' => now()->subDay(),
         ]);
@@ -104,7 +104,7 @@ class StartingScopeTest extends TestCase
         );
     }
 
-    public function testOnlyStartedModelsAreReturnedWhenCallingMethodOnlyNotStarted()
+    public function testOnlyStartedModelsAreReturnedWhenCallingMethodOnlyNotStarted(): void
     {
         $startedModelsCount = $this->faker()->randomDigitNotNull();
         self::MODEL::factory()->count($startedModelsCount)->create([
@@ -113,7 +113,7 @@ class StartingScopeTest extends TestCase
         ]);
 
         $notStartedModelsCount = $this->faker()->randomDigitNotNull();
-        $notStartedModels = self::MODEL::factory()->count($notStartedModelsCount)->create([
+        $notStartedModels      = self::MODEL::factory()->count($notStartedModelsCount)->create([
             'expired_at' => now()->addDay(),
             'started_at' => now()->addDay(),
         ]);

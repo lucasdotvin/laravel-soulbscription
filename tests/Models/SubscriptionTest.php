@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Models;
+namespace Tests\Models;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -20,12 +20,12 @@ class SubscriptionTest extends TestCase
     use RefreshDatabase;
     use WithFaker;
 
-    public function testModelRenews()
+    public function testModelRenews(): void
     {
         Carbon::setTestNow(now());
 
-        $plan = Plan::factory()->create();
-        $subscriber = User::factory()->create();
+        $plan         = Plan::factory()->create();
+        $subscriber   = User::factory()->create();
         $subscription = Subscription::factory()
             ->for($plan)
             ->for($subscriber, 'subscriber')
@@ -42,19 +42,19 @@ class SubscriptionTest extends TestCase
         Event::assertDispatched(SubscriptionRenewed::class);
 
         $this->assertDatabaseHas('subscriptions', [
-            'plan_id' => $plan->id,
-            'subscriber_id' => $subscriber->id,
+            'plan_id'         => $plan->id,
+            'subscriber_id'   => $subscriber->id,
             'subscriber_type' => User::class,
-            'expired_at' => $expectedExpiredAt,
+            'expired_at'      => $expectedExpiredAt,
         ]);
     }
 
-    public function testModelRenewsBasedOnCurrentDateIfOverdue()
+    public function testModelRenewsBasedOnCurrentDateIfOverdue(): void
     {
         Carbon::setTestNow(now());
 
-        $plan = Plan::factory()->create();
-        $subscriber = User::factory()->create();
+        $plan         = Plan::factory()->create();
+        $subscriber   = User::factory()->create();
         $subscription = Subscription::factory()
             ->for($plan)
             ->for($subscriber, 'subscriber')
@@ -71,19 +71,19 @@ class SubscriptionTest extends TestCase
         Event::assertDispatched(SubscriptionRenewed::class);
 
         $this->assertDatabaseHas('subscriptions', [
-            'plan_id' => $plan->id,
-            'subscriber_id' => $subscriber->id,
+            'plan_id'         => $plan->id,
+            'subscriber_id'   => $subscriber->id,
             'subscriber_type' => User::class,
-            'expired_at' => $expectedExpiredAt,
+            'expired_at'      => $expectedExpiredAt,
         ]);
     }
 
-    public function testModelCanCancel()
+    public function testModelCanCancel(): void
     {
         Carbon::setTestNow(now());
 
-        $plan = Plan::factory()->create();
-        $subscriber = User::factory()->create();
+        $plan         = Plan::factory()->create();
+        $subscriber   = User::factory()->create();
         $subscription = Subscription::factory()
             ->for($plan)
             ->for($subscriber, 'subscriber')
@@ -97,17 +97,17 @@ class SubscriptionTest extends TestCase
         Event::assertDispatched(SubscriptionCanceled::class);
 
         $this->assertDatabaseHas('subscriptions', [
-            'id' => $subscription->id,
+            'id'          => $subscription->id,
             'canceled_at' => now(),
         ]);
     }
 
-    public function testModelCanStart()
+    public function testModelCanStart(): void
     {
         Carbon::setTestNow(now());
 
-        $plan = Plan::factory()->create();
-        $subscriber = User::factory()->create();
+        $plan         = Plan::factory()->create();
+        $subscriber   = User::factory()->create();
         $subscription = Subscription::factory()
             ->for($plan)
             ->for($subscriber, 'subscriber')
@@ -121,17 +121,17 @@ class SubscriptionTest extends TestCase
         Event::assertDispatched(SubscriptionStarted::class);
 
         $this->assertDatabaseHas('subscriptions', [
-            'id' => $subscription->id,
+            'id'         => $subscription->id,
             'started_at' => today(),
         ]);
     }
 
-    public function testModelCanSuppress()
+    public function testModelCanSuppress(): void
     {
         Carbon::setTestNow(now());
 
-        $plan = Plan::factory()->create();
-        $subscriber = User::factory()->create();
+        $plan         = Plan::factory()->create();
+        $subscriber   = User::factory()->create();
         $subscription = Subscription::factory()
             ->for($plan)
             ->for($subscriber, 'subscriber')
@@ -144,15 +144,15 @@ class SubscriptionTest extends TestCase
         Event::assertDispatched(SubscriptionSuppressed::class);
 
         $this->assertDatabaseHas('subscriptions', [
-            'id' => $subscription->id,
+            'id'            => $subscription->id,
             'suppressed_at' => now(),
         ]);
     }
 
-    public function testModelCanMarkAsSwitched()
+    public function testModelCanMarkAsSwitched(): void
     {
-        $plan = Plan::factory()->create();
-        $subscriber = User::factory()->create();
+        $plan         = Plan::factory()->create();
+        $subscriber   = User::factory()->create();
         $subscription = Subscription::factory()
             ->for($plan)
             ->for($subscriber, 'subscriber')
@@ -162,14 +162,14 @@ class SubscriptionTest extends TestCase
             ->save();
 
         $this->assertDatabaseHas('subscriptions', [
-            'id' => $subscription->id,
+            'id'           => $subscription->id,
             'was_switched' => true,
         ]);
     }
 
-    public function testModelRegistersRenewal()
+    public function testModelRegistersRenewal(): void
     {
-        $subscriber = User::factory()->create();
+        $subscriber   = User::factory()->create();
         $subscription = Subscription::factory()
             ->for($subscriber, 'subscriber')
             ->create();
@@ -179,13 +179,13 @@ class SubscriptionTest extends TestCase
         $this->assertDatabaseCount('subscription_renewals', 1);
         $this->assertDatabaseHas('subscription_renewals', [
             'subscription_id' => $subscription->id,
-            'renewal' => true,
+            'renewal'         => true,
         ]);
     }
 
-    public function testModelRegistersOverdue()
+    public function testModelRegistersOverdue(): void
     {
-        $subscriber = User::factory()->create();
+        $subscriber   = User::factory()->create();
         $subscription = Subscription::factory()
             ->for($subscriber, 'subscriber')
             ->create([
@@ -197,18 +197,18 @@ class SubscriptionTest extends TestCase
         $this->assertDatabaseCount('subscription_renewals', 1);
         $this->assertDatabaseHas('subscription_renewals', [
             'subscription_id' => $subscription->id,
-            'overdue' => true,
+            'overdue'         => true,
         ]);
     }
 
-    public function testModelConsidersGraceDaysOnOverdue()
+    public function testModelConsidersGraceDaysOnOverdue(): void
     {
-        $subscriber = User::factory()->create();
+        $subscriber   = User::factory()->create();
         $subscription = Subscription::factory()
             ->for($subscriber, 'subscriber')
             ->create([
                 'grace_days_ended_at' => now()->addDay(),
-                'expired_at' => now()->subDay(),
+                'expired_at'          => now()->subDay(),
             ]);
 
         $subscription->renew();
@@ -216,11 +216,11 @@ class SubscriptionTest extends TestCase
         $this->assertDatabaseCount('subscription_renewals', 1);
         $this->assertDatabaseHas('subscription_renewals', [
             'subscription_id' => $subscription->id,
-            'overdue' => false,
+            'overdue'         => false,
         ]);
     }
 
-    public function testModelReturnsNotStartedSubscriptionsInNotActiveScope()
+    public function testModelReturnsNotStartedSubscriptionsInNotActiveScope(): void
     {
         Subscription::factory()
             ->count($this->faker()->randomDigitNotNull())
@@ -240,11 +240,11 @@ class SubscriptionTest extends TestCase
 
         $this->assertCount($notStartedSubscriptionCount, $returnedSubscriptions);
         $notStartedSubscription->each(
-            fn ($subscription) => $this->assertContains($subscription->id, $returnedSubscriptions->pluck('id'))
+            fn($subscription) => $this->assertContains($subscription->id, $returnedSubscriptions->pluck('id'))
         );
     }
 
-    public function testModelReturnsExpiredSubscriptionsInNotActiveScope()
+    public function testModelReturnsExpiredSubscriptionsInNotActiveScope(): void
     {
         Subscription::factory()
             ->count($this->faker()->randomDigitNotNull())
@@ -264,11 +264,11 @@ class SubscriptionTest extends TestCase
 
         $this->assertCount($expiredSubscriptionCount, $returnedSubscriptions);
         $expiredSubscription->each(
-            fn ($subscription) => $this->assertContains($subscription->id, $returnedSubscriptions->pluck('id'))
+            fn($subscription) => $this->assertContains($subscription->id, $returnedSubscriptions->pluck('id'))
         );
     }
 
-    public function testModelReturnsSuppressedSubscriptionsInNotActiveScope()
+    public function testModelReturnsSuppressedSubscriptionsInNotActiveScope(): void
     {
         Subscription::factory()
             ->count($this->faker()->randomDigitNotNull())
@@ -288,11 +288,11 @@ class SubscriptionTest extends TestCase
 
         $this->assertCount($suppressedSubscriptionCount, $returnedSubscriptions);
         $suppressedSubscription->each(
-            fn ($subscription) => $this->assertContains($subscription->id, $returnedSubscriptions->pluck('id'))
+            fn($subscription) => $this->assertContains($subscription->id, $returnedSubscriptions->pluck('id'))
         );
     }
 
-    public function testModelReturnsOnlyCanceledSubscriptionsWithTheScope()
+    public function testModelReturnsOnlyCanceledSubscriptionsWithTheScope(): void
     {
         Subscription::factory()
             ->count($this->faker()->randomDigitNotNull())
@@ -314,11 +314,11 @@ class SubscriptionTest extends TestCase
 
         $this->assertCount($canceledSubscriptionCount, $returnedSubscriptions);
         $canceledSubscription->each(
-            fn ($subscription) => $this->assertContains($subscription->id, $returnedSubscriptions->pluck('id'))
+            fn($subscription) => $this->assertContains($subscription->id, $returnedSubscriptions->pluck('id'))
         );
     }
 
-    public function testModelReturnsOnlyNotCanceledSubscriptionsWithTheScope()
+    public function testModelReturnsOnlyNotCanceledSubscriptionsWithTheScope(): void
     {
         Subscription::factory()
             ->count($this->faker()->randomDigitNotNull())
@@ -340,7 +340,7 @@ class SubscriptionTest extends TestCase
 
         $this->assertCount($notCanceledSubscriptionCount, $returnedSubscriptions);
         $notCanceledSubscription->each(
-            fn ($subscription) => $this->assertContains($subscription->id, $returnedSubscriptions->pluck('id'))
+            fn($subscription) => $this->assertContains($subscription->id, $returnedSubscriptions->pluck('id'))
         );
     }
 }

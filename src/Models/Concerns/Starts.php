@@ -6,19 +6,19 @@ use LucasDotVin\Soulbscription\Models\Scopes\StartingScope;
 
 trait Starts
 {
-    public static function bootStarts()
+    public static function bootStarts(): void
     {
         static::addGlobalScope(new StartingScope());
     }
 
-    public function initializeStarts()
+    public function initializeStarts(): void
     {
         if (! isset($this->casts['started_at'])) {
             $this->casts['started_at'] = 'datetime';
         }
     }
 
-    public function started()
+    public function started(): bool
     {
         if (empty($this->started_at)) {
             return false;
@@ -27,7 +27,7 @@ trait Starts
         return $this->started_at->isPast();
     }
 
-    public function notStarted()
+    public function notStarted(): bool
     {
         return ! $this->started();
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Models;
+namespace Tests\Models;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -14,11 +14,14 @@ class FeaturePlanTest extends TestCase
     use RefreshDatabase;
     use WithFaker;
 
-    public function testModelCanRetrievePlan()
+    public function testModelCanRetrievePlan(): void
     {
         $feature = Feature::factory()
             ->create();
 
+        /**
+         * @var Plan $plan
+         */
         $plan = Plan::factory()->create();
         $plan->features()->attach($feature);
 
@@ -27,7 +30,7 @@ class FeaturePlanTest extends TestCase
         $this->assertEquals($plan->id, $featurePlanPivot->plan->id);
     }
 
-    public function testModelCanRetrieveFeature()
+    public function testModelCanRetrieveFeature(): void
     {
         $feature = Feature::factory()
             ->create();

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Models;
+namespace Tests\Scopes;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -14,7 +14,7 @@ class ExpiringWithGraceDaysScopeTest extends TestCase
 
     public const MODEL = Subscription::class;
 
-    public function testExpiredModelsAreNotReturnedByDefault()
+    public function testExpiredModelsAreNotReturnedByDefault(): void
     {
         $expiredModelsCount = $this->faker()->randomDigitNotNull();
         self::MODEL::factory()->count($expiredModelsCount)->create([
@@ -22,7 +22,7 @@ class ExpiringWithGraceDaysScopeTest extends TestCase
         ]);
 
         $unexpiredModelsCount = $this->faker()->randomDigitNotNull();
-        $unexpiredModels = self::MODEL::factory()->count($unexpiredModelsCount)->create([
+        $unexpiredModels      = self::MODEL::factory()->count($unexpiredModelsCount)->create([
             'expired_at' => now()->addDay(),
         ]);
 
@@ -34,24 +34,24 @@ class ExpiringWithGraceDaysScopeTest extends TestCase
         );
     }
 
-    public function testExpiredModelsWithGraceDaysAreReturnedByDefault()
+    public function testExpiredModelsWithGraceDaysAreReturnedByDefault(): void
     {
         $expiredModelsWithoutGraceDaysCount = $this->faker()->randomDigitNotNull();
         self::MODEL::factory()->count($expiredModelsWithoutGraceDaysCount)->create([
-            'expired_at' => now()->subDay(),
+            'expired_at'          => now()->subDay(),
             'grace_days_ended_at' => null,
         ]);
 
         $expiredModelsWithPastGraceDaysCount = $this->faker()->randomDigitNotNull();
         self::MODEL::factory()->count($expiredModelsWithPastGraceDaysCount)->create([
-            'expired_at' => now()->subDay(),
+            'expired_at'          => now()->subDay(),
             'grace_days_ended_at' => now()->subDay(),
         ]);
 
         $expiredModelsWithFutureGraceDaysCount = $this->faker()->randomDigitNotNull();
-        $expiredModelsWithFutureGraceDays = self::MODEL::factory()
+        $expiredModelsWithFutureGraceDays      = self::MODEL::factory()
             ->count($expiredModelsWithFutureGraceDaysCount)->create([
-                'expired_at' => now()->subDay(),
+                'expired_at'          => now()->subDay(),
                 'grace_days_ended_at' => now()->addDay(),
             ]);
 
@@ -63,22 +63,22 @@ class ExpiringWithGraceDaysScopeTest extends TestCase
         );
     }
 
-    public function testExpiredModelsAreReturnedWhenCallingMethodWithExpired()
+    public function testExpiredModelsAreReturnedWhenCallingMethodWithExpired(): void
     {
         $expiredModelsCount = $this->faker()->randomDigitNotNull();
-        $expiredModels = self::MODEL::factory()->count($expiredModelsCount)->create([
+        $expiredModels      = self::MODEL::factory()->count($expiredModelsCount)->create([
             'expired_at' => now()->subDay(),
         ]);
 
         $unexpiredModelsCount = $this->faker()->randomDigitNotNull();
-        $unexpiredModels = self::MODEL::factory()->count($unexpiredModelsCount)->create([
+        $unexpiredModels      = self::MODEL::factory()->count($unexpiredModelsCount)->create([
             'expired_at' => now()->addDay(),
         ]);
 
         $expiredModelsWithFutureGraceDays = self::MODEL::factory()
             ->count($this->faker()->randomDigitNotNull())
             ->create([
-                'expired_at' => now()->subDay(),
+                'expired_at'          => now()->subDay(),
                 'grace_days_ended_at' => now()->addDay(),
             ]);
 
@@ -93,7 +93,7 @@ class ExpiringWithGraceDaysScopeTest extends TestCase
         );
     }
 
-    public function testExpiredModelsAreNotReturnedWhenCallingMethodWithExpiredAndPassingFalse()
+    public function testExpiredModelsAreNotReturnedWhenCallingMethodWithExpiredAndPassingFalse(): void
     {
         $expiredModelsCount = $this->faker()->randomDigitNotNull();
         self::MODEL::factory()->count($expiredModelsCount)->create([
@@ -101,14 +101,14 @@ class ExpiringWithGraceDaysScopeTest extends TestCase
         ]);
 
         $unexpiredModelsCount = $this->faker()->randomDigitNotNull();
-        $unexpiredModels = self::MODEL::factory()->count($unexpiredModelsCount)->create([
+        $unexpiredModels      = self::MODEL::factory()->count($unexpiredModelsCount)->create([
             'expired_at' => now()->addDay(),
         ]);
 
         $expiredModelsWithFutureGraceDays = self::MODEL::factory()
             ->count($this->faker()->randomDigitNotNull())
             ->create([
-                'expired_at' => now()->subDay(),
+                'expired_at'          => now()->subDay(),
                 'grace_days_ended_at' => now()->addDay(),
             ]);
 
@@ -122,10 +122,10 @@ class ExpiringWithGraceDaysScopeTest extends TestCase
         );
     }
 
-    public function testOnlyExpiredModelsAreReturnedWhenCallingMethodOnlyExpired()
+    public function testOnlyExpiredModelsAreReturnedWhenCallingMethodOnlyExpired(): void
     {
         $expiredModelsCount = $this->faker()->randomDigitNotNull();
-        $expiredModels = self::MODEL::factory()->count($expiredModelsCount)->create([
+        $expiredModels      = self::MODEL::factory()->count($expiredModelsCount)->create([
             'expired_at' => now()->subDay(),
         ]);
 
@@ -137,14 +137,14 @@ class ExpiringWithGraceDaysScopeTest extends TestCase
         $expiredModelsWithPastGraceDays = self::MODEL::factory()
             ->count($this->faker()->randomDigitNotNull())
             ->create([
-                'expired_at' => now()->subDay(),
+                'expired_at'          => now()->subDay(),
                 'grace_days_ended_at' => now()->subDay(),
             ]);
 
         $expiredModelsWithNullGraceDays = self::MODEL::factory()
             ->count($this->faker()->randomDigitNotNull())
             ->create([
-                'expired_at' => now()->subDay(),
+                'expired_at'          => now()->subDay(),
                 'grace_days_ended_at' => null,
             ]);
 

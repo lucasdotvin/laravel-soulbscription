@@ -8,13 +8,13 @@ use Illuminate\Database\Eloquent\Scope;
 
 class ExpiringScope implements Scope
 {
-    protected $extensions = [
+    protected array $extensions = [
         'OnlyExpired',
         'WithExpired',
         'WithoutExpired',
     ];
 
-    public function apply(Builder $builder, Model $model)
+    public function apply(Builder $builder, Model $model): void
     {
         $builder->where(
             fn (Builder $query) =>
@@ -23,14 +23,14 @@ class ExpiringScope implements Scope
         );
     }
 
-    public function extend(Builder $builder)
+    public function extend(Builder $builder): void
     {
         foreach ($this->extensions as $extension) {
             $this->{"add{$extension}"}($builder);
         }
     }
 
-    protected function addWithExpired(Builder $builder)
+    protected function addWithExpired(Builder $builder): void
     {
         $builder->macro('withExpired', function (Builder $builder, $withExpired = true) {
             if ($withExpired) {
@@ -41,7 +41,7 @@ class ExpiringScope implements Scope
         });
     }
 
-    protected function addWithoutExpired(Builder $builder)
+    protected function addWithoutExpired(Builder $builder): void
     {
         $builder->macro('withoutExpired', function (Builder $builder) {
             $builder->withoutGlobalScope($this)->where(
@@ -54,7 +54,7 @@ class ExpiringScope implements Scope
         });
     }
 
-    protected function addOnlyExpired(Builder $builder)
+    protected function addOnlyExpired(Builder $builder): void
     {
         $builder->macro('onlyExpired', function (Builder $builder) {
             $builder->withoutGlobalScope($this)->where(

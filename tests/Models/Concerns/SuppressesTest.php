@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Models\Concerns;
+namespace Tests\Models\Concerns;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -14,7 +14,7 @@ class SuppressesTest extends TestCase
 
     public const MODEL = Subscription::class;
 
-    public function testModelReturnsSuppressedWhenSuppressedAtIsOnThePast()
+    public function testModelReturnsSuppressedWhenSuppressedAtIsOnThePast(): void
     {
         $model = self::MODEL::factory()->make([
             'suppressed_at' => now()->subDay(),
@@ -24,7 +24,7 @@ class SuppressesTest extends TestCase
         $this->assertFalse($model->notSuppressed());
     }
 
-    public function testModelReturnsNotSuppressedWhenSuppressedAtIsOnTheFuture()
+    public function testModelReturnsNotSuppressedWhenSuppressedAtIsOnTheFuture(): void
     {
         $model = self::MODEL::factory()->make([
             'suppressed_at' => now()->addDay(),
@@ -34,9 +34,9 @@ class SuppressesTest extends TestCase
         $this->assertTrue($model->notSuppressed());
     }
 
-    public function testModelReturnsNotSuppressedWhenSuppressedAtIsNull()
+    public function testModelReturnsNotSuppressedWhenSuppressedAtIsNull(): void
     {
-        $model = self::MODEL::factory()->make();
+        $model                = self::MODEL::factory()->make();
         $model->suppressed_at = null;
 
         $this->assertFalse($model->suppressed());

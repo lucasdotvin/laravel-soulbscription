@@ -6,23 +6,23 @@ use LucasDotVin\Soulbscription\Models\Scopes\ExpiringWithGraceDaysScope;
 
 trait ExpiresAndHasGraceDays
 {
-    public static function bootExpiresAndHasGraceDays()
+    public static function bootExpiresAndHasGraceDays(): void
     {
         static::addGlobalScope(new ExpiringWithGraceDaysScope());
     }
 
-    public function initializeExpiresAndHasGraceDays()
+    public function initializeExpiresAndHasGraceDays(): void
     {
-        if (! isset($this->casts['expired_at'])) {
+        if (!isset($this->casts['expired_at'])) {
             $this->casts['expired_at'] = 'datetime';
         }
 
-        if (! isset($this->casts['grace_days_ended_at'])) {
+        if (!isset($this->casts['grace_days_ended_at'])) {
             $this->casts['grace_days_ended_at'] = 'datetime';
         }
     }
 
-    public function expired()
+    public function expired(): bool
     {
         if (is_null($this->grace_days_ended_at)) {
             return $this->expired_at->isPast();
@@ -32,17 +32,17 @@ trait ExpiresAndHasGraceDays
             and $this->grace_days_ended_at->isPast();
     }
 
-    public function notExpired()
+    public function notExpired(): bool
     {
-        return ! $this->expired();
+        return !$this->expired();
     }
 
-    public function hasExpired()
+    public function hasExpired(): bool
     {
         return $this->expired();
     }
 
-    public function hasNotExpired()
+    public function hasNotExpired(): bool
     {
         return $this->notExpired();
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Models\Concerns;
+namespace Tests\Models\Concerns;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -14,7 +14,7 @@ class StartsTest extends TestCase
 
     public const MODEL = Subscription::class;
 
-    public function testModelReturnsStartedWhenStartedAtIsOnThePast()
+    public function testModelReturnsStartedWhenStartedAtIsOnThePast(): void
     {
         $model = self::MODEL::factory()->make([
             'started_at' => now()->subDay(),
@@ -24,7 +24,7 @@ class StartsTest extends TestCase
         $this->assertFalse($model->notStarted());
     }
 
-    public function testModelReturnsNotStartedWhenStartedAtIsOnTheFuture()
+    public function testModelReturnsNotStartedWhenStartedAtIsOnTheFuture(): void
     {
         $model = self::MODEL::factory()->make([
             'started_at' => now()->addDay(),
@@ -34,9 +34,9 @@ class StartsTest extends TestCase
         $this->assertTrue($model->notStarted());
     }
 
-    public function testModelReturnsNotStartedWhenStartedAtIsNull()
+    public function testModelReturnsNotStartedWhenStartedAtIsNull(): void
     {
-        $model = self::MODEL::factory()->make();
+        $model             = self::MODEL::factory()->make();
         $model->started_at = null;
 
         $this->assertFalse($model->started());

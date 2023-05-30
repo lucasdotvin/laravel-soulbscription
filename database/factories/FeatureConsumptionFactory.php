@@ -13,9 +13,10 @@ class FeatureConsumptionFactory extends Factory
     /**
      * Define the model's default state.
      *
-     * @return array
+     * @return array{feature_id: \LucasDotVin\Soulbscription\Models\Feature,
+     *     consumption: float, expired_at: \DateTimeInterface, subscriber_id: int, subscriber_type: string}
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'feature_id'      => Feature::factory(),
@@ -26,16 +27,16 @@ class FeatureConsumptionFactory extends Factory
         ];
     }
 
-    public function expired()
+    public function expired(): Factory
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes): array => [
             'expired_at' => $this->faker->dateTime(),
         ]);
     }
 
-    public function notExpired()
+    public function notExpired(): FeatureConsumptionFactory
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes): array => [
             'expired_at' => now()->addDays($this->faker->randomDigitNotNull()),
         ]);
     }

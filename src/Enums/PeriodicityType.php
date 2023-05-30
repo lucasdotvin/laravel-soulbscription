@@ -7,13 +7,13 @@ use Illuminate\Support\Str;
 
 class PeriodicityType
 {
-    public const Year = 'Year';
+    public const YEAR = 'Year';
 
-    public const Month = 'Month';
+    public const MONTH = 'Month';
 
-    public const Week = 'Week';
+    public const WEEK = 'Week';
 
-    public const Day = 'Day';
+    public const DAY = 'Day';
 
     public static function getDateDifference(Carbon $from, Carbon $to, string $unit): int
     {

@@ -6,7 +6,7 @@ use Illuminate\Support\ServiceProvider;
 
 class SoulbscriptionServiceProvider extends ServiceProvider
 {
-    public function boot()
+    public function boot(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/soulbscription.php', 'soulbscription');
 

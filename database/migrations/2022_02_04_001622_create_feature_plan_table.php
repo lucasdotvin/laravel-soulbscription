@@ -10,9 +10,9 @@ return new class () extends Migration {
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('feature_plan', function (Blueprint $table) {
+        Schema::create('feature_plan', function (Blueprint $table): void {
             $table->id();
             $table->decimal('charges')->nullable();
             $table->foreignIdFor(\LucasDotVin\Soulbscription\Models\Feature::class)->constrained()->cascadeOnDelete();
@@ -26,7 +26,7 @@ return new class () extends Migration {
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('feature_plan');
     }
