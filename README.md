@@ -126,7 +126,7 @@ class FeatureSeeder extends Seeder
 
 ...
 
-class PhotoController extends Seeder
+class PhotoController extends Controller
 {
     public function store(Request $request)
     {
