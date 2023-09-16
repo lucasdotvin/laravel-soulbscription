@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Models;
+namespace Tests\Models;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -14,65 +14,65 @@ class FeatureTest extends TestCase
     use RefreshDatabase;
     use WithFaker;
 
-    public function testModelCalculateYearlyExpiration()
+    public function testModelCalculateYearlyExpiration(): void
     {
         Carbon::setTestNow(now());
 
-        $years = $this->faker->randomDigitNotNull();
+        $years   = $this->faker->randomDigitNotNull();
         $feature = Feature::factory()->create([
-            'periodicity_type' => PeriodicityType::Year,
-            'periodicity' => $years,
+            'periodicity_type' => PeriodicityType::YEAR,
+            'periodicity'      => $years,
         ]);
 
         $this->assertEquals(now()->addYears($years), $feature->calculateNextRecurrenceEnd());
     }
 
-    public function testModelCalculateMonthlyExpiration()
+    public function testModelCalculateMonthlyExpiration(): void
     {
         Carbon::setTestNow(now());
 
-        $months = $this->faker->randomDigitNotNull();
+        $months  = $this->faker->randomDigitNotNull();
         $feature = Feature::factory()->create([
-            'periodicity_type' => PeriodicityType::Month,
-            'periodicity' => $months,
+            'periodicity_type' => PeriodicityType::MONTH,
+            'periodicity'      => $months,
         ]);
 
         $this->assertEquals(now()->addMonths($months), $feature->calculateNextRecurrenceEnd());
     }
 
-    public function testModelCalculateWeeklyExpiration()
+    public function testModelCalculateWeeklyExpiration(): void
     {
         Carbon::setTestNow(now());
 
-        $weeks = $this->faker->randomDigitNotNull();
+        $weeks   = $this->faker->randomDigitNotNull();
         $feature = Feature::factory()->create([
-            'periodicity_type' => PeriodicityType::Week,
-            'periodicity' => $weeks,
+            'periodicity_type' => PeriodicityType::WEEK,
+            'periodicity'      => $weeks,
         ]);
 
         $this->assertEquals(now()->addWeeks($weeks), $feature->calculateNextRecurrenceEnd());
     }
 
-    public function testModelCalculateDailyExpiration()
+    public function testModelCalculateDailyExpiration(): void
     {
         Carbon::setTestNow(now());
 
-        $days = $this->faker->randomDigitNotNull();
+        $days    = $this->faker->randomDigitNotNull();
         $feature = Feature::factory()->create([
-            'periodicity_type' => PeriodicityType::Day,
-            'periodicity' => $days,
+            'periodicity_type' => PeriodicityType::DAY,
+            'periodicity'      => $days,
         ]);
 
         $this->assertEquals(now()->addDays($days), $feature->calculateNextRecurrenceEnd());
     }
 
-    public function testModelcalculateNextRecurrenceEndConsideringRecurrences()
+    public function testModelcalculateNextRecurrenceEndConsideringRecurrences(): void
     {
         Carbon::setTestNow(now());
 
         $feature = Feature::factory()->create([
-            'periodicity_type' => PeriodicityType::Week,
-            'periodicity' => 1,
+            'periodicity_type' => PeriodicityType::WEEK,
+            'periodicity'      => 1,
         ]);
 
         $startDate = now()->subDays(11);
@@ -80,7 +80,7 @@ class FeatureTest extends TestCase
         $this->assertEquals(now()->addDays(3), $feature->calculateNextRecurrenceEnd($startDate));
     }
 
-    public function testModelIsNotQuotaByDefault()
+    public function testModelIsNotQuotaByDefault(): void
     {
         $creationPayload = Feature::factory()->raw();
 
@@ -89,7 +89,7 @@ class FeatureTest extends TestCase
         $feature = Feature::create($creationPayload);
 
         $this->assertDatabaseHas('features', [
-            'id' => $feature->id,
+            'id'    => $feature->id,
             'quota' => false,
         ]);
     }

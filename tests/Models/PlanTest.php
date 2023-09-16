@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Models;
+namespace Tests\Models;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -15,16 +15,16 @@ class PlanTest extends TestCase
     use RefreshDatabase;
     use WithFaker;
 
-    public function testModelCancalculateGraceDaysEnd()
+    public function testModelCancalculateGraceDaysEnd(): void
     {
         Carbon::setTestNow(now());
 
-        $days = $this->faker->randomDigitNotNull();
+        $days      = $this->faker->randomDigitNotNull();
         $graceDays = $this->faker->randomDigitNotNull();
-        $plan = Plan::factory()->create([
-            'grace_days' => $graceDays,
-            'periodicity_type' => PeriodicityType::Day,
-            'periodicity' => $days,
+        $plan      = Plan::factory()->create([
+            'grace_days'       => $graceDays,
+            'periodicity_type' => PeriodicityType::DAY,
+            'periodicity'      => $days,
         ]);
 
         $this->assertEquals(
@@ -33,7 +33,7 @@ class PlanTest extends TestCase
         );
     }
 
-    public function testModelCanRetrieveSubscriptions()
+    public function testModelCanRetrieveSubscriptions(): void
     {
         $plan = Plan::factory()
             ->create();

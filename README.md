@@ -75,7 +75,7 @@ class FeatureSeeder extends Seeder
         $deployMinutes = Feature::create([
             'consumable'       => true,
             'name'             => 'deploy-minutes',
-            'periodicity_type' => PeriodicityType::Day,
+            'periodicity_type' => PeriodicityType::DAY,
             'periodicity'      => 1,
         ]);
 
@@ -166,13 +166,13 @@ class PlanSeeder extends Seeder
     {
         $silver = Plan::create([
             'name'             => 'silver',
-            'periodicity_type' => PeriodicityType::Month,
+            'periodicity_type' => PeriodicityType::MONTH,
             'periodicity'      => 1,
         ]);
 
         $gold = Plan::create([
             'name'             => 'gold',
-            'periodicity_type' => PeriodicityType::Month,
+            'periodicity_type' => PeriodicityType::MONTH,
             'periodicity'      => 1,
         ]);
     }

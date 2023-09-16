@@ -19,6 +19,46 @@ use LucasDotVin\Soulbscription\Models\Scopes\ExpiringWithGraceDaysScope;
 use LucasDotVin\Soulbscription\Models\Scopes\StartingScope;
 use LucasDotVin\Soulbscription\Models\Scopes\SuppressingScope;
 
+/**
+ * @property int                                                                 $id
+ * @property int                                                                 $plan_id
+ * @property int                                                                 $subscriber_id
+ * @property string                                                              $subscriber_type
+ * @property \Illuminate\Support\Carbon                                          $canceled_at
+ * @property \Illuminate\Support\Carbon                                          $expired_at
+ * @property \Illuminate\Support\Carbon                                          $grace_days_ended_at
+ * @property \Illuminate\Support\Carbon                                          $started_at
+ * @property \Illuminate\Support\Carbon                                          $suppressed_at
+ * @property bool                                                                $was_switched
+ * @property \Illuminate\Support\Carbon|null                                     $created_at
+ * @property \Illuminate\Support\Carbon |null                                    $updated_at
+ * @property \Illuminate\Support\Carbon|null                                     $deleted_at
+ * @property Plan                                                                $plan
+ * @property Model                                                               $subscriber
+ * @property-read \Illuminate\Database\Eloquent\Collection|SubscriptionRenewal[] $renewals
+ * @property-read int|null                                                       $renewals_count
+ * @property-read boolean                                                        $is_overdue
+ * @method static Builder|Subscription newModelQuery()
+ * @method static Builder|Subscription newQuery()
+ * @method static Builder|Subscription query()
+ * @method static Builder|Subscription whereCanceledAt($value)
+ * @method static Builder|Subscription whereCreatedAt($value)
+ * @method static Builder|Subscription whereDeletedAt($value)
+ * @method static Builder|Subscription whereExpiredAt($value)
+ * @method static Builder|Subscription whereGraceDaysEndedAt($value)
+ * @method static Builder|Subscription whereId($value)
+ * @method static Builder|Subscription wherePlanId($value)
+ * @method static Builder|Subscription whereStartedAt($value)
+ * @method static Builder|Subscription whereSubscriberId($value)
+ * @method static Builder|Subscription whereSubscriberType($value)
+ * @method static Builder|Subscription whereSuppressedAt($value)
+ * @method static Builder|Subscription whereUpdatedAt($value)
+ * @method static Builder|Subscription whereWasSwitched($value)
+ * @method static Builder|Subscription canceled()
+ * @method static Builder|Subscription notCanceled()
+ * @method static Builder|Subscription notActive()
+ * @method static Builder|Subscription expiringWithGraceDays()
+ */
 class Subscription extends Model
 {
     use ExpiresAndHasGraceDays;
@@ -27,8 +67,12 @@ class Subscription extends Model
     use Starts;
     use Suppresses;
 
-    protected $dates = [
-        'canceled_at',
+    protected $casts = [
+        'canceled_at'         => 'datetime',
+        'grace_days_ended_at' => 'datetime',
+        'expired_at'          => 'datetime',
+        'started_at'          => 'datetime',
+        'suppressed_at'       => 'datetime',
     ];
 
     protected $fillable = [
@@ -40,41 +84,45 @@ class Subscription extends Model
         'was_switched',
     ];
 
-    public function plan()
+    protected $appends = [
+        'is_overdue',
+    ];
+
+    public function plan(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(config('soulbscription.models.plan'));
     }
 
-    public function renewals()
+    public function renewals(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(config('soulbscription.models.subscription_renewal'));
     }
 
-    public function subscriber()
+    public function subscriber(): \Illuminate\Database\Eloquent\Relations\MorphTo
     {
         return $this->morphTo('subscriber');
     }
 
-    public function scopeNotActive(Builder $query)
+    public function scopeNotActive(Builder $query): Builder
     {
         return $query->withoutGlobalScopes([
-                ExpiringWithGraceDaysScope::class,
-                StartingScope::class,
-                SuppressingScope::class,
-            ])
+            ExpiringWithGraceDaysScope::class,
+            StartingScope::class,
+            SuppressingScope::class,
+        ])
             ->where(function (Builder $query) {
-                $query->where(fn (Builder $query) => $query->onlyExpired())
-                    ->orWhere(fn (Builder $query) => $query->onlyNotStarted())
-                    ->orWhere(fn (Builder $query) => $query->onlySuppressed());
+                $query->where(fn(Builder $query) => $query->onlyExpired())
+                    ->orWhere(fn(Builder $query) => $query->onlyNotStarted())
+                    ->orWhere(fn(Builder $query) => $query->onlySuppressed());
             });
     }
 
-    public function scopeCanceled(Builder $query)
+    public function scopeCanceled(Builder $query): Builder
     {
         return $query->whereNotNull('canceled_at');
     }
 
-    public function scopeNotCanceled(Builder $query)
+    public function scopeNotCanceled(Builder $query): Builder
     {
         return $query->whereNull('canceled_at');
     }
@@ -86,7 +134,7 @@ class Subscription extends Model
         ]);
     }
 
-    public function start(?Carbon $startDate = null): self
+    public function start(?\Illuminate\Support\Carbon $startDate = null): self
     {
         $startDate = $startDate ?: today();
 
@@ -102,7 +150,7 @@ class Subscription extends Model
         return $this;
     }
 
-    public function renew(?Carbon $expirationDate = null): self
+    public function renew(?\Illuminate\Support\Carbon $expirationDate = null): self
     {
         $this->renewals()->create([
             'renewal' => true,
@@ -120,7 +168,7 @@ class Subscription extends Model
         return $this;
     }
 
-    public function cancel(?Carbon $cancelDate = null): self
+    public function cancel(?\Illuminate\Support\Carbon $cancelDate = null): self
     {
         $cancelDate = $cancelDate ?: now();
 
@@ -132,7 +180,7 @@ class Subscription extends Model
         return $this;
     }
 
-    public function suppress(?Carbon $suppressation = null)
+    public function suppress(?\Illuminate\Support\Carbon $suppressation = null): static
     {
         $suppressationDate = $suppressation ?: now();
 
@@ -154,13 +202,13 @@ class Subscription extends Model
         return $this->expired_at->isPast();
     }
 
-    private function getRenewedExpiration(?Carbon $expirationDate = null)
+    private function getRenewedExpiration(?\Illuminate\Support\Carbon $expirationDate = null): Carbon
     {
-        if (! empty($expirationDate)) {
+        if (!empty($expirationDate)) {
             return $expirationDate;
         }
 
-        if ($this->isOverdue) {
+        if ($this->is_overdue) {
             return $this->plan->calculateNextRecurrenceEnd();
         }
 

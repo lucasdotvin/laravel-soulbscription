@@ -14,7 +14,7 @@ class SuppressingScopeTest extends TestCase
 
     public const MODEL = Subscription::class;
 
-    public function testSuppressedModelsAreNotReturnedByDefault()
+    public function testSuppressedModelsAreNotReturnedByDefault(): void
     {
         $suppressedModelsCount = $this->faker()->randomDigitNotNull();
         self::MODEL::factory()
@@ -25,7 +25,7 @@ class SuppressingScopeTest extends TestCase
             ->create();
 
         $notSuppressedModelsCount = $this->faker()->randomDigitNotNull();
-        $notSuppressedModels = self::MODEL::factory()
+        $notSuppressedModels      = self::MODEL::factory()
             ->count($notSuppressedModelsCount)
             ->notSuppressed()
             ->notExpired()
@@ -40,7 +40,7 @@ class SuppressingScopeTest extends TestCase
         );
     }
 
-    public function testSuppressedModelsAreNotReturnedWhenCallingWithoutNotSuppressed()
+    public function testSuppressedModelsAreNotReturnedWhenCallingWithoutNotSuppressed(): void
     {
         $suppressedModelsCount = $this->faker()->randomDigitNotNull();
         self::MODEL::factory()
@@ -51,7 +51,7 @@ class SuppressingScopeTest extends TestCase
             ->create();
 
         $notSuppressedModelsCount = $this->faker()->randomDigitNotNull();
-        $notSuppressedModels = self::MODEL::factory()
+        $notSuppressedModels      = self::MODEL::factory()
             ->count($notSuppressedModelsCount)
             ->notSuppressed()
             ->notExpired()
@@ -66,10 +66,10 @@ class SuppressingScopeTest extends TestCase
         );
     }
 
-    public function testSuppressedModelsAreReturnedWhenCallingMethodWithNotSuppressed()
+    public function testSuppressedModelsAreReturnedWhenCallingMethodWithNotSuppressed(): void
     {
         $suppressedModelsCount = $this->faker()->randomDigitNotNull();
-        $suppressedModels = self::MODEL::factory()
+        $suppressedModels      = self::MODEL::factory()
             ->count($suppressedModelsCount)
             ->suppressed()
             ->notExpired()
@@ -77,7 +77,7 @@ class SuppressingScopeTest extends TestCase
             ->create();
 
         $notSuppressedModelsCount = $this->faker()->randomDigitNotNull();
-        $notSuppressedModels = self::MODEL::factory()
+        $notSuppressedModels      = self::MODEL::factory()
             ->count($notSuppressedModelsCount)
             ->notSuppressed()
             ->notExpired()
@@ -94,7 +94,7 @@ class SuppressingScopeTest extends TestCase
         );
     }
 
-    public function testSuppressedModelsAreReturnedWhenCallingMethodWithNotSuppressedAndPassingAFalse()
+    public function testSuppressedModelsAreReturnedWhenCallingMethodWithNotSuppressedAndPassingAFalse(): void
     {
         $suppressedModelsCount = $this->faker()->randomDigitNotNull();
         self::MODEL::factory()
@@ -105,7 +105,7 @@ class SuppressingScopeTest extends TestCase
             ->create();
 
         $notSuppressedModelsCount = $this->faker()->randomDigitNotNull();
-        $notSuppressedModels = self::MODEL::factory()
+        $notSuppressedModels      = self::MODEL::factory()
             ->count($notSuppressedModelsCount)
             ->notSuppressed()
             ->notExpired()
@@ -120,10 +120,10 @@ class SuppressingScopeTest extends TestCase
         );
     }
 
-    public function testOnlySuppressedModelsAreReturnedWhenCallingMethodOnlyNotSuppressed()
+    public function testOnlySuppressedModelsAreReturnedWhenCallingMethodOnlyNotSuppressed(): void
     {
         $suppressedModelsCount = $this->faker()->randomDigitNotNull();
-        $suppressedModels = self::MODEL::factory()
+        $suppressedModels      = self::MODEL::factory()
             ->count($suppressedModelsCount)
             ->suppressed()
             ->notExpired()

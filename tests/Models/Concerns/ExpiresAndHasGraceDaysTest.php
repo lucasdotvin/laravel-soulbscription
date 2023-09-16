@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Models\Concerns;
+namespace Tests\Models\Concerns;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -16,7 +16,7 @@ class ExpiresAndHasGraceDaysTest extends TestCase
 
     public const MODEL = Subscription::class;
 
-    public function testTraitAppliesScope()
+    public function testTraitAppliesScope(): void
     {
         $model = self::MODEL::factory()->create();
 
@@ -24,7 +24,7 @@ class ExpiresAndHasGraceDaysTest extends TestCase
         $this->assertArrayHasKey(ExpiringWithGraceDaysScope::class, $model->getGlobalScopes());
     }
 
-    public function testModelReturnsExpiredStatus()
+    public function testModelReturnsExpiredStatus(): void
     {
         $expiredModel = self::MODEL::factory()
             ->expired()
@@ -52,7 +52,7 @@ class ExpiresAndHasGraceDaysTest extends TestCase
         $this->assertFalse($notExpiredModel->expired());
     }
 
-    public function testModelReturnsNotExpiredStatus()
+    public function testModelReturnsNotExpiredStatus(): void
     {
         $expiredModel = self::MODEL::factory()
             ->expired()
@@ -80,7 +80,7 @@ class ExpiresAndHasGraceDaysTest extends TestCase
         $this->assertTrue($notExpiredModel->notExpired());
     }
 
-    public function testModelReturnsIfItHasExpired()
+    public function testModelReturnsIfItHasExpired(): void
     {
         $expiredModel = self::MODEL::factory()
             ->expired()
@@ -108,7 +108,7 @@ class ExpiresAndHasGraceDaysTest extends TestCase
         $this->assertFalse($notExpiredModel->hasExpired());
     }
 
-    public function testModelReturnsIfItHasNotExpired()
+    public function testModelReturnsIfItHasNotExpired(): void
     {
         $expiredModel = self::MODEL::factory()
             ->expired()

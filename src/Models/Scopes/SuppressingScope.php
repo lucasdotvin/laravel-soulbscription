@@ -8,25 +8,25 @@ use Illuminate\Database\Eloquent\Scope;
 
 class SuppressingScope implements Scope
 {
-    protected $extensions = [
+    protected array $extensions = [
         'OnlySuppressed',
         'WithSuppressed',
         'WithoutSuppressed',
     ];
 
-    public function apply(Builder $builder, Model $model)
+    public function apply(Builder $builder, Model $model): void
     {
         $builder->whereNull('suppressed_at');
     }
 
-    public function extend(Builder $builder)
+    public function extend(Builder $builder): void
     {
         foreach ($this->extensions as $extension) {
             $this->{"add{$extension}"}($builder);
         }
     }
 
-    protected function addWithSuppressed(Builder $builder)
+    protected function addWithSuppressed(Builder $builder): void
     {
         $builder->macro('withSuppressed', function (Builder $builder, $withSuppressed = true) {
             if ($withSuppressed) {
@@ -37,7 +37,7 @@ class SuppressingScope implements Scope
         });
     }
 
-    protected function addWithoutSuppressed(Builder $builder)
+    protected function addWithoutSuppressed(Builder $builder): void
     {
         $builder->macro('withoutSuppressed', function (Builder $builder) {
             $builder->withoutGlobalScope($this)->whereNull('suppressed_at');
@@ -46,7 +46,7 @@ class SuppressingScope implements Scope
         });
     }
 
-    protected function addOnlySuppressed(Builder $builder)
+    protected function addOnlySuppressed(Builder $builder): void
     {
         $builder->macro('onlySuppressed', function (Builder $builder) {
             $builder->withoutGlobalScope($this)->whereNotNull('suppressed_at');

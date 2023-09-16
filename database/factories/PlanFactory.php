@@ -13,24 +13,24 @@ class PlanFactory extends Factory
     /**
      * Define the model's default state.
      *
-     * @return array
+     * @return array{grace_days: int, name: string, periodicity: int, periodicity_type: string}
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'grace_days'       => 0,
             'name'             => $this->faker->words(asText: true),
             'periodicity'      => $this->faker->randomDigitNotNull(),
             'periodicity_type' => $this->faker->randomElement([
-                PeriodicityType::Year,
-                PeriodicityType::Month,
-                PeriodicityType::Week,
-                PeriodicityType::Day,
+                PeriodicityType::YEAR,
+                PeriodicityType::MONTH,
+                PeriodicityType::WEEK,
+                PeriodicityType::DAY,
             ]),
         ];
     }
 
-    public function withGraceDays()
+    public function withGraceDays(): PlanFactory
     {
         return $this->state([
             'grace_days' => $this->faker->randomDigitNotNull(),

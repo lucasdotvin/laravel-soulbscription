@@ -12,9 +12,9 @@ class SubscriptionRenewalFactory extends Factory
     /**
      * Define the model's default state.
      *
-     * @return array
+     * @return array{subscription_id: int, overdue: bool, renewal: bool}
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'subscription_id' => Subscription::factory(),

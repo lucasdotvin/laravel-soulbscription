@@ -6,19 +6,19 @@ use LucasDotVin\Soulbscription\Models\Scopes\SuppressingScope;
 
 trait Suppresses
 {
-    public static function bootSuppresses()
+    public static function bootSuppresses(): void
     {
         static::addGlobalScope(new SuppressingScope());
     }
 
-    public function initializeSuppresses()
+    public function initializeSuppresses(): void
     {
         if (! isset($this->casts['suppressed_at'])) {
             $this->casts['suppressed_at'] = 'datetime';
         }
     }
 
-    public function suppressed()
+    public function suppressed(): bool
     {
         if (empty($this->suppressed_at)) {
             return false;
@@ -27,7 +27,7 @@ trait Suppresses
         return $this->suppressed_at->isPast();
     }
 
-    public function notSuppressed()
+    public function notSuppressed(): bool
     {
         return ! $this->suppressed();
     }

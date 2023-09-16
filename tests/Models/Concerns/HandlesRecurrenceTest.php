@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Models\Concerns;
+namespace Tests\Models\Concerns;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -16,66 +16,66 @@ class HandlesRecurrenceTest extends TestCase
 
     public const MODEL = Plan::class;
 
-    public function testModelCalculateYearlyExpiration()
+    public function testModelCalculateYearlyExpiration(): void
     {
         Carbon::setTestNow(now());
 
         $years = $this->faker->randomDigitNotNull();
-        $plan = self::MODEL::factory()->create([
-            'periodicity_type' => PeriodicityType::Year,
-            'periodicity' => $years,
+        $plan  = self::MODEL::factory()->create([
+            'periodicity_type' => PeriodicityType::YEAR,
+            'periodicity'      => $years,
         ]);
 
         $this->assertEquals(now()->addYears($years), $plan->calculateNextRecurrenceEnd());
     }
 
-    public function testModelCalculateMonthlyExpiration()
+    public function testModelCalculateMonthlyExpiration(): void
     {
         Carbon::setTestNow(now());
 
         $months = $this->faker->randomDigitNotNull();
-        $plan = self::MODEL::factory()->create([
-            'periodicity_type' => PeriodicityType::Month,
-            'periodicity' => $months,
+        $plan   = self::MODEL::factory()->create([
+            'periodicity_type' => PeriodicityType::MONTH,
+            'periodicity'      => $months,
         ]);
 
         $this->assertEquals(now()->addMonths($months), $plan->calculateNextRecurrenceEnd());
     }
 
-    public function testModelCalculateWeeklyExpiration()
+    public function testModelCalculateWeeklyExpiration(): void
     {
         Carbon::setTestNow(now());
 
         $weeks = $this->faker->randomDigitNotNull();
-        $plan = self::MODEL::factory()->create([
-            'periodicity_type' => PeriodicityType::Week,
-            'periodicity' => $weeks,
+        $plan  = self::MODEL::factory()->create([
+            'periodicity_type' => PeriodicityType::WEEK,
+            'periodicity'      => $weeks,
         ]);
 
         $this->assertEquals(now()->addWeeks($weeks), $plan->calculateNextRecurrenceEnd());
     }
 
-    public function testModelCalculateDailyExpiration()
+    public function testModelCalculateDailyExpiration(): void
     {
         Carbon::setTestNow(now());
 
         $days = $this->faker->randomDigitNotNull();
         $plan = self::MODEL::factory()->create([
-            'periodicity_type' => PeriodicityType::Day,
-            'periodicity' => $days,
+            'periodicity_type' => PeriodicityType::DAY,
+            'periodicity'      => $days,
         ]);
 
         $this->assertEquals(now()->addDays($days), $plan->calculateNextRecurrenceEnd());
     }
 
-    public function testModelCalculateExpirationWithADifferentStart()
+    public function testModelCalculateExpirationWithADifferentStart(): void
     {
         Carbon::setTestNow(now());
 
         $weeks = $this->faker->randomDigitNotNull();
-        $plan = self::MODEL::factory()->create([
-            'periodicity_type' => PeriodicityType::Week,
-            'periodicity' => $weeks,
+        $plan  = self::MODEL::factory()->create([
+            'periodicity_type' => PeriodicityType::WEEK,
+            'periodicity'      => $weeks,
         ]);
 
         $start = now()->subDay();
@@ -83,14 +83,14 @@ class HandlesRecurrenceTest extends TestCase
         $this->assertEquals($start->copy()->addWeeks($weeks), $plan->calculateNextRecurrenceEnd($start));
     }
 
-    public function testModelCalculateExpirationWithADifferentStartAsString()
+    public function testModelCalculateExpirationWithADifferentStartAsString(): void
     {
         Carbon::setTestNow(today());
 
         $weeks = $this->faker->randomDigitNotNull();
-        $plan = self::MODEL::factory()->create([
-            'periodicity_type' => PeriodicityType::Week,
-            'periodicity' => $weeks,
+        $plan  = self::MODEL::factory()->create([
+            'periodicity_type' => PeriodicityType::WEEK,
+            'periodicity'      => $weeks,
         ]);
 
         $start = today()->subDay();

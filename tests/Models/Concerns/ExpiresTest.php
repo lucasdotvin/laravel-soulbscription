@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Models\Concerns;
+namespace Tests\Models\Concerns;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -14,7 +14,7 @@ class ExpiresTest extends TestCase
 
     public const MODEL = FeatureConsumption::class;
 
-    public function testExpiredModelsAreNotReturnedByDefault()
+    public function testExpiredModelsAreNotReturnedByDefault(): void
     {
         $expiredModelsCount = $this->faker()->randomDigitNotNull();
         self::MODEL::factory()->count($expiredModelsCount)->create([
@@ -22,7 +22,7 @@ class ExpiresTest extends TestCase
         ]);
 
         $unexpiredModelsCount = $this->faker()->randomDigitNotNull();
-        $unexpiredModels = self::MODEL::factory()->count($unexpiredModelsCount)->create([
+        $unexpiredModels      = self::MODEL::factory()->count($unexpiredModelsCount)->create([
             'expired_at' => now()->addDay(),
         ]);
 
@@ -34,15 +34,15 @@ class ExpiresTest extends TestCase
         );
     }
 
-    public function testExpiredModelsAreReturnedWhenCallingMethodWithExpired()
+    public function testExpiredModelsAreReturnedWhenCallingMethodWithExpired(): void
     {
         $expiredModelsCount = $this->faker()->randomDigitNotNull();
-        $expiredModels = self::MODEL::factory()->count($expiredModelsCount)->create([
+        $expiredModels      = self::MODEL::factory()->count($expiredModelsCount)->create([
             'expired_at' => now()->subDay(),
         ]);
 
         $unexpiredModelsCount = $this->faker()->randomDigitNotNull();
-        $unexpiredModels = self::MODEL::factory()->count($unexpiredModelsCount)->create([
+        $unexpiredModels      = self::MODEL::factory()->count($unexpiredModelsCount)->create([
             'expired_at' => now()->addDay(),
         ]);
 
@@ -56,10 +56,10 @@ class ExpiresTest extends TestCase
         );
     }
 
-    public function testOnlyExpiredModelsAreReturnedWhenCallingMethodOnlyExpired()
+    public function testOnlyExpiredModelsAreReturnedWhenCallingMethodOnlyExpired(): void
     {
         $expiredModelsCount = $this->faker()->randomDigitNotNull();
-        $expiredModels = self::MODEL::factory()->count($expiredModelsCount)->create([
+        $expiredModels      = self::MODEL::factory()->count($expiredModelsCount)->create([
             'expired_at' => now()->subDay(),
         ]);
 
@@ -76,7 +76,7 @@ class ExpiresTest extends TestCase
         );
     }
 
-    public function testModelReturnsExpiredStatus()
+    public function testModelReturnsExpiredStatus(): void
     {
         $expiredModel = self::MODEL::factory()
             ->expired()
@@ -90,7 +90,7 @@ class ExpiresTest extends TestCase
         $this->assertFalse($notExpiredModel->expired());
     }
 
-    public function testModelReturnsNotExpiredStatus()
+    public function testModelReturnsNotExpiredStatus(): void
     {
         $expiredModel = self::MODEL::factory()
             ->expired()
@@ -104,7 +104,7 @@ class ExpiresTest extends TestCase
         $this->assertTrue($notExpiredModel->notExpired());
     }
 
-    public function testModelsWithoutExpirationDateAreReturnedByDefault()
+    public function testModelsWithoutExpirationDateAreReturnedByDefault(): void
     {
         $expiredModelsCount = $this->faker()->randomDigitNotNull();
         self::MODEL::factory()->count($expiredModelsCount)->create([
@@ -112,7 +112,7 @@ class ExpiresTest extends TestCase
         ]);
 
         $unexpiredModelsCount = $this->faker()->randomDigitNotNull();
-        $unexpiredModels = self::MODEL::factory()->count($unexpiredModelsCount)->create([
+        $unexpiredModels      = self::MODEL::factory()->count($unexpiredModelsCount)->create([
             'expired_at' => null,
         ]);
 
