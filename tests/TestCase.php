@@ -1,6 +1,6 @@
 <?php
 
-namespace LucasDotVin\Soulbscription\Tests;
+namespace Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use LucasDotVin\Soulbscription\SoulbscriptionServiceProvider;

@@ -1,9 +1,9 @@
 <h1 align="center">Laravel Soulbscription</h1>
 
 <p align="center"><a href="https://packagist.org/packages/lucasdotvin/laravel-soulbscription"><img alt="Latest Version on Packagist" src="https://img.shields.io/packagist/v/lucasdotvin/laravel-soulbscription.svg?style=flat-square"></a>
-<a href="https://github.com/lucasdotvin/laravel-soulbscription/actions?query=workflow%3Arun-tests+branch%3Amain"><img alt="GitHub Tests Action Status" src="https://img.shields.io/github/workflow/status/lucasdotvin/laravel-soulbscription/run-tests?label=tests"></a>
+<a href="https://github.com/lucasdotvin/laravel-soulbscription/actions/workflows/run-tests.yml"><img src="https://github.com/lucasdotvin/laravel-soulbscription/actions/workflows/run-tests.yml/badge.svg?branch=main" alt="run-tests"></a>
 <a href="https://codecov.io/gh/lucasdotvin/laravel-soulbscription"><img src="https://codecov.io/gh/lucasdotvin/laravel-soulbscription/branch/develop/graph/badge.svg?token=9NUYY1E28D"/></a>
-<a href="https://github.com/lucasdotvin/laravel-soulbscription/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain"><img alt="GitHub Code Style Action Status" src="https://img.shields.io/github/workflow/status/lucasdotvin/laravel-soulbscription/Check%20&%20fix%20styling?label=code%20style"></a>
+<a href="https://github.com/lucasdotvin/laravel-soulbscription/actions/workflows/php-cs-fixer.yml"><img src="https://github.com/lucasdotvin/laravel-soulbscription/actions/workflows/php-cs-fixer.yml/badge.svg?branch=main" alt="Check &amp; fix styling"></a>
 <a href="https://packagist.org/packages/lucasdotvin/laravel-soulbscription"><img alt="Total Downloads" src="https://img.shields.io/packagist/dt/lucasdotvin/laravel-soulbscription.svg?style=flat-square"></a></p>
 
 ## About
@@ -126,7 +126,7 @@ class FeatureSeeder extends Seeder
 
 ...
 
-class PhotoController extends Seeder
+class PhotoController extends Controller
 {
     public function store(Request $request)
     {
@@ -180,6 +180,18 @@ class PlanSeeder extends Seeder
 ```
 
 Everything here is quite simple, but it is worth to emphasize: by receiving the periodicity options above, the two plans are defined as monthly.
+
+#### Plans Without Periodicity ("Free Plans" or "Permanent Plans")
+
+You can define plans without periodicity, so your users can subscribe to them permanently (or until they cancel their subscriptions). To do so, just pass a `null` value to the `periodicity_type` and `periodicity` attributes:
+
+```php
+$free = Plan::create([
+    'name'             => 'free',
+    'periodicity_type' => null,
+    'periodicity'      => null,
+]);
+```
 
 #### Grace Days
 
@@ -285,7 +297,7 @@ Above, we are simulating an application for a school. It has to subscribe studen
 
 ### Switching Plans
 
-Users change their mind all the time and you have to deal with it. If you need to change the current plan o a user, simply call the method `switchTo`:
+Users change their mind all the time and you have to deal with it. If you need to change the current plan of a user, simply call the method `switchTo`:
 
 ```php
 $student->switchTo($newPlan);

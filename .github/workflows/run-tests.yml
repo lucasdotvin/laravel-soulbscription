@@ -14,14 +14,14 @@ jobs:
       fail-fast: true
       matrix:
         os: [ubuntu-latest]
-        php: [8.0, 8.1]
-        laravel: [8.*, 9.*]
+        php: [8.1, 8.2]
+        laravel: [9.*, 10.*]
         stability: [prefer-stable]
         include:
-          - laravel: 8.*
-            testbench: ^6.23
           - laravel: 9.*
             testbench: ^7.10
+          - laravel: 10.*
+            testbench: ^8.0
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
@@ -52,4 +52,4 @@ jobs:
       - name: Codecov
         # You may pin to the exact commit or the version.
         # uses: codecov/codecov-action@d9f34f8cd5cb3b3eb79b3e4b5dae3a16df499a70
-        uses: codecov/codecov-action@v3.1.1
+        uses: codecov/codecov-action@v3.1.4

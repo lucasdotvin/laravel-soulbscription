@@ -1,6 +1,6 @@
 <?php
 
-namespace LucasDotVin\Soulbscription\Tests\Feature\Models\Concerns;
+namespace Tests\Feature\Models\Concerns;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -9,7 +9,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use InvalidArgumentException;
 use LogicException;
-use LucasDotVin\DBQueriesCounter\Traits\CountsQueries;
 use LucasDotVin\Soulbscription\Events\FeatureConsumed;
 use LucasDotVin\Soulbscription\Events\FeatureTicketCreated;
 use LucasDotVin\Soulbscription\Events\SubscriptionScheduled;
@@ -20,14 +19,13 @@ use LucasDotVin\Soulbscription\Models\FeatureConsumption;
 use LucasDotVin\Soulbscription\Models\Plan;
 use LucasDotVin\Soulbscription\Models\Subscription;
 use LucasDotVin\Soulbscription\Models\SubscriptionRenewal;
-use LucasDotVin\Soulbscription\Tests\Mocks\Models\User;
-use LucasDotVin\Soulbscription\Tests\TestCase;
 use OutOfBoundsException;
 use OverflowException;
+use Tests\Mocks\Models\User;
+use Tests\TestCase;
 
 class HasSubscriptionsTest extends TestCase
 {
-    use CountsQueries;
     use RefreshDatabase;
     use WithFaker;
 
@@ -355,29 +353,6 @@ class HasSubscriptionsTest extends TestCase
             $renewals->pluck('id'),
             $subscriber->renewals->pluck('id'),
         );
-    }
-
-    public function testModelCachesFeatures()
-    {
-        $charges = $this->faker->numberBetween(5, 10);
-        $consumption = $this->faker->numberBetween(1, $charges);
-
-        $plan = Plan::factory()->createOne();
-        $feature = Feature::factory()->consumable()->createOne();
-        $feature->plans()->attach($plan, [
-            'charges' => $charges,
-        ]);
-
-        $subscriber = User::factory()->createOne();
-        $subscriber->subscribeTo($plan);
-
-        $this->whileCountingQueries(fn () => $subscriber->features);
-        $initiallyPerformedQueries = $this->getQueryCount();
-
-        $this->whileCountingQueries(fn () => $subscriber->features);
-        $totalPerformedQueries = $this->getQueryCount();
-
-        $this->assertEquals($initiallyPerformedQueries, $totalPerformedQueries);
     }
 
     public function testModelHasFeatureTickets()

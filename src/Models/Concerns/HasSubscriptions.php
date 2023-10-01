@@ -119,11 +119,16 @@ trait HasSubscriptions
 
     public function subscribeTo(Plan $plan, $expiration = null, $startDate = null): Subscription
     {
-        $expiration = $expiration ?? $plan->calculateNextRecurrenceEnd($startDate);
+        if ($plan->periodicity) {
+            $expiration = $expiration ?? $plan->calculateNextRecurrenceEnd($startDate);
 
-        $graceDaysEnd = $plan->hasGraceDays
-            ? $plan->calculateGraceDaysEnd($expiration)
-            : null;
+            $graceDaysEnd = $plan->hasGraceDays
+                ? $plan->calculateGraceDaysEnd($expiration)
+                : null;
+        } else {
+            $expiration = null;
+            $graceDaysEnd = null;
+        }
 
         return $this->subscription()
             ->make([

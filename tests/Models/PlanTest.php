@@ -1,6 +1,6 @@
 <?php
 
-namespace LucasDotVin\Soulbscription\Tests\Feature\Models;
+namespace Tests\Feature\Models;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 use LucasDotVin\Soulbscription\Enums\PeriodicityType;
 use LucasDotVin\Soulbscription\Models\Plan;
 use LucasDotVin\Soulbscription\Models\Subscription;
-use LucasDotVin\Soulbscription\Tests\TestCase;
+use Tests\TestCase;
 
 class PlanTest extends TestCase
 {
@@ -50,5 +50,17 @@ class PlanTest extends TestCase
         $subscriptions->each(function ($subscription) use ($plan) {
             $this->assertTrue($plan->subscriptions->contains($subscription));
         });
+    }
+
+    public function testPlanCanBeCreatedWithoutPeriodicity()
+    {
+        $plan = Plan::factory()
+            ->create([
+                'periodicity' => null,
+                'periodicity_type' => null,
+            ]);
+
+        $this->assertNull($plan->periodicity);
+        $this->assertNull($plan->periodicity_type);
     }
 }
