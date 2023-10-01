@@ -51,4 +51,16 @@ class PlanTest extends TestCase
             $this->assertTrue($plan->subscriptions->contains($subscription));
         });
     }
+
+    public function testPlanCanBeCreatedWithoutPeriodicity()
+    {
+        $plan = Plan::factory()
+            ->create([
+                'periodicity' => null,
+                'periodicity_type' => null,
+            ]);
+
+        $this->assertNull($plan->periodicity);
+        $this->assertNull($plan->periodicity_type);
+    }
 }

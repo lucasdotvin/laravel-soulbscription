@@ -58,6 +58,12 @@ class ExpiresAndHasGraceDaysTest extends TestCase
             ->expired()
             ->create();
 
+        $modelWithNullExpiredAt = self::MODEL::factory()
+            ->expired()
+            ->create([
+                'expired_at' => null,
+            ]);
+
         $expiredModelWithFutureGraceDays = self::MODEL::factory()
             ->expired()
             ->create([
@@ -78,6 +84,7 @@ class ExpiresAndHasGraceDaysTest extends TestCase
         $this->assertTrue($expiredModelWithFutureGraceDays->notExpired());
         $this->assertFalse($expiredModelWithPastGraceDays->notExpired());
         $this->assertTrue($notExpiredModel->notExpired());
+        $this->assertTrue($modelWithNullExpiredAt->notExpired());
     }
 
     public function testModelReturnsIfItHasExpired()
@@ -85,6 +92,12 @@ class ExpiresAndHasGraceDaysTest extends TestCase
         $expiredModel = self::MODEL::factory()
             ->expired()
             ->create();
+
+        $modelWithNullExpiredAt = self::MODEL::factory()
+            ->expired()
+            ->create([
+                'expired_at' => null,
+            ]);
 
         $expiredModelWithFutureGraceDays = self::MODEL::factory()
             ->expired()
@@ -106,6 +119,7 @@ class ExpiresAndHasGraceDaysTest extends TestCase
         $this->assertFalse($expiredModelWithFutureGraceDays->hasExpired());
         $this->assertTrue($expiredModelWithPastGraceDays->hasExpired());
         $this->assertFalse($notExpiredModel->hasExpired());
+        $this->assertFalse($modelWithNullExpiredAt->hasExpired());
     }
 
     public function testModelReturnsIfItHasNotExpired()
@@ -113,6 +127,12 @@ class ExpiresAndHasGraceDaysTest extends TestCase
         $expiredModel = self::MODEL::factory()
             ->expired()
             ->create();
+
+        $modelWithNullExpiredAt = self::MODEL::factory()
+            ->expired()
+            ->create([
+                'expired_at' => null,
+            ]);
 
         $expiredModelWithFutureGraceDays = self::MODEL::factory()
             ->expired()
@@ -134,5 +154,6 @@ class ExpiresAndHasGraceDaysTest extends TestCase
         $this->assertTrue($expiredModelWithFutureGraceDays->hasNotExpired());
         $this->assertFalse($expiredModelWithPastGraceDays->hasNotExpired());
         $this->assertTrue($notExpiredModel->hasNotExpired());
+        $this->assertTrue($modelWithNullExpiredAt->hasNotExpired());
     }
 }
