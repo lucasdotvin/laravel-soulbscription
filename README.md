@@ -181,6 +181,18 @@ class PlanSeeder extends Seeder
 
 Everything here is quite simple, but it is worth to emphasize: by receiving the periodicity options above, the two plans are defined as monthly.
 
+#### Plans Without Periodicity ("Free Plans" or "Permanent Plans")
+
+You can define plans without periodicity, so your users can subscribe to them permanently (or until they cancel their subscriptions). To do so, just pass a `null` value to the `periodicity_type` and `periodicity` attributes:
+
+```php
+$free = Plan::create([
+    'name'             => 'free',
+    'periodicity_type' => null,
+    'periodicity'      => null,
+]);
+```
+
 #### Grace Days
 
 You can define a number of grace days to each plan, so your users will not loose access to their features immediately on expiration:
