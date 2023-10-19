@@ -457,10 +457,11 @@ Finally, open the `soulbscription.php` file and set the `feature_tickets` flag t
 
 #### Creating Tickets
 
-To create a ticket, you can use the method `giveTicketFor`. This method expects the feature name, the expiration and optionally a number of charges (you can ignore it when creating tickets for not consumable features):
+To create a ticket, you can use the method `giveTicketFor`. This method expects the feature id, the expiration and optionally a number of charges (you can ignore it when creating tickets for not consumable features):
 
 ```php
-$subscriber->giveTicketFor('deploy-minutes', today()->addMonth(), 10);
+$featureId = Feature::whereName('deploy-minutes')->first()->id;
+$subscriber->giveTicketFor($featureId, today()->addMonth(), 10);
 ```
 
 > This method will fire a `FeatureTicketCreated($subscriber, Feature $feature, FeatureTicket $featureTicket)` event.
@@ -476,9 +477,9 @@ class UserFeatureTrialController extends Controller
 {
     public function store(FeatureTrialRequest $request, User $user)
     {
-        $featureName = $request->input('feature_name');
+        $featureId = $request->input('feature_id');
         $expiration = today()->addDays($request->input('trial_days'));
-        $user->giveTicketFor($featureName, $expiration);
+        $user->giveTicketFor($featureId, $expiration);
 
         return redirect()->route('admin.users.show', $user);
     }
@@ -490,7 +491,7 @@ class UserFeatureTrialController extends Controller
 You can create tickets that never expire, so your subscribers will receive access to them forever:
 
 ```php
-$subscriber->giveTicketFor('deploy-minutes', null, 10);
+$subscriber->giveTicketFor($featureId, null, 10);
 ```
 
 > Don't forget to remove these tickets when your user cancels his subscription. Otherwise, they will be able to consume the charges forever.
