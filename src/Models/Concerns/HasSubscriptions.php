@@ -187,7 +187,7 @@ trait HasSubscriptions
      * @throws LogicException
      * @throws ModelNotFoundException
      */
-    public function giveTicketFor($featureName, $expiration = null, ?float $charges = null): FeatureTicket
+    public function giveTicketFor($featureId, $expiration = null, ?float $charges = null): FeatureTicket
     {
         throw_unless(
             config('soulbscription.feature_tickets'),
@@ -195,7 +195,7 @@ trait HasSubscriptions
         );
 
         $featureModel = config('soulbscription.models.feature');
-        $feature = $featureModel::whereName($featureName)->firstOrFail();
+        $feature = $featureModel::whereKey($featureId)->firstOrFail();
 
         $featureTicket = $this->featureTickets()
             ->make([
