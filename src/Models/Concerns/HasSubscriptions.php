@@ -226,7 +226,7 @@ trait HasSubscriptions
 
         $remainingCharges = $this->getRemainingCharges($featureName);
 
-        return $remainingCharges >= $consumption;
+        return $remainingCharges === -1 || $remainingCharges >= $consumption;
     }
 
     public function cantConsume($featureName, ?float $consumption = null): bool
