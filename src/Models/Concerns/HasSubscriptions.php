@@ -293,13 +293,12 @@ trait HasSubscriptions
             : null;
 
         $featureConsumption = $this->featureConsumptions()
-            ->make([
-                'consumption' => $consumption,
-                'expired_at' => $consumptionExpiration,
-            ])
-            ->feature()
-            ->associate($feature);
+            ->whereFeatureId($feature->id)
+            ->firstOrNew();
 
+        $featureConsumption->feature()->associate($feature);
+        $featureConsumption->consumption += $consumption;
+        $featureConsumption->expired_at = $consumptionExpiration;
         $featureConsumption->save();
 
         return $featureConsumption;
