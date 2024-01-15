@@ -154,12 +154,12 @@ trait HasSubscriptions
 
     public function missingSubscriptionTo(Plan $plan): bool
     {
-        return ! $this->hasSubscriptionTo($plan);
+        return !$this->hasSubscriptionTo($plan);
     }
 
     public function isNotSubscribedTo(Plan $plan): bool
     {
-        return ! $this->isSubscribedTo($plan);
+        return !$this->isSubscribedTo($plan);
     }
 
     public function switchTo(Plan $plan, $expiration = null, $immediately = true): Subscription
@@ -216,7 +216,7 @@ trait HasSubscriptions
             return false;
         }
 
-        if (! $feature->consumable) {
+        if (!$feature->consumable) {
             return true;
         }
 
@@ -226,17 +226,17 @@ trait HasSubscriptions
 
         $remainingCharges = $this->getRemainingCharges($featureName);
 
-        return $remainingCharges === -1 || $remainingCharges >= $consumption;
+        return $remainingCharges >= $consumption;
     }
 
     public function cantConsume($featureName, ?float $consumption = null): bool
     {
-        return ! $this->canConsume($featureName, $consumption);
+        return !$this->canConsume($featureName, $consumption);
     }
 
     public function hasFeature($featureName): bool
     {
-        return ! $this->missingFeature($featureName);
+        return !$this->missingFeature($featureName);
     }
 
     public function missingFeature($featureName): bool
@@ -293,13 +293,12 @@ trait HasSubscriptions
             : null;
 
         $featureConsumption = $this->featureConsumptions()
-            ->make([
-                'consumption' => $consumption,
-                'expired_at' => $consumptionExpiration,
-            ])
-            ->feature()
-            ->associate($feature);
+            ->whereFeatureId($feature->id)
+            ->firstOrNew();
 
+        $featureConsumption->feature()->associate($feature);
+        $featureConsumption->consumption += $consumption;
+        $featureConsumption->expired_at = $consumptionExpiration;
         $featureConsumption->save();
 
         return $featureConsumption;
@@ -327,9 +326,12 @@ trait HasSubscriptions
             return 0;
         }
 
-        return $subscriptionFeature
-            ->pivot
-            ->charges;
+        $charges = $subscriptionFeature->pivot->charges;
+        if ($charges == -1) {
+            return INF;
+        }
+
+        return $charges;
     }
 
     protected function getTicketChargesForAFeature(Model $feature): float
@@ -341,9 +343,12 @@ trait HasSubscriptions
             return 0;
         }
 
-        return $ticketFeature
-            ->tickets
-            ->sum('charges');
+        $charges = $ticketFeature->tickets->sum('charges');
+        if ($charges === -1) {
+            return INF;
+        }
+
+        return $charges;
     }
 
     public function getFeature(string $featureName): ?Feature
@@ -355,7 +360,7 @@ trait HasSubscriptions
 
     public function getFeaturesAttribute(): Collection
     {
-        if (! is_null($this->loadedFeatures)) {
+        if (!is_null($this->loadedFeatures)) {
             return $this->loadedFeatures;
         }
 
@@ -367,7 +372,7 @@ trait HasSubscriptions
 
     protected function loadSubscriptionFeatures(): Collection
     {
-        if (! is_null($this->loadedSubscriptionFeatures)) {
+        if (!is_null($this->loadedSubscriptionFeatures)) {
             return $this->loadedSubscriptionFeatures;
         }
 
@@ -378,17 +383,17 @@ trait HasSubscriptions
 
     protected function loadTicketFeatures(): Collection
     {
-        if (! config('soulbscription.feature_tickets')) {
+        if (!config('soulbscription.feature_tickets')) {
             return $this->loadedTicketFeatures = Collection::empty();
         }
 
-        if (! is_null($this->loadedTicketFeatures)) {
+        if (!is_null($this->loadedTicketFeatures)) {
             return $this->loadedTicketFeatures;
         }
 
         return $this->loadedTicketFeatures = Feature::with([
-                'tickets' => fn (HasMany $query) => $query->withoutExpired()->whereMorphedTo('subscriber', $this),
-            ])
+            'tickets' => fn (HasMany $query) => $query->withoutExpired()->whereMorphedTo('subscriber', $this),
+        ])
             ->whereHas(
                 'tickets',
                 fn (Builder $query) => $query->withoutExpired()->whereMorphedTo('subscriber', $this),
