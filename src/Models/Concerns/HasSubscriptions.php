@@ -360,7 +360,7 @@ trait HasSubscriptions
 
     public function getFeaturesAttribute(): Collection
     {
-        if (!is_null($this->loadedFeatures)) {
+        if (! is_null($this->loadedFeatures)) {
             return $this->loadedFeatures;
         }
 
