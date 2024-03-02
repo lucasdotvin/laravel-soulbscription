@@ -18,10 +18,10 @@
     ],
     "require": {
         "php": "^8.0|^8.1|^8.2",
-        "illuminate/contracts": "^8.0|^9.0|^10.0"
+        "illuminate/contracts": "^8.0|^9.0|^10.0|^11.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^6.22|^7.0|^8.0",
+        "orchestra/testbench": "^6.22|^7.0|^8.0|^9.0",
         "phpunit/phpunit": "^9.5|^10.0",
         "squizlabs/php_codesniffer": "*"
     },
@@ -52,7 +52,7 @@
             "providers": [
                 "LucasDotVin\\Soulbscription\\SoulbscriptionServiceProvider"
             ],
-            "aliases": {}
+            "aliases": []
         }
     },
     "minimum-stability": "stable",
