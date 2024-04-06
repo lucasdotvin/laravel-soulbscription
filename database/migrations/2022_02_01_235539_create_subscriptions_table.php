@@ -13,7 +13,7 @@ return new class() extends Migration {
      */
     public function up()
     {
-        Schema::create('subscriptions', function (Blueprint $table) {
+        Schema::create('soulbscription_subscriptions', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(\LucasDotVin\Soulbscription\Models\Plan::class);
             $table->timestamp('canceled_at')->nullable();
