@@ -27,6 +27,8 @@ class Subscription extends Model
     use Starts;
     use Suppresses;
 
+    public $table = 'soulbscription_subscriptions';
+
     protected $dates = [
         'canceled_at',
     ];
