@@ -17,7 +17,7 @@ trait HandlesRecurrence
             $start = Carbon::parse($start);
         }
 
-        $recurrences = PeriodicityType::getDateDifference(from: now(), to: $start, unit: $this->periodicity_type);
+        $recurrences = PeriodicityType::getDateDifference(from: $start, to: now(), unit: $this->periodicity_type);
         $expirationDate = $start->copy()->add($this->periodicity_type, $this->periodicity + $recurrences);
 
         return $expirationDate;
