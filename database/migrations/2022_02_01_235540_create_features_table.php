@@ -18,7 +18,7 @@ return new class() extends Migration {
             $table->boolean('consumable');
             $table->boolean('quota')->default(false);
             $table->boolean('postpaid')->default(false);
-            $table->unsignedInteger('periodicity')->nullable();
+            $table->integer('periodicity')->unsigned()->nullable();
             $table->string('periodicity_type')->nullable();
             $table->softDeletes();
             $table->timestamps();
