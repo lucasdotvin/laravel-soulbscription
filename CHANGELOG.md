@@ -2,6 +2,18 @@
 
 All notable changes to `laravel-soulbscription` will be documented in this file.
 
+## 4.2.0 - 2024-04-08
+
+### What's Changed
+
+* Laravel 11.x Compatibility by @laravel-shift in https://github.com/lucasdotvin/laravel-soulbscription/pull/96
+
+### New Contributors
+
+* @laravel-shift made their first contribution in https://github.com/lucasdotvin/laravel-soulbscription/pull/96
+
+**Full Changelog**: https://github.com/lucasdotvin/laravel-soulbscription/compare/4.1.0...4.2.0
+
 ## v4.1.0 - 2023-10-01
 
 ### What's Changed
@@ -87,7 +99,8 @@ All notable changes to `laravel-soulbscription` will be documented in this file.
 ## v1.3.0 - 2022-03-03
 
 - [x] Implemented feature tickets
-- - [x] Made feature tickets an optional feature   
+  
+- - [x] Made feature tickets an optional feature
   
 - 
 - 
