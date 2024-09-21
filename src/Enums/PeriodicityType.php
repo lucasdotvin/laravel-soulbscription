@@ -21,6 +21,6 @@ class PeriodicityType
 
         $differenceMethodName = 'diffIn' . $unitInPlural;
 
-        return $from->{$differenceMethodName}($to);
+        return (int) $from->{$differenceMethodName}($to);
     }
 }
