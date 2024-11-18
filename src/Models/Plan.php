@@ -19,6 +19,9 @@ class Plan extends Model
         'name',
         'periodicity_type',
         'periodicity',
+        'price',
+        'price_id',
+        'currency',
     ];
 
     public function features()

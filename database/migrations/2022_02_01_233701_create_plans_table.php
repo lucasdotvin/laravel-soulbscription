@@ -18,6 +18,9 @@ return new class extends Migration {
             $table->string('name');
             $table->integer('periodicity')->unsigned()->nullable();
             $table->string('periodicity_type')->nullable();
+            $table->decimal('price')->default('0.0');
+            $table->string('price_id')->nullable();
+            $table->string('currency')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
