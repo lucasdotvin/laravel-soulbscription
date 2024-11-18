@@ -2,8 +2,8 @@
 
 namespace LucasDotVin\Soulbscription\Database\Factories;
 
-use LucasDotVin\Soulbscription\Models\Plan;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use LucasDotVin\Soulbscription\Models\Plan;
 use LucasDotVin\Soulbscription\Models\Subscription;
 
 class SubscriptionFactory extends Factory
@@ -18,13 +18,13 @@ class SubscriptionFactory extends Factory
     public function definition()
     {
         return [
-            'plan_id'         => Plan::factory(),
-            'canceled_at'     => null,
-            'started_at'      => $this->faker->dateTime(),
-            'suppressed_at'   => null,
-            'expired_at'      => $this->faker->dateTime(),
-            'was_switched'    => false,
-            'subscriber_id'   => $this->faker->randomNumber(),
+            'plan_id' => Plan::factory(),
+            'canceled_at' => null,
+            'started_at' => $this->faker->dateTime(),
+            'suppressed_at' => null,
+            'expired_at' => $this->faker->dateTime(),
+            'was_switched' => false,
+            'subscriber_id' => $this->faker->randomNumber(),
             'subscriber_type' => $this->faker->word(),
         ];
     }

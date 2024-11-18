@@ -8,7 +8,7 @@ trait ExpiresAndHasGraceDays
 {
     public static function bootExpiresAndHasGraceDays()
     {
-        static::addGlobalScope(new ExpiringWithGraceDaysScope());
+        static::addGlobalScope(new ExpiringWithGraceDaysScope);
     }
 
     public function initializeExpiresAndHasGraceDays()

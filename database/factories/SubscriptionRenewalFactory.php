@@ -2,8 +2,9 @@
 
 namespace LucasDotVin\Soulbscription\Database\Factories;
 
-use LucasDotVin\Soulbscription\Models\{Subscription, SubscriptionRenewal};
 use Illuminate\Database\Eloquent\Factories\Factory;
+use LucasDotVin\Soulbscription\Models\Subscription;
+use LucasDotVin\Soulbscription\Models\SubscriptionRenewal;
 
 class SubscriptionRenewalFactory extends Factory
 {
@@ -18,8 +19,8 @@ class SubscriptionRenewalFactory extends Factory
     {
         return [
             'subscription_id' => Subscription::factory(),
-            'overdue'         => $this->faker->boolean(),
-            'renewal'         => $this->faker->boolean(),
+            'overdue' => $this->faker->boolean(),
+            'renewal' => $this->faker->boolean(),
         ];
     }
 }

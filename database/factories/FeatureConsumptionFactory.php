@@ -2,8 +2,8 @@
 
 namespace LucasDotVin\Soulbscription\Database\Factories;
 
-use LucasDotVin\Soulbscription\Models\Feature;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use LucasDotVin\Soulbscription\Models\Feature;
 use LucasDotVin\Soulbscription\Models\FeatureConsumption;
 
 class FeatureConsumptionFactory extends Factory
@@ -18,10 +18,10 @@ class FeatureConsumptionFactory extends Factory
     public function definition()
     {
         return [
-            'feature_id'      => Feature::factory(),
-            'consumption'     => $this->faker->randomFloat(),
-            'expired_at'      => $this->faker->dateTime(),
-            'subscriber_id'   => $this->faker->randomNumber(),
+            'feature_id' => Feature::factory(),
+            'consumption' => $this->faker->randomFloat(),
+            'expired_at' => $this->faker->dateTime(),
+            'subscriber_id' => $this->faker->randomNumber(),
             'subscriber_type' => $this->faker->word(),
         ];
     }

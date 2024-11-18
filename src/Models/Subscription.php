@@ -58,10 +58,10 @@ class Subscription extends Model
     public function scopeNotActive(Builder $query)
     {
         return $query->withoutGlobalScopes([
-                ExpiringWithGraceDaysScope::class,
-                StartingScope::class,
-                SuppressingScope::class,
-            ])
+            ExpiringWithGraceDaysScope::class,
+            StartingScope::class,
+            SuppressingScope::class,
+        ])
             ->where(function (Builder $query) {
                 $query->where(fn (Builder $query) => $query->onlyExpired())
                     ->orWhere(fn (Builder $query) => $query->onlyNotStarted())

@@ -8,7 +8,7 @@ trait Expires
 {
     public static function bootExpires()
     {
-        static::addGlobalScope(new ExpiringScope());
+        static::addGlobalScope(new ExpiringScope);
     }
 
     public function initializeExpires()
