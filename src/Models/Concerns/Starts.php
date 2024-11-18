@@ -8,7 +8,7 @@ trait Starts
 {
     public static function bootStarts()
     {
-        static::addGlobalScope(new StartingScope());
+        static::addGlobalScope(new StartingScope);
     }
 
     public function initializeStarts()

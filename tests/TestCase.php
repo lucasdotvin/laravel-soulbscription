@@ -15,8 +15,7 @@ class TestCase extends Orchestra
         $this->loadLaravelMigrations();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) =>
-                'LucasDotVin\\Soulbscription\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
+            fn (string $modelName) => 'LucasDotVin\\Soulbscription\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
     }
 

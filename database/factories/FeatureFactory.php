@@ -2,8 +2,8 @@
 
 namespace LucasDotVin\Soulbscription\Database\Factories;
 
-use LucasDotVin\Soulbscription\Enums\PeriodicityType;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use LucasDotVin\Soulbscription\Enums\PeriodicityType;
 use LucasDotVin\Soulbscription\Models\Feature;
 
 class FeatureFactory extends Factory
@@ -18,17 +18,17 @@ class FeatureFactory extends Factory
     public function definition()
     {
         return [
-            'consumable'       => $this->faker->boolean(),
-            'name'             => $this->faker->words(asText: true),
-            'periodicity'      => $this->faker->randomDigitNotNull(),
+            'consumable' => $this->faker->boolean(),
+            'name' => $this->faker->words(asText: true),
+            'periodicity' => $this->faker->randomDigitNotNull(),
             'periodicity_type' => $this->faker->randomElement([
                 PeriodicityType::Year,
                 PeriodicityType::Month,
                 PeriodicityType::Week,
                 PeriodicityType::Day,
             ]),
-            'quota'            => false,
-            'postpaid'         => false,
+            'quota' => false,
+            'postpaid' => false,
         ];
     }
 
