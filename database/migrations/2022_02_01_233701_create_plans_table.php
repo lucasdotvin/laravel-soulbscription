@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->integer('grace_days')->default(0);
             $table->string('name');
+            $table->string('display_name')->nullable();
             $table->integer('periodicity')->unsigned()->nullable();
             $table->string('periodicity_type')->nullable();
             $table->decimal('price')->default('0.0');
