@@ -16,6 +16,7 @@ class Feature extends Model
     protected $fillable = [
         'consumable',
         'name',
+        'display_name',
         'periodicity_type',
         'periodicity',
         'quota',

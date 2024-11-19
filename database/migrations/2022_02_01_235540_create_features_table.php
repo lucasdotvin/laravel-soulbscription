@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('features', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('display_name');
             $table->boolean('consumable')->default(false);
             $table->boolean('quota')->default(false);
             $table->boolean('postpaid')->default(false);
