@@ -2,23 +2,39 @@
 
 namespace LucasDotVin\Soulbscription\Events;
 
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Foundation\Events\Dispatchable;
+use InvalidArgumentException;
 use Illuminate\Queue\SerializesModels;
-use LucasDotVin\Soulbscription\Models\Feature;
-use LucasDotVin\Soulbscription\Models\FeatureTicket;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Broadcasting\InteractsWithSockets;
 
 class FeatureTicketCreated
 {
     use Dispatchable;
-    use InteractsWithSockets;
     use SerializesModels;
+    use InteractsWithSockets;
+
+    public mixed $feature;
+    public mixed $subscriber;
+    public mixed $featureTicket;
 
     public function __construct(
-        public $subscriber,
-        public Feature $feature,
-        public FeatureTicket $featureTicket,
+        $subscriber,
+        mixed $feature,
+        mixed $featureTicket
     ) {
-        //
+        $featureClass = config('soulbscription.models.feature');
+        $featureTicketClass = config('soulbscription.models.feature_ticket');
+
+        throw_if(!($feature instanceof $featureClass), new InvalidArgumentException(
+            "Feature must be an instance of $featureClass."
+        ));
+
+        throw_if(!($featureTicket instanceof $featureTicketClass), new InvalidArgumentException(
+            "FeatureTicket must be an instance of $featureTicketClass."
+        ));
+
+        $this->feature = $feature;
+        $this->subscriber = $subscriber;
+        $this->featureTicket = $featureTicket;
     }
 }
