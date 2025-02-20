@@ -2,13 +2,16 @@
 
 namespace LucasDotVin\Soulbscription\Database\Factories;
 
-use LucasDotVin\Soulbscription\Models\Plan;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use LucasDotVin\Soulbscription\Models\Subscription;
 
 class SubscriptionFactory extends Factory
 {
-    protected $model = Subscription::class;
+    protected $model;
+
+    public function __construct()
+    {
+        $this->model = config('soulbscription.models.subscription');
+    }
 
     /**
      * Define the model's default state.
@@ -18,7 +21,7 @@ class SubscriptionFactory extends Factory
     public function definition()
     {
         return [
-            'plan_id'         => Plan::factory(),
+            'plan_id'         => config('soulbscription.models.plan')::factory(),
             'canceled_at'     => null,
             'started_at'      => $this->faker->dateTime(),
             'suppressed_at'   => null,

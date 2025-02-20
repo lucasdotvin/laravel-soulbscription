@@ -2,23 +2,39 @@
 
 namespace LucasDotVin\Soulbscription\Events;
 
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Foundation\Events\Dispatchable;
+use InvalidArgumentException;
 use Illuminate\Queue\SerializesModels;
-use LucasDotVin\Soulbscription\Models\Feature;
-use LucasDotVin\Soulbscription\Models\FeatureConsumption;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Broadcasting\InteractsWithSockets;
 
 class FeatureConsumed
 {
     use Dispatchable;
-    use InteractsWithSockets;
     use SerializesModels;
+    use InteractsWithSockets;
+
+    public mixed $feature;
+    public mixed $subscriber;
+    public mixed $featureConsumption;
 
     public function __construct(
-        public $subscriber,
-        public Feature $feature,
-        public FeatureConsumption $featureConsumption,
+        $subscriber,
+        mixed $feature,
+        mixed $featureConsumption
     ) {
-        //
+        $featureClass = config('soulbscription.models.feature');
+        $featureConsumptionClass = config('soulbscription.models.feature_consumption');
+
+        throw_if(!($feature instanceof $featureClass), new InvalidArgumentException(
+            "Feature must be an instance of $featureClass."
+        ));
+
+        throw_if(!($featureConsumption instanceof $featureConsumptionClass), new InvalidArgumentException(
+            "FeatureConsumption must be an instance of $featureConsumptionClass."
+        ));
+
+        $this->feature = $feature;
+        $this->subscriber = $subscriber;
+        $this->featureConsumption = $featureConsumption;
     }
 }
