@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-soulbscription` will be documented in this file.
 
+## 4.2.2 - 2025-03-20
+
+### What's Changed
+
+* Laravel 12.x Compatibility by @laravel-shift in https://github.com/lucasdotvin/laravel-soulbscription/pull/117
+* [Hotfix] Renewed expiration delta bug by @lucasdotvin in https://github.com/lucasdotvin/laravel-soulbscription/pull/121
+
+**Full Changelog**: https://github.com/lucasdotvin/laravel-soulbscription/compare/4.2.0...4.2.2
+
 ## 4.2.1 - 2025-03-20
 
 ### What's Changed
