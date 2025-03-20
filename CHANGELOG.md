@@ -2,6 +2,45 @@
 
 All notable changes to `laravel-soulbscription` will be documented in this file.
 
+## 4.2.1 - 2025-03-20
+
+### What's Changed
+
+* [Hotfix] Renewed expiration delta bug by @lucasdotvin in https://github.com/lucasdotvin/laravel-soulbscription/pull/121
+
+**Full Changelog**: https://github.com/lucasdotvin/laravel-soulbscription/compare/4.1.0...4.2.1
+
+## 4.2.0 - 2024-04-08
+
+### What's Changed
+
+* Laravel 11.x Compatibility by @laravel-shift in https://github.com/lucasdotvin/laravel-soulbscription/pull/96
+
+### New Contributors
+
+* @laravel-shift made their first contribution in https://github.com/lucasdotvin/laravel-soulbscription/pull/96
+
+**Full Changelog**: https://github.com/lucasdotvin/laravel-soulbscription/compare/4.1.0...4.2.0
+
+## v4.1.0 - 2023-10-01
+
+### What's Changed
+
+- Bump codecov/codecov-action from 3.1.1 to 3.1.2 by @dependabot in https://github.com/lucasdotvin/laravel-soulbscription/pull/60
+- Bump dependabot/fetch-metadata from 1.3.6 to 1.4.0 by @dependabot in https://github.com/lucasdotvin/laravel-soulbscription/pull/62
+- Bump codecov/codecov-action from 3.1.2 to 3.1.3 by @dependabot in https://github.com/lucasdotvin/laravel-soulbscription/pull/63
+- Bump codecov/codecov-action from 3.1.3 to 3.1.4 by @dependabot in https://github.com/lucasdotvin/laravel-soulbscription/pull/66
+- Bump dependabot/fetch-metadata from 1.4.0 to 1.5.0 by @dependabot in https://github.com/lucasdotvin/laravel-soulbscription/pull/67
+- Bump dependabot/fetch-metadata from 1.5.0 to 1.5.1 by @dependabot in https://github.com/lucasdotvin/laravel-soulbscription/pull/68
+- Bump dependabot/fetch-metadata from 1.5.1 to 1.6.0 by @dependabot in https://github.com/lucasdotvin/laravel-soulbscription/pull/71
+- Update README.md by @harrisonratcliffe in https://github.com/lucasdotvin/laravel-soulbscription/pull/77
+
+### New Contributors
+
+- @harrisonratcliffe made their first contribution in https://github.com/lucasdotvin/laravel-soulbscription/pull/77
+
+**Full Changelog**: https://github.com/lucasdotvin/laravel-soulbscription/compare/4.0.0...4.1.0
+
 ## v4.0.0 - 2023-04-07
 
 ### What's Changed
@@ -68,7 +107,9 @@ All notable changes to `laravel-soulbscription` will be documented in this file.
 ## v1.3.0 - 2022-03-03
 
 - [x] Implemented feature tickets
+  
 - - [x] Made feature tickets an optional feature
+  
 - 
 - 
 - 
