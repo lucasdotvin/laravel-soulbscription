@@ -113,6 +113,7 @@ class Subscription extends Model
 
         $this->update([
             'expired_at' => $expirationDate,
+            'grace_days_ended_at' => $expirationDate->addDays($this->plan->grace_days),
         ]);
 
         event(new SubscriptionRenewed($this));
