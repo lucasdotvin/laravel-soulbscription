@@ -343,4 +343,21 @@ class SubscriptionTest extends TestCase
             fn ($subscription) => $this->assertContains($subscription->id, $returnedSubscriptions->pluck('id'))
         );
     }
+
+    public function testModelUpdatesGraceDaysEndedAtWhenRenewing()
+    {
+        $subscriber = User::factory()->create();
+        $subscription = Subscription::factory()
+            ->for($subscriber, 'subscriber')
+            ->create([
+                'grace_days_ended_at' => now()->subDay(),
+            ]);
+
+        $subscription->renew();
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $subscription->id,
+            'grace_days_ended_at' => $subscription->expired_at->addDays($subscription->plan->grace_days),
+        ]);
+    }
 }
