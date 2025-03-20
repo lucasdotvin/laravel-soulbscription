@@ -2,31 +2,29 @@
 
 namespace Tests\Feature\Models;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
+use Tests\Mocks\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use LucasDotVin\Soulbscription\Events\SubscriptionCanceled;
 use LucasDotVin\Soulbscription\Events\SubscriptionRenewed;
 use LucasDotVin\Soulbscription\Events\SubscriptionStarted;
 use LucasDotVin\Soulbscription\Events\SubscriptionSuppressed;
-use LucasDotVin\Soulbscription\Models\Plan;
-use LucasDotVin\Soulbscription\Models\Subscription;
-use Tests\Mocks\Models\User;
-use Tests\TestCase;
 
 class SubscriptionTest extends TestCase
 {
-    use RefreshDatabase;
     use WithFaker;
+    use RefreshDatabase;
 
     public function testModelRenews()
     {
         Carbon::setTestNow(now());
 
-        $plan = Plan::factory()->create();
+        $plan = config('soulbscription.models.plan')::factory()->create();
         $subscriber = User::factory()->create();
-        $subscription = Subscription::factory()
+        $subscription = config('soulbscription.models.subscription')::factory()
             ->for($plan)
             ->for($subscriber, 'subscriber')
             ->create([
@@ -53,9 +51,9 @@ class SubscriptionTest extends TestCase
     {
         Carbon::setTestNow(now());
 
-        $plan = Plan::factory()->create();
+        $plan = config('soulbscription.models.plan')::factory()->create();
         $subscriber = User::factory()->create();
-        $subscription = Subscription::factory()
+        $subscription = config('soulbscription.models.subscription')::factory()
             ->for($plan)
             ->for($subscriber, 'subscriber')
             ->create([
@@ -82,9 +80,9 @@ class SubscriptionTest extends TestCase
     {
         Carbon::setTestNow(now());
 
-        $plan = Plan::factory()->create();
+        $plan = config('soulbscription.models.plan')::factory()->create();
         $subscriber = User::factory()->create();
-        $subscription = Subscription::factory()
+        $subscription = config('soulbscription.models.subscription')::factory()
             ->for($plan)
             ->for($subscriber, 'subscriber')
             ->notStarted()
@@ -106,9 +104,9 @@ class SubscriptionTest extends TestCase
     {
         Carbon::setTestNow(now());
 
-        $plan = Plan::factory()->create();
+        $plan = config('soulbscription.models.plan')::factory()->create();
         $subscriber = User::factory()->create();
-        $subscription = Subscription::factory()
+        $subscription = config('soulbscription.models.subscription')::factory()
             ->for($plan)
             ->for($subscriber, 'subscriber')
             ->notStarted()
@@ -130,9 +128,9 @@ class SubscriptionTest extends TestCase
     {
         Carbon::setTestNow(now());
 
-        $plan = Plan::factory()->create();
+        $plan = config('soulbscription.models.plan')::factory()->create();
         $subscriber = User::factory()->create();
-        $subscription = Subscription::factory()
+        $subscription = config('soulbscription.models.subscription')::factory()
             ->for($plan)
             ->for($subscriber, 'subscriber')
             ->create();
@@ -151,9 +149,9 @@ class SubscriptionTest extends TestCase
 
     public function testModelCanMarkAsSwitched()
     {
-        $plan = Plan::factory()->create();
+        $plan = config('soulbscription.models.plan')::factory()->create();
         $subscriber = User::factory()->create();
-        $subscription = Subscription::factory()
+        $subscription = config('soulbscription.models.subscription')::factory()
             ->for($plan)
             ->for($subscriber, 'subscriber')
             ->create();
@@ -170,7 +168,7 @@ class SubscriptionTest extends TestCase
     public function testModelRegistersRenewal()
     {
         $subscriber = User::factory()->create();
-        $subscription = Subscription::factory()
+        $subscription = config('soulbscription.models.subscription')::factory()
             ->for($subscriber, 'subscriber')
             ->create();
 
@@ -186,7 +184,7 @@ class SubscriptionTest extends TestCase
     public function testModelRegistersOverdue()
     {
         $subscriber = User::factory()->create();
-        $subscription = Subscription::factory()
+        $subscription = config('soulbscription.models.subscription')::factory()
             ->for($subscriber, 'subscriber')
             ->create([
                 'expired_at' => now()->subDay(),
@@ -204,7 +202,7 @@ class SubscriptionTest extends TestCase
     public function testModelConsidersGraceDaysOnOverdue()
     {
         $subscriber = User::factory()->create();
-        $subscription = Subscription::factory()
+        $subscription = config('soulbscription.models.subscription')::factory()
             ->for($subscriber, 'subscriber')
             ->create([
                 'grace_days_ended_at' => now()->addDay(),
@@ -222,21 +220,21 @@ class SubscriptionTest extends TestCase
 
     public function testModelReturnsNotStartedSubscriptionsInNotActiveScope()
     {
-        Subscription::factory()
+        config('soulbscription.models.subscription')::factory()
             ->count($this->faker()->randomDigitNotNull())
             ->started()
             ->notExpired()
             ->notSuppressed()
             ->create();
 
-        $notStartedSubscription = Subscription::factory()
+        $notStartedSubscription = config('soulbscription.models.subscription')::factory()
             ->count($notStartedSubscriptionCount = $this->faker()->randomDigitNotNull())
             ->notStarted()
             ->notExpired()
             ->notSuppressed()
             ->create();
 
-        $returnedSubscriptions = Subscription::notActive()->get();
+        $returnedSubscriptions = config('soulbscription.models.subscription')::notActive()->get();
 
         $this->assertCount($notStartedSubscriptionCount, $returnedSubscriptions);
         $notStartedSubscription->each(
@@ -246,21 +244,21 @@ class SubscriptionTest extends TestCase
 
     public function testModelReturnsExpiredSubscriptionsInNotActiveScope()
     {
-        Subscription::factory()
+        config('soulbscription.models.subscription')::factory()
             ->count($this->faker()->randomDigitNotNull())
             ->started()
             ->notExpired()
             ->notSuppressed()
             ->create();
 
-        $expiredSubscription = Subscription::factory()
+        $expiredSubscription = config('soulbscription.models.subscription')::factory()
             ->count($expiredSubscriptionCount = $this->faker()->randomDigitNotNull())
             ->started()
             ->expired()
             ->notSuppressed()
             ->create();
 
-        $returnedSubscriptions = Subscription::notActive()->get();
+        $returnedSubscriptions = config('soulbscription.models.subscription')::notActive()->get();
 
         $this->assertCount($expiredSubscriptionCount, $returnedSubscriptions);
         $expiredSubscription->each(
@@ -270,21 +268,21 @@ class SubscriptionTest extends TestCase
 
     public function testModelReturnsSuppressedSubscriptionsInNotActiveScope()
     {
-        Subscription::factory()
+        config('soulbscription.models.subscription')::factory()
             ->count($this->faker()->randomDigitNotNull())
             ->started()
             ->notExpired()
             ->notSuppressed()
             ->create();
 
-        $suppressedSubscription = Subscription::factory()
+        $suppressedSubscription = config('soulbscription.models.subscription')::factory()
             ->count($suppressedSubscriptionCount = $this->faker()->randomDigitNotNull())
             ->started()
             ->notExpired()
             ->suppressed()
             ->create();
 
-        $returnedSubscriptions = Subscription::notActive()->get();
+        $returnedSubscriptions = config('soulbscription.models.subscription')::notActive()->get();
 
         $this->assertCount($suppressedSubscriptionCount, $returnedSubscriptions);
         $suppressedSubscription->each(
@@ -294,7 +292,7 @@ class SubscriptionTest extends TestCase
 
     public function testModelReturnsOnlyCanceledSubscriptionsWithTheScope()
     {
-        Subscription::factory()
+        config('soulbscription.models.subscription')::factory()
             ->count($this->faker()->randomDigitNotNull())
             ->started()
             ->notExpired()
@@ -302,7 +300,7 @@ class SubscriptionTest extends TestCase
             ->notCanceled()
             ->create();
 
-        $canceledSubscription = Subscription::factory()
+        $canceledSubscription = config('soulbscription.models.subscription')::factory()
             ->count($canceledSubscriptionCount = $this->faker()->randomDigitNotNull())
             ->started()
             ->notExpired()
@@ -310,7 +308,7 @@ class SubscriptionTest extends TestCase
             ->canceled()
             ->create();
 
-        $returnedSubscriptions = Subscription::canceled()->get();
+        $returnedSubscriptions = config('soulbscription.models.subscription')::canceled()->get();
 
         $this->assertCount($canceledSubscriptionCount, $returnedSubscriptions);
         $canceledSubscription->each(
@@ -320,7 +318,7 @@ class SubscriptionTest extends TestCase
 
     public function testModelReturnsOnlyNotCanceledSubscriptionsWithTheScope()
     {
-        Subscription::factory()
+        config('soulbscription.models.subscription')::factory()
             ->count($this->faker()->randomDigitNotNull())
             ->started()
             ->notExpired()
@@ -328,7 +326,7 @@ class SubscriptionTest extends TestCase
             ->canceled()
             ->create();
 
-        $notCanceledSubscription = Subscription::factory()
+        $notCanceledSubscription = config('soulbscription.models.subscription')::factory()
             ->count($notCanceledSubscriptionCount = $this->faker()->randomDigitNotNull())
             ->started()
             ->notExpired()
@@ -336,7 +334,7 @@ class SubscriptionTest extends TestCase
             ->notCanceled()
             ->create();
 
-        $returnedSubscriptions = Subscription::notCanceled()->get();
+        $returnedSubscriptions = config('soulbscription.models.subscription')::notCanceled()->get();
 
         $this->assertCount($notCanceledSubscriptionCount, $returnedSubscriptions);
         $notCanceledSubscription->each(

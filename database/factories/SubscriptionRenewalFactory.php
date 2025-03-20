@@ -2,12 +2,16 @@
 
 namespace LucasDotVin\Soulbscription\Database\Factories;
 
-use LucasDotVin\Soulbscription\Models\{Subscription, SubscriptionRenewal};
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class SubscriptionRenewalFactory extends Factory
 {
-    protected $model = SubscriptionRenewal::class;
+    protected $model;
+
+    public function __construct()
+    {
+        $this->model = config('soulbscription.models.subscription_renewal');
+    }
 
     /**
      * Define the model's default state.
@@ -17,7 +21,7 @@ class SubscriptionRenewalFactory extends Factory
     public function definition()
     {
         return [
-            'subscription_id' => Subscription::factory(),
+            'subscription_id' => config('soulbscription.models.subscription')::factory(),
             'overdue'         => $this->faker->boolean(),
             'renewal'         => $this->faker->boolean(),
         ];

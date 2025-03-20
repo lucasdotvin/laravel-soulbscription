@@ -2,38 +2,51 @@
 
 namespace Tests\Feature\Models;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use LucasDotVin\Soulbscription\Models\Subscription;
 use Tests\TestCase;
+use InvalidArgumentException;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ExpiringWithGraceDaysScopeTest extends TestCase
 {
-    use RefreshDatabase;
     use WithFaker;
+    use RefreshDatabase;
 
-    public const MODEL = Subscription::class;
+    public const MODEL = 'soulbscription.models.subscription';
+
+    protected function getModelClass()
+    {
+        $modelClass = config(self::MODEL);
+
+        throw_if(!is_a($modelClass, Model::class, true), new InvalidArgumentException(
+            "Configured subscription model must be a subclass of " . Model::class
+        ));
+
+        return $modelClass;
+    }
 
     public function testExpiredModelsAreNotReturnedByDefault()
     {
-        $expiredModelsCount = $this->faker()->randomDigitNotNull();
-        self::MODEL::factory()->count($expiredModelsCount)->create([
+        $modelClass = $this->getModelClass();
+        $expiredModelsCount = $this->faker->randomDigitNotNull();
+
+        $modelClass::factory()->count($expiredModelsCount)->create([
             'expired_at' => now()->subDay(),
         ]);
 
-        $unexpiredModelsCount = $this->faker()->randomDigitNotNull();
-        $unexpiredModels = self::MODEL::factory()->count($unexpiredModelsCount)->create([
+        $unexpiredModelsCount = $this->faker->randomDigitNotNull();
+        $unexpiredModels = $modelClass::factory()->count($unexpiredModelsCount)->create([
             'expired_at' => now()->addDay(),
         ]);
 
-        $modelsWithNullExpiredAtCount = $this->faker()->randomDigitNotNull();
-        $modelsWithNullExpired = self::MODEL::factory()->count($modelsWithNullExpiredAtCount)->create([
+        $modelsWithNullExpiredAtCount = $this->faker->randomDigitNotNull();
+        $modelsWithNullExpired = $modelClass::factory()->count($modelsWithNullExpiredAtCount)->create([
             'expired_at' => null,
         ]);
 
         $expectedSubscriptions = $unexpiredModels->concat($modelsWithNullExpired);
-
-        $returnedSubscriptions = self::MODEL::all();
+        $returnedSubscriptions = $modelClass::all();
 
         $this->assertEqualsCanonicalizing(
             $expectedSubscriptions->pluck('id')->toArray(),
@@ -43,26 +56,28 @@ class ExpiringWithGraceDaysScopeTest extends TestCase
 
     public function testExpiredModelsWithGraceDaysAreReturnedByDefault()
     {
-        $expiredModelsWithoutGraceDaysCount = $this->faker()->randomDigitNotNull();
-        self::MODEL::factory()->count($expiredModelsWithoutGraceDaysCount)->create([
+        $modelClass = $this->getModelClass();
+        $expiredModelsWithoutGraceDaysCount = $this->faker->randomDigitNotNull();
+
+        $modelClass::factory()->count($expiredModelsWithoutGraceDaysCount)->create([
             'expired_at' => now()->subDay(),
             'grace_days_ended_at' => null,
         ]);
 
-        $expiredModelsWithPastGraceDaysCount = $this->faker()->randomDigitNotNull();
-        self::MODEL::factory()->count($expiredModelsWithPastGraceDaysCount)->create([
+        $expiredModelsWithPastGraceDaysCount = $this->faker->randomDigitNotNull();
+        $modelClass::factory()->count($expiredModelsWithPastGraceDaysCount)->create([
             'expired_at' => now()->subDay(),
             'grace_days_ended_at' => now()->subDay(),
         ]);
 
-        $expiredModelsWithFutureGraceDaysCount = $this->faker()->randomDigitNotNull();
-        $expiredModelsWithFutureGraceDays = self::MODEL::factory()
+        $expiredModelsWithFutureGraceDaysCount = $this->faker->randomDigitNotNull();
+        $expiredModelsWithFutureGraceDays = $modelClass::factory()
             ->count($expiredModelsWithFutureGraceDaysCount)->create([
                 'expired_at' => now()->subDay(),
                 'grace_days_ended_at' => now()->addDay(),
             ]);
 
-        $returnedSubscriptions = self::MODEL::all();
+        $returnedSubscriptions = $modelClass::all();
 
         $this->assertEqualsCanonicalizing(
             $expiredModelsWithFutureGraceDays->pluck('id'),
@@ -72,25 +87,27 @@ class ExpiringWithGraceDaysScopeTest extends TestCase
 
     public function testExpiredModelsAreReturnedWhenCallingMethodWithExpired()
     {
-        $expiredModelsCount = $this->faker()->randomDigitNotNull();
-        $expiredModels = self::MODEL::factory()->count($expiredModelsCount)->create([
+        $modelClass = $this->getModelClass();
+        $expiredModelsCount = $this->faker->randomDigitNotNull();
+
+        $expiredModels = $modelClass::factory()->count($expiredModelsCount)->create([
             'expired_at' => now()->subDay(),
         ]);
 
-        $unexpiredModelsCount = $this->faker()->randomDigitNotNull();
-        $unexpiredModels = self::MODEL::factory()->count($unexpiredModelsCount)->create([
+        $unexpiredModelsCount = $this->faker->randomDigitNotNull();
+        $unexpiredModels = $modelClass::factory()->count($unexpiredModelsCount)->create([
             'expired_at' => now()->addDay(),
         ]);
 
-        $expiredModelsWithFutureGraceDays = self::MODEL::factory()
-            ->count($this->faker()->randomDigitNotNull())
+        $expiredModelsWithFutureGraceDays = $modelClass::factory()
+            ->count($this->faker->randomDigitNotNull())
             ->create([
                 'expired_at' => now()->subDay(),
                 'grace_days_ended_at' => now()->addDay(),
             ]);
 
-        $modelsWithNullExpiredAtCount = $this->faker()->randomDigitNotNull();
-        $modelsWithNullExpired = self::MODEL::factory()->count($modelsWithNullExpiredAtCount)->create([
+        $modelsWithNullExpiredAtCount = $this->faker->randomDigitNotNull();
+        $modelsWithNullExpired = $modelClass::factory()->count($modelsWithNullExpiredAtCount)->create([
             'expired_at' => null,
         ]);
 
@@ -98,7 +115,7 @@ class ExpiringWithGraceDaysScopeTest extends TestCase
             ->concat($expiredModelsWithFutureGraceDays)
             ->concat($modelsWithNullExpired);
 
-        $returnedSubscriptions = self::MODEL::withExpired()->get();
+        $returnedSubscriptions = $modelClass::withExpired()->get();
 
         $this->assertEqualsCanonicalizing(
             $expectedSubscriptions->pluck('id')->toArray(),
@@ -108,32 +125,34 @@ class ExpiringWithGraceDaysScopeTest extends TestCase
 
     public function testExpiredModelsAreNotReturnedWhenCallingMethodWithExpiredAndPassingFalse()
     {
-        $expiredModelsCount = $this->faker()->randomDigitNotNull();
-        self::MODEL::factory()->count($expiredModelsCount)->create([
+        $modelClass = $this->getModelClass();
+        $expiredModelsCount = $this->faker->randomDigitNotNull();
+
+        $modelClass::factory()->count($expiredModelsCount)->create([
             'expired_at' => now()->subDay(),
         ]);
 
-        $unexpiredModelsCount = $this->faker()->randomDigitNotNull();
-        $unexpiredModels = self::MODEL::factory()->count($unexpiredModelsCount)->create([
+        $unexpiredModelsCount = $this->faker->randomDigitNotNull();
+        $unexpiredModels = $modelClass::factory()->count($unexpiredModelsCount)->create([
             'expired_at' => now()->addDay(),
         ]);
 
-        $expiredModelsWithFutureGraceDays = self::MODEL::factory()
-            ->count($this->faker()->randomDigitNotNull())
+        $expiredModelsWithFutureGraceDays = $modelClass::factory()
+            ->count($this->faker->randomDigitNotNull())
             ->create([
                 'expired_at' => now()->subDay(),
                 'grace_days_ended_at' => now()->addDay(),
             ]);
 
-        $modelsWithNullExpiredAtCount = $this->faker()->randomDigitNotNull();
-        $modelsWithNullExpired = self::MODEL::factory()->count($modelsWithNullExpiredAtCount)->create([
+        $modelsWithNullExpiredAtCount = $this->faker->randomDigitNotNull();
+        $modelsWithNullExpired = $modelClass::factory()->count($modelsWithNullExpiredAtCount)->create([
             'expired_at' => null,
         ]);
 
         $expectedSubscriptions = $unexpiredModels->concat($expiredModelsWithFutureGraceDays)
             ->concat($modelsWithNullExpired);
 
-        $returnedSubscriptions = self::MODEL::withExpired(false)->get();
+        $returnedSubscriptions = $modelClass::withExpired(false)->get();
 
         $this->assertEqualsCanonicalizing(
             $expectedSubscriptions->pluck('id')->toArray(),
@@ -143,30 +162,32 @@ class ExpiringWithGraceDaysScopeTest extends TestCase
 
     public function testOnlyExpiredModelsAreReturnedWhenCallingMethodOnlyExpired()
     {
-        $expiredModelsCount = $this->faker()->randomDigitNotNull();
-        $expiredModels = self::MODEL::factory()->count($expiredModelsCount)->create([
+        $modelClass = $this->getModelClass();
+        $expiredModelsCount = $this->faker->randomDigitNotNull();
+
+        $expiredModels = $modelClass::factory()->count($expiredModelsCount)->create([
             'expired_at' => now()->subDay(),
         ]);
 
-        $unexpiredModelsCount = $this->faker()->randomDigitNotNull();
-        self::MODEL::factory()->count($unexpiredModelsCount)->create([
+        $unexpiredModelsCount = $this->faker->randomDigitNotNull();
+        $modelClass::factory()->count($unexpiredModelsCount)->create([
             'expired_at' => now()->addDay(),
         ]);
 
-        $modelsWithNullExpiredAtCount = $this->faker()->randomDigitNotNull();
-        self::MODEL::factory()->count($modelsWithNullExpiredAtCount)->create([
+        $modelsWithNullExpiredAtCount = $this->faker->randomDigitNotNull();
+        $modelClass::factory()->count($modelsWithNullExpiredAtCount)->create([
             'expired_at' => null,
         ]);
 
-        $expiredModelsWithPastGraceDays = self::MODEL::factory()
-            ->count($this->faker()->randomDigitNotNull())
+        $expiredModelsWithPastGraceDays = $modelClass::factory()
+            ->count($this->faker->randomDigitNotNull())
             ->create([
                 'expired_at' => now()->subDay(),
                 'grace_days_ended_at' => now()->subDay(),
             ]);
 
-        $expiredModelsWithNullGraceDays = self::MODEL::factory()
-            ->count($this->faker()->randomDigitNotNull())
+        $expiredModelsWithNullGraceDays = $modelClass::factory()
+            ->count($this->faker->randomDigitNotNull())
             ->create([
                 'expired_at' => now()->subDay(),
                 'grace_days_ended_at' => null,
@@ -175,7 +196,7 @@ class ExpiringWithGraceDaysScopeTest extends TestCase
         $expectedSubscriptions = $expiredModels->concat($expiredModelsWithNullGraceDays)
             ->concat($expiredModelsWithPastGraceDays);
 
-        $returnedSubscriptions = self::MODEL::onlyExpired()->get();
+        $returnedSubscriptions = $modelClass::onlyExpired()->get();
 
         $this->assertEqualsCanonicalizing(
             $expectedSubscriptions->pluck('id')->toArray(),

@@ -15,8 +15,8 @@ return new class () extends Migration {
         Schema::create('feature_plan', function (Blueprint $table) {
             $table->id();
             $table->decimal('charges')->nullable();
-            $table->foreignIdFor(\LucasDotVin\Soulbscription\Models\Feature::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(\LucasDotVin\Soulbscription\Models\Plan::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(config('soulbscription.models.plan')::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(config('soulbscription.models.feature')::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

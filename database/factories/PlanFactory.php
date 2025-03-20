@@ -4,11 +4,15 @@ namespace LucasDotVin\Soulbscription\Database\Factories;
 
 use LucasDotVin\Soulbscription\Enums\PeriodicityType;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use LucasDotVin\Soulbscription\Models\Plan;
 
 class PlanFactory extends Factory
 {
-    protected $model = Plan::class;
+    protected $model;
+
+    public function __construct()
+    {
+        $this->model = config('soulbscription.models.plan');
+    }
 
     /**
      * Define the model's default state.

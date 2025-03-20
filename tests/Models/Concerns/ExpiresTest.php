@@ -2,125 +2,120 @@
 
 namespace Tests\Feature\Models\Concerns;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use LucasDotVin\Soulbscription\Models\FeatureConsumption;
 use Tests\TestCase;
+use InvalidArgumentException;
+use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use LucasDotVin\Soulbscription\Enums\PeriodicityType;
 
-class ExpiresTest extends TestCase
+class HandlesRecurrenceTest extends TestCase
 {
     use RefreshDatabase;
     use WithFaker;
 
-    public const MODEL = FeatureConsumption::class;
+    public const MODEL = 'soulbscription.models.plan';
 
-    public function testExpiredModelsAreNotReturnedByDefault()
+    protected function getModelClass()
     {
-        $expiredModelsCount = $this->faker()->randomDigitNotNull();
-        self::MODEL::factory()->count($expiredModelsCount)->create([
-            'expired_at' => now()->subDay(),
-        ]);
+        $modelClass = config(self::MODEL);
 
-        $unexpiredModelsCount = $this->faker()->randomDigitNotNull();
-        $unexpiredModels = self::MODEL::factory()->count($unexpiredModelsCount)->create([
-            'expired_at' => now()->addDay(),
-        ]);
+        throw_if(!is_a($modelClass, Model::class, true), new InvalidArgumentException(
+            "Configured plan model must be a subclass of " . Model::class
+        ));
 
-        $returnedSubscriptions = self::MODEL::all();
-
-        $this->assertEqualsCanonicalizing(
-            $unexpiredModels->pluck('id')->toArray(),
-            $returnedSubscriptions->pluck('id')->toArray(),
-        );
+        return $modelClass;
     }
 
-    public function testExpiredModelsAreReturnedWhenCallingMethodWithExpired()
+    public function testModelCalculateYearlyExpiration()
     {
-        $expiredModelsCount = $this->faker()->randomDigitNotNull();
-        $expiredModels = self::MODEL::factory()->count($expiredModelsCount)->create([
-            'expired_at' => now()->subDay(),
+        Carbon::setTestNow(now());
+
+        $years = $this->faker->randomDigitNotNull();
+        $modelClass = $this->getModelClass();
+        $plan = $modelClass::factory()->create([
+            'periodicity_type' => PeriodicityType::Year,
+            'periodicity' => $years,
         ]);
 
-        $unexpiredModelsCount = $this->faker()->randomDigitNotNull();
-        $unexpiredModels = self::MODEL::factory()->count($unexpiredModelsCount)->create([
-            'expired_at' => now()->addDay(),
-        ]);
-
-        $expectedSubscriptions = $expiredModels->concat($unexpiredModels);
-
-        $returnedSubscriptions = self::MODEL::withExpired()->get();
-
-        $this->assertEqualsCanonicalizing(
-            $expectedSubscriptions->pluck('id')->toArray(),
-            $returnedSubscriptions->pluck('id')->toArray(),
-        );
+        $this->assertEquals(now()->addYears($years), $plan->calculateNextRecurrenceEnd());
     }
 
-    public function testOnlyExpiredModelsAreReturnedWhenCallingMethodOnlyExpired()
+    public function testModelCalculateMonthlyExpiration()
     {
-        $expiredModelsCount = $this->faker()->randomDigitNotNull();
-        $expiredModels = self::MODEL::factory()->count($expiredModelsCount)->create([
-            'expired_at' => now()->subDay(),
+        Carbon::setTestNow(now());
+
+        $months = $this->faker->randomDigitNotNull();
+        $modelClass = $this->getModelClass();
+        $plan = $modelClass::factory()->create([
+            'periodicity_type' => PeriodicityType::Month,
+            'periodicity' => $months,
         ]);
 
-        $unexpiredModelsCount = $this->faker()->randomDigitNotNull();
-        self::MODEL::factory()->count($unexpiredModelsCount)->create([
-            'expired_at' => now()->addDay(),
-        ]);
-
-        $returnedSubscriptions = self::MODEL::onlyExpired()->get();
-
-        $this->assertEqualsCanonicalizing(
-            $expiredModels->pluck('id')->toArray(),
-            $returnedSubscriptions->pluck('id')->toArray(),
-        );
+        $this->assertEquals(now()->addMonths($months), $plan->calculateNextRecurrenceEnd());
     }
 
-    public function testModelReturnsExpiredStatus()
+    public function testModelCalculateWeeklyExpiration()
     {
-        $expiredModel = self::MODEL::factory()
-            ->expired()
-            ->create();
+        Carbon::setTestNow(now());
 
-        $notExpiredModel = self::MODEL::factory()
-            ->notExpired()
-            ->create();
-
-        $this->assertTrue($expiredModel->expired());
-        $this->assertFalse($notExpiredModel->expired());
-    }
-
-    public function testModelReturnsNotExpiredStatus()
-    {
-        $expiredModel = self::MODEL::factory()
-            ->expired()
-            ->create();
-
-        $notExpiredModel = self::MODEL::factory()
-            ->notExpired()
-            ->create();
-
-        $this->assertFalse($expiredModel->notExpired());
-        $this->assertTrue($notExpiredModel->notExpired());
-    }
-
-    public function testModelsWithoutExpirationDateAreReturnedByDefault()
-    {
-        $expiredModelsCount = $this->faker()->randomDigitNotNull();
-        self::MODEL::factory()->count($expiredModelsCount)->create([
-            'expired_at' => now()->subDay(),
+        $weeks = $this->faker->randomDigitNotNull();
+        $modelClass = $this->getModelClass();
+        $plan = $modelClass::factory()->create([
+            'periodicity_type' => PeriodicityType::Week,
+            'periodicity' => $weeks,
         ]);
 
-        $unexpiredModelsCount = $this->faker()->randomDigitNotNull();
-        $unexpiredModels = self::MODEL::factory()->count($unexpiredModelsCount)->create([
-            'expired_at' => null,
+        $this->assertEquals(now()->addWeeks($weeks), $plan->calculateNextRecurrenceEnd());
+    }
+
+    public function testModelCalculateDailyExpiration()
+    {
+        Carbon::setTestNow(now());
+
+        $days = $this->faker->randomDigitNotNull();
+        $modelClass = $this->getModelClass();
+        $plan = $modelClass::factory()->create([
+            'periodicity_type' => PeriodicityType::Day,
+            'periodicity' => $days,
         ]);
 
-        $returnedSubscriptions = self::MODEL::all();
+        $this->assertEquals(now()->addDays($days), $plan->calculateNextRecurrenceEnd());
+    }
 
-        $this->assertEqualsCanonicalizing(
-            $unexpiredModels->pluck('id')->toArray(),
-            $returnedSubscriptions->pluck('id')->toArray(),
+    public function testModelCalculateExpirationWithADifferentStart()
+    {
+        Carbon::setTestNow(now());
+
+        $weeks = $this->faker->randomDigitNotNull();
+        $modelClass = $this->getModelClass();
+        $plan = $modelClass::factory()->create([
+            'periodicity_type' => PeriodicityType::Week,
+            'periodicity' => $weeks,
+        ]);
+
+        $start = now()->subDay();
+
+        $this->assertEquals($start->copy()->addWeeks($weeks), $plan->calculateNextRecurrenceEnd($start));
+    }
+
+    public function testModelCalculateExpirationWithADifferentStartAsString()
+    {
+        Carbon::setTestNow(today());
+
+        $weeks = $this->faker->randomDigitNotNull();
+        $modelClass = $this->getModelClass();
+        $plan = $modelClass::factory()->create([
+            'periodicity_type' => PeriodicityType::Week,
+            'periodicity' => $weeks,
+        ]);
+
+        $start = today()->subDay();
+
+        $this->assertEquals(
+            $start->copy()->addWeeks($weeks),
+            $plan->calculateNextRecurrenceEnd($start->toDateTimeString()),
         );
     }
 }

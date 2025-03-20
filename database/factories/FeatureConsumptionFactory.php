@@ -2,13 +2,15 @@
 
 namespace LucasDotVin\Soulbscription\Database\Factories;
 
-use LucasDotVin\Soulbscription\Models\Feature;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use LucasDotVin\Soulbscription\Models\FeatureConsumption;
-
 class FeatureConsumptionFactory extends Factory
 {
-    protected $model = FeatureConsumption::class;
+    protected $model;
+
+    public function __construct()
+    {
+        $this->model = config('soulbscription.models.feature_consumption');
+    }
 
     /**
      * Define the model's default state.
@@ -18,7 +20,7 @@ class FeatureConsumptionFactory extends Factory
     public function definition()
     {
         return [
-            'feature_id'      => Feature::factory(),
+            'feature_id'      => config('soulbscription.models.feature')::factory(),
             'consumption'     => $this->faker->randomFloat(),
             'expired_at'      => $this->faker->dateTime(),
             'subscriber_id'   => $this->faker->randomNumber(),

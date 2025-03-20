@@ -2,37 +2,51 @@
 
 namespace Tests\Feature\Models;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use LucasDotVin\Soulbscription\Models\Subscription;
 use Tests\TestCase;
+use InvalidArgumentException;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class SuppressingScopeTest extends TestCase
 {
-    use RefreshDatabase;
     use WithFaker;
+    use RefreshDatabase;
 
-    public const MODEL = Subscription::class;
+    public const MODEL = 'soulbscription.models.subscription';
+
+    protected function getModelClass()
+    {
+        $modelClass = config(self::MODEL);
+
+        throw_if(!is_a($modelClass, Model::class, true), new InvalidArgumentException(
+            "Configured subscription model must be a subclass of " . Model::class
+        ));
+
+        return $modelClass;
+    }
 
     public function testSuppressedModelsAreNotReturnedByDefault()
     {
-        $suppressedModelsCount = $this->faker()->randomDigitNotNull();
-        self::MODEL::factory()
+        $modelClass = $this->getModelClass();
+        $suppressedModelsCount = $this->faker->randomDigitNotNull();
+
+        $modelClass::factory()
             ->count($suppressedModelsCount)
             ->suppressed()
             ->notExpired()
             ->started()
             ->create();
 
-        $notSuppressedModelsCount = $this->faker()->randomDigitNotNull();
-        $notSuppressedModels = self::MODEL::factory()
+        $notSuppressedModelsCount = $this->faker->randomDigitNotNull();
+        $notSuppressedModels = $modelClass::factory()
             ->count($notSuppressedModelsCount)
             ->notSuppressed()
             ->notExpired()
             ->started()
             ->create();
 
-        $returnedSubscriptions = self::MODEL::all();
+        $returnedSubscriptions = $modelClass::all();
 
         $this->assertEqualsCanonicalizing(
             $notSuppressedModels->pluck('id')->toArray(),
@@ -42,23 +56,25 @@ class SuppressingScopeTest extends TestCase
 
     public function testSuppressedModelsAreNotReturnedWhenCallingWithoutNotSuppressed()
     {
-        $suppressedModelsCount = $this->faker()->randomDigitNotNull();
-        self::MODEL::factory()
+        $modelClass = $this->getModelClass();
+        $suppressedModelsCount = $this->faker->randomDigitNotNull();
+
+        $modelClass::factory()
             ->count($suppressedModelsCount)
             ->suppressed()
             ->notExpired()
             ->started()
             ->create();
 
-        $notSuppressedModelsCount = $this->faker()->randomDigitNotNull();
-        $notSuppressedModels = self::MODEL::factory()
+        $notSuppressedModelsCount = $this->faker->randomDigitNotNull();
+        $notSuppressedModels = $modelClass::factory()
             ->count($notSuppressedModelsCount)
             ->notSuppressed()
             ->notExpired()
             ->started()
             ->create();
 
-        $returnedSubscriptions = self::MODEL::withoutSuppressed()->get();
+        $returnedSubscriptions = $modelClass::withoutSuppressed()->get();
 
         $this->assertEqualsCanonicalizing(
             $notSuppressedModels->pluck('id')->toArray(),
@@ -68,16 +84,18 @@ class SuppressingScopeTest extends TestCase
 
     public function testSuppressedModelsAreReturnedWhenCallingMethodWithNotSuppressed()
     {
-        $suppressedModelsCount = $this->faker()->randomDigitNotNull();
-        $suppressedModels = self::MODEL::factory()
+        $modelClass = $this->getModelClass();
+        $suppressedModelsCount = $this->faker->randomDigitNotNull();
+
+        $suppressedModels = $modelClass::factory()
             ->count($suppressedModelsCount)
             ->suppressed()
             ->notExpired()
             ->started()
             ->create();
 
-        $notSuppressedModelsCount = $this->faker()->randomDigitNotNull();
-        $notSuppressedModels = self::MODEL::factory()
+        $notSuppressedModelsCount = $this->faker->randomDigitNotNull();
+        $notSuppressedModels = $modelClass::factory()
             ->count($notSuppressedModelsCount)
             ->notSuppressed()
             ->notExpired()
@@ -85,8 +103,7 @@ class SuppressingScopeTest extends TestCase
             ->create();
 
         $expectedSubscriptions = $suppressedModels->concat($notSuppressedModels);
-
-        $returnedSubscriptions = self::MODEL::withSuppressed()->get();
+        $returnedSubscriptions = $modelClass::withSuppressed()->get();
 
         $this->assertEqualsCanonicalizing(
             $expectedSubscriptions->pluck('id')->toArray(),
@@ -96,23 +113,25 @@ class SuppressingScopeTest extends TestCase
 
     public function testSuppressedModelsAreReturnedWhenCallingMethodWithNotSuppressedAndPassingAFalse()
     {
-        $suppressedModelsCount = $this->faker()->randomDigitNotNull();
-        self::MODEL::factory()
+        $modelClass = $this->getModelClass();
+        $suppressedModelsCount = $this->faker->randomDigitNotNull();
+
+        $modelClass::factory()
             ->count($suppressedModelsCount)
             ->suppressed()
             ->notExpired()
             ->started()
             ->create();
 
-        $notSuppressedModelsCount = $this->faker()->randomDigitNotNull();
-        $notSuppressedModels = self::MODEL::factory()
+        $notSuppressedModelsCount = $this->faker->randomDigitNotNull();
+        $notSuppressedModels = $modelClass::factory()
             ->count($notSuppressedModelsCount)
             ->notSuppressed()
             ->notExpired()
             ->started()
             ->create();
 
-        $returnedSubscriptions = self::MODEL::withSuppressed(false)->get();
+        $returnedSubscriptions = $modelClass::withSuppressed(false)->get();
 
         $this->assertEqualsCanonicalizing(
             $notSuppressedModels->pluck('id')->toArray(),
@@ -122,23 +141,26 @@ class SuppressingScopeTest extends TestCase
 
     public function testOnlySuppressedModelsAreReturnedWhenCallingMethodOnlyNotSuppressed()
     {
-        $suppressedModelsCount = $this->faker()->randomDigitNotNull();
-        $suppressedModels = self::MODEL::factory()
+        $modelClass = $this->getModelClass();
+        $suppressedModelsCount = $this->faker->randomDigitNotNull();
+
+        $suppressedModels = $modelClass::factory()
             ->count($suppressedModelsCount)
             ->suppressed()
             ->notExpired()
             ->started()
             ->create();
 
-        $notSuppressedModelsCount = $this->faker()->randomDigitNotNull();
-        self::MODEL::factory()
+        $notSuppressedModelsCount = $this->faker->randomDigitNotNull();
+
+        $modelClass::factory()
             ->count($notSuppressedModelsCount)
             ->notSuppressed()
             ->notExpired()
             ->started()
             ->create();
 
-        $returnedSubscriptions = self::MODEL::onlySuppressed()->get();
+        $returnedSubscriptions = $modelClass::onlySuppressed()->get();
 
         $this->assertEqualsCanonicalizing(
             $suppressedModels->pluck('id')->toArray(),
