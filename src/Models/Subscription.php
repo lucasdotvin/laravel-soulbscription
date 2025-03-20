@@ -110,10 +110,15 @@ class Subscription extends Model
         ]);
 
         $expirationDate = $this->getRenewedExpiration($expirationDate);
+        $graceDaysEndedAt = null;
+
+        if ($this->plan->grace_days) {
+            $graceDaysEndedAt = $expirationDate->addDays($this->plan->grace_days);
+        }
 
         $this->update([
             'expired_at' => $expirationDate,
-            'grace_days_ended_at' => $expirationDate->addDays($this->plan->grace_days),
+            'grace_days_ended_at' => $graceDaysEndedAt,
         ]);
 
         event(new SubscriptionRenewed($this));
