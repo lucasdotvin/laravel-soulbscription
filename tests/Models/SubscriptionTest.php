@@ -360,4 +360,23 @@ class SubscriptionTest extends TestCase
             'grace_days_ended_at' => $subscription->expired_at->addDays($subscription->plan->grace_days),
         ]);
     }
+
+    public function testModelLeavesGraceDaysEmptyWhenRenewingIfPlanDoesNotHaveIt()
+    {
+        $subscriber = User::factory()->create();
+        $subscription = Subscription::factory()
+            ->for($subscriber, 'subscriber')
+            ->create([
+                'grace_days_ended_at' => null,
+            ]);
+
+        $subscription->plan->update(['grace_days' => 0]);
+
+        $subscription->renew();
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $subscription->id,
+            'grace_days_ended_at' => null,
+        ]);
+    }
 }
