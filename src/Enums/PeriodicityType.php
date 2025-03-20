@@ -19,7 +19,7 @@ class PeriodicityType
     {
         $unitInPlural = Str::plural($unit);
 
-        $differenceMethodName = 'diffIn' . $unitInPlural;
+        $differenceMethodName = 'diffIn'.$unitInPlural;
 
         return $from->{$differenceMethodName}($to);
     }

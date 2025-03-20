@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class() extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -15,7 +16,8 @@ return new class() extends Migration {
         Schema::create('features', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->boolean('consumable');
+            $table->string('display_name')->nullable();
+            $table->boolean('consumable')->default(false);
             $table->boolean('quota')->default(false);
             $table->boolean('postpaid')->default(false);
             $table->integer('periodicity')->unsigned()->nullable();

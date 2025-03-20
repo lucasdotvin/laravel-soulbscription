@@ -17,8 +17,12 @@ class Plan extends Model
     protected $fillable = [
         'grace_days',
         'name',
+        'display_name',
         'periodicity_type',
         'periodicity',
+        'price',
+        'price_id',
+        'currency',
     ];
 
     public function features()

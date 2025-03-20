@@ -194,7 +194,7 @@ class HasSubscriptionsTest extends TestCase
         $subscriber->consume($feature->name);
 
         $this->assertDatabaseHas('feature_consumptions', [
-            'consumption' => null,
+            'consumption' => 0,
             'feature_id' => $feature->id,
             'subscriber_id' => $subscriber->id,
         ]);
