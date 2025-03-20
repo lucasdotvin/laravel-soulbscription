@@ -347,7 +347,12 @@ class SubscriptionTest extends TestCase
     public function testModelUpdatesGraceDaysEndedAtWhenRenewing()
     {
         $subscriber = User::factory()->create();
+        $plan = Plan::factory()->create([
+            'grace_days' => $graceDays = $this->faker()->randomDigitNotNull(),
+        ]);
+
         $subscription = Subscription::factory()
+            ->for($plan)
             ->for($subscriber, 'subscriber')
             ->create([
                 'grace_days_ended_at' => now()->subDay(),
@@ -357,20 +362,23 @@ class SubscriptionTest extends TestCase
 
         $this->assertDatabaseHas('subscriptions', [
             'id' => $subscription->id,
-            'grace_days_ended_at' => $subscription->expired_at->addDays($subscription->plan->grace_days),
+            'grace_days_ended_at' => $subscription->expired_at->addDays($graceDays),
         ]);
     }
 
     public function testModelLeavesGraceDaysEmptyWhenRenewingIfPlanDoesNotHaveIt()
     {
         $subscriber = User::factory()->create();
+        $plan = Plan::factory()->create([
+            'grace_days' => 0,
+        ]);
+
         $subscription = Subscription::factory()
+            ->for($plan)
             ->for($subscriber, 'subscriber')
             ->create([
                 'grace_days_ended_at' => null,
             ]);
-
-        $subscription->plan->update(['grace_days' => 0]);
 
         $subscription->renew();
 
