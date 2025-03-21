@@ -2,6 +2,23 @@
 
 All notable changes to `laravel-soulbscription` will be documented in this file.
 
+## 4.2.3 - 2025-03-21
+
+### What's Changed
+
+* Laravel 11.x Compatibility by @laravel-shift in https://github.com/lucasdotvin/laravel-soulbscription/pull/96
+* Laravel 12.x Compatibility by @laravel-shift in https://github.com/lucasdotvin/laravel-soulbscription/pull/117
+* [Feature] Laravel 12 support by @lucasdotvin in https://github.com/lucasdotvin/laravel-soulbscription/pull/122
+* build(deps): Bump dependabot/fetch-metadata from 1.6.0 to 2.3.0 by @dependabot in https://github.com/lucasdotvin/laravel-soulbscription/pull/123
+* build(deps): Bump codecov/codecov-action from 3.1.4 to 5.4.0 by @dependabot in https://github.com/lucasdotvin/laravel-soulbscription/pull/124
+* [Bugfix] 4.2.3 - Update grace days on subscription renew by @lucasdotvin in https://github.com/lucasdotvin/laravel-soulbscription/pull/119
+
+### New Contributors
+
+* @laravel-shift made their first contribution in https://github.com/lucasdotvin/laravel-soulbscription/pull/96
+
+**Full Changelog**: https://github.com/lucasdotvin/laravel-soulbscription/compare/4.2.1...4.2.3
+
 ## 4.2.2 - 2025-03-20
 
 ### What's Changed
