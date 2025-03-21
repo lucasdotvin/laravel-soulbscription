@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Models\Concerns;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -21,6 +22,7 @@ use LucasDotVin\Soulbscription\Models\Subscription;
 use LucasDotVin\Soulbscription\Models\SubscriptionRenewal;
 use OutOfBoundsException;
 use OverflowException;
+use ReflectionClass;
 use Tests\Mocks\Models\User;
 use Tests\TestCase;
 
@@ -427,6 +429,42 @@ class HasSubscriptionsTest extends TestCase
         );
     }
 
+    public function testModelGetFeaturesFromPreviouslyLoadedTickets()
+    {
+        $feature = Feature::factory()->createOne();
+        $subscriber = User::factory()->createOne();
+
+        $reflection = new ReflectionClass($subscriber);
+        $property = $reflection->getProperty('loadedTicketFeatures');
+        $property->setAccessible(true);
+        $property->setValue($subscriber, Collection::make([$feature]));
+
+        config()->set('soulbscription.feature_tickets', true);
+
+        $features = $subscriber->getFeaturesAttribute();
+
+        $this->assertCount(1, $features);
+        $this->assertTrue($features->contains($feature));
+    }
+
+    public function testModelGetFeaturesFromPreviouslyLoadedSubscription()
+    {
+        $feature = Feature::factory()->createOne();
+        $subscriber = User::factory()->createOne();
+
+        $reflection = new ReflectionClass($subscriber);
+        $property = $reflection->getProperty('loadedSubscriptionFeatures');
+        $property->setAccessible(true);
+        $property->setValue($subscriber, Collection::make([$feature]));
+
+        config()->set('soulbscription.feature_tickets', true);
+
+        $features = $subscriber->getFeaturesAttribute();
+
+        $this->assertCount(1, $features);
+        $this->assertTrue($features->contains($feature));
+    }
+
     public function testModelGetFeaturesFromNonExpirableTickets()
     {
         $feature = Feature::factory()->consumable()->createOne();
@@ -805,6 +843,31 @@ class HasSubscriptionsTest extends TestCase
         ]);
     }
 
+    public function testItDoesNothingWhileSettingQuotaIfTheGivenAmountIsTheSameAsTheBalance()
+    {
+        $charges = $this->faker->numberBetween(5, 10);
+        $consumption = $this->faker->numberBetween(1, $charges);
+
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->quota()->createOne();
+        $feature->plans()->attach($plan, [
+            'charges' => $charges,
+        ]);
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($plan);
+
+        $subscriber->consume($feature->name, $consumption);
+        $subscriber->setConsumedQuota($feature->name, $consumption);
+
+        $this->assertDatabaseHas('feature_consumptions', [
+            'consumption' => $consumption,
+            'feature_id' => $feature->id,
+            'subscriber_id' => $subscriber->id,
+            'expired_at' => null,
+        ]);
+    }
+
     public function testItRaisesAnExceptionWhenSettingConsumedQuotaForANotQuotaFeature()
     {
         $charges = $this->faker->numberBetween(5, 10);
@@ -908,7 +971,7 @@ class HasSubscriptionsTest extends TestCase
         $this->assertEquals(0, $subscriber->getRemainingCharges($feature->name));
     }
 
-    public function testItReturnsNegativeBalanceForFeatures()
+    public function testItReturnsNegativeBalanceForPostpaidFeatures()
     {
         $charges = $this->faker->numberBetween(5, 10);
         $consumption = $this->faker->numberBetween($charges + 1, $charges * 2);
@@ -927,6 +990,16 @@ class HasSubscriptionsTest extends TestCase
         $this->assertLessThan(0, $subscriber->balance($feature->name));
     }
 
+    public function testItReturnsZeroForUnavailableFeatures()
+    {
+        $feature = Feature::factory()->createOne();
+        $subscriber = User::factory()->createOne();
+
+        $remainingCharges = $subscriber->getRemainingCharges($feature->name);
+
+        $this->assertEquals(0, $remainingCharges);
+    }
+
     public function testItReturnsRemainingChargesOnlyForTheGivenUser()
     {
         config(['soulbscription.feature_tickets' => true]);
@@ -942,5 +1015,85 @@ class HasSubscriptionsTest extends TestCase
         $otherSubscriber->giveTicketFor($feature->name, null, $charges);
 
         $this->assertEquals($charges, $subscriber->getRemainingCharges($feature->name));
+    }
+
+    public function testItCanCheckIfSubscriberHasFeature()
+    {
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->createOne();
+        $feature->plans()->attach($plan);
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($plan);
+
+        $this->assertTrue($subscriber->hasFeature($feature->name));
+    }
+
+    public function testItCanCheckIfSubscriberDoesNotHaveFeature()
+    {
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->createOne();
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($plan);
+
+        $this->assertFalse($subscriber->hasFeature($feature->name));
+    }
+
+    public function testItCanAlwaysConsumeAPostpaidFeature()
+    {
+        $charges = $this->faker->numberBetween(5, 10);
+        $consumption = $this->faker->numberBetween($charges + 1, $charges * 2);
+
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->postpaid()->createOne();
+        $feature->plans()->attach($plan, [
+            'charges' => $charges,
+        ]);
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($plan);
+
+        $this->assertTrue($subscriber->canConsume($feature->name, $consumption));
+
+        $subscriber->consume($feature->name, $consumption);
+
+        $this->assertDatabaseHas('feature_consumptions', [
+            'consumption' => $consumption,
+            'feature_id' => $feature->id,
+            'subscriber_id' => $subscriber->id,
+        ]);
+    }
+
+    public function testItSetsAnEmptyExpirationIfThePlanHasNoPeriodicity()
+    {
+        $plan = Plan::factory()->createOne([
+            'periodicity' => null,
+        ]);
+
+        $subscriber = User::factory()->createOne();
+        $subscription = $subscriber->subscribeTo($plan);
+
+        $this->assertNull($subscription->expired_at);
+    }
+
+    public function testItReturnsZeroForCurrentConsumptionWhenSubscriberDoesNotHaveFeature()
+    {
+        $feature = Feature::factory()->createOne();
+        $subscriber = User::factory()->createOne();
+
+        $currentConsumption = $subscriber->getCurrentConsumption($feature->name);
+
+        $this->assertEquals(0, $currentConsumption);
+    }
+
+    public function testItReturnsZeroForTotalChargesWhenSubscriberDoesNotHaveFeature()
+    {
+        $feature = Feature::factory()->createOne();
+        $subscriber = User::factory()->createOne();
+
+        $totalCharges = $subscriber->getTotalCharges($feature->name);
+
+        $this->assertEquals(0, $totalCharges);
     }
 }

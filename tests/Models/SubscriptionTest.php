@@ -387,4 +387,26 @@ class SubscriptionTest extends TestCase
             'grace_days_ended_at' => null,
         ]);
     }
+
+    public function testModelUsesProvidedExpirationAtRenewing()
+    {
+        $subscriber = User::factory()->create();
+        $plan = Plan::factory()->create();
+
+        $subscription = Subscription::factory()
+            ->for($plan)
+            ->for($subscriber, 'subscriber')
+            ->create([
+                'expired_at' => now()->subDay(),
+            ]);
+
+        $expectedExpiredAt = now()->addDays($days = $this->faker()->randomDigitNotNull())->toDateTimeString();
+
+        $subscription->renew(now()->addDays($days));
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $subscription->id,
+            'expired_at' => $expectedExpiredAt,
+        ]);
+    }
 }
