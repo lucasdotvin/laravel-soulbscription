@@ -343,4 +343,70 @@ class SubscriptionTest extends TestCase
             fn ($subscription) => $this->assertContains($subscription->id, $returnedSubscriptions->pluck('id'))
         );
     }
+
+    public function testModelUpdatesGraceDaysEndedAtWhenRenewing()
+    {
+        $subscriber = User::factory()->create();
+        $plan = Plan::factory()->create([
+            'grace_days' => $graceDays = $this->faker()->randomDigitNotNull(),
+        ]);
+
+        $subscription = Subscription::factory()
+            ->for($plan)
+            ->for($subscriber, 'subscriber')
+            ->create([
+                'grace_days_ended_at' => now()->subDay(),
+            ]);
+
+        $subscription->renew();
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $subscription->id,
+            'grace_days_ended_at' => $subscription->expired_at->addDays($graceDays),
+        ]);
+    }
+
+    public function testModelLeavesGraceDaysEmptyWhenRenewingIfPlanDoesNotHaveIt()
+    {
+        $subscriber = User::factory()->create();
+        $plan = Plan::factory()->create([
+            'grace_days' => 0,
+        ]);
+
+        $subscription = Subscription::factory()
+            ->for($plan)
+            ->for($subscriber, 'subscriber')
+            ->create([
+                'grace_days_ended_at' => null,
+            ]);
+
+        $subscription->renew();
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $subscription->id,
+            'grace_days_ended_at' => null,
+        ]);
+    }
+
+    public function testModelUsesProvidedExpirationAtRenewing()
+    {
+        $subscriber = User::factory()->create();
+        $plan = Plan::factory()->create();
+
+        $subscription = Subscription::factory()
+            ->for($plan)
+            ->for($subscriber, 'subscriber')
+            ->create([
+                'expired_at' => now()->subDay(),
+            ]);
+
+        $expectedExpiredAt = now()->addDays($days = $this->faker()->randomDigitNotNull())->toDateTimeString();
+
+        $subscription->renew(now()->addDays($days));
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $subscription->id,
+            'expired_at' => $expectedExpiredAt,
+        ]);
+    }
 }
