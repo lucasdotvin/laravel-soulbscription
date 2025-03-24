@@ -106,7 +106,7 @@ trait HasSubscriptions
             ->whereFeatureId($feature->id)
             ->firstOrNew();
 
-        if ($featureConsumption->consumption === $consumption) {
+        if ($featureConsumption->consumption == $consumption) {
             return;
         }
 
