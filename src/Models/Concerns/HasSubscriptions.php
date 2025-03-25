@@ -194,7 +194,8 @@ trait HasSubscriptions
             new LogicException('The tickets are not enabled in the configs.'),
         );
 
-        $feature = Feature::whereName($featureName)->firstOrFail();
+        $featureModel = config('soulbscription.models.feature');
+        $feature = $featureModel::whereName($featureName)->firstOrFail();
 
         $featureTicket = $this->featureTickets()
             ->make([
@@ -386,7 +387,8 @@ trait HasSubscriptions
             return $this->loadedTicketFeatures;
         }
 
-        return $this->loadedTicketFeatures = Feature::with([
+        $featureModel = config('soulbscription.models.feature');
+        return $this->loadedTicketFeatures = $featureModel::with([
                 'tickets' => fn (HasMany $query) => $query->withoutExpired()->whereMorphedTo('subscriber', $this),
             ])
             ->whereHas(
