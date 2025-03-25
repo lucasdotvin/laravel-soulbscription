@@ -15,6 +15,7 @@ use LucasDotVin\Soulbscription\Models\Feature;
 use LucasDotVin\Soulbscription\Models\FeatureTicket;
 use LucasDotVin\Soulbscription\Models\Plan;
 use LucasDotVin\Soulbscription\Models\Subscription;
+use Illuminate\Database\RecordNotFoundException;
 use OutOfBoundsException;
 use OverflowException;
 
@@ -82,6 +83,48 @@ trait HasSubscriptions
         event(new FeatureConsumed($this, $feature, $featureConsumption));
     }
 
+    /**
+     * @throws OutOfBoundsException
+     */
+    public function revokeConsume($featureName, ?float $consumption = null)
+    {
+        throw_if($this->missingFeature($featureName), new OutOfBoundsException(
+            'None of the active plans grants access to this feature.',
+        ));
+
+        $feature = $this->getFeature($featureName);
+        if($feature->quota){
+            // con cuota, no requiere de fechas
+            $featureConsumption = $this->featureConsumptions()
+                ->whereFeatureId($feature->id)
+                ->first();
+            if($featureConsumption == null ){
+                throw new RecordNotFoundException("Record [".$featureName."] not found", 404);
+            }
+            $featureConsumption->feature()->associate($feature);
+            $featureConsumption->consumption -= $consumption;
+            if($featureConsumption->consumption <= 0){
+                $featureConsumption->delete();
+                return;
+            }
+            $featureConsumption->save();
+        }else{
+            $featureConsumption = $this->featureConsumptions()
+                ->whereFeatureId($feature->id)
+                ->first();
+            if($featureConsumption == null ){
+                throw new RecordNotFoundException("Record [".$featureName."] not found", 404);
+            }
+            $featureConsumption->feature()->associate($feature);
+            $featureConsumption->consumption -= $consumption;
+            if($featureConsumption->consumption <= 0){
+                $featureConsumption->delete();
+                return;
+            }
+            $featureConsumption->save();
+            return;
+        }
+    }
     /**
      * @throws OutOfBoundsException
      * @throws OverflowException
