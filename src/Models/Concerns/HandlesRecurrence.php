@@ -4,7 +4,11 @@ namespace LucasDotVin\Soulbscription\Models\Concerns;
 
 use Illuminate\Support\Carbon;
 use LucasDotVin\Soulbscription\Enums\PeriodicityType;
+use Illuminate\Support\Str;
 
+/**
+ * @property \LucasDotVin\Soulbscription\Enums\PeriodicityType $periodicity_type
+ */
 trait HandlesRecurrence
 {
     public function calculateNextRecurrenceEnd(Carbon|string $start = null): Carbon
@@ -22,7 +26,7 @@ trait HandlesRecurrence
             0,
         );
 
-        $expirationDate = $start->copy()->add($this->periodicity_type, $this->periodicity + $recurrences);
+        $expirationDate = $start->copy()->add(Str::lower($this->periodicity_type), $this->periodicity + $recurrences);
 
         return $expirationDate;
     }

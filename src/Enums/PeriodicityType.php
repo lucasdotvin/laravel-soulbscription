@@ -23,7 +23,7 @@ class PeriodicityType
             $delta = 1;
         }
 
-        $unitInPlural = Str::plural($unit);
+        $unitInPlural = Str::plural(Str::studly(Str::lower($unit)));
 
         $differenceMethodName = 'diffIn' . $unitInPlural;
         $difference = abs($from->{$differenceMethodName}($to));

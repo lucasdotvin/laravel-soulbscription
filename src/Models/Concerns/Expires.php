@@ -18,12 +18,12 @@ trait Expires
         }
     }
 
-    public function expired()
+    public function expired(): bool
     {
         return $this->expired_at->isPast();
     }
 
-    public function notExpired()
+    public function notExpired(): bool
     {
         return ! $this->expired();
     }

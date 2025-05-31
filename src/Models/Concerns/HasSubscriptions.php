@@ -4,19 +4,21 @@ namespace LucasDotVin\Soulbscription\Models\Concerns;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use InvalidArgumentException;
 use LogicException;
 use LucasDotVin\Soulbscription\Events\FeatureConsumed;
 use LucasDotVin\Soulbscription\Events\FeatureTicketCreated;
-use LucasDotVin\Soulbscription\Models\Feature;
-use LucasDotVin\Soulbscription\Models\FeatureTicket;
-use LucasDotVin\Soulbscription\Models\Plan;
-use LucasDotVin\Soulbscription\Models\Subscription;
+use LucasDotVin\Soulbscription\Contracts\FeatureConsumptionContract;
+use LucasDotVin\Soulbscription\Contracts\FeatureContract;
+use LucasDotVin\Soulbscription\Contracts\FeatureTicketContract;
+use LucasDotVin\Soulbscription\Contracts\PlanContract;
+use LucasDotVin\Soulbscription\Contracts\SubscriptionContract;
 use OutOfBoundsException;
 use OverflowException;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 trait HasSubscriptions
 {
@@ -26,12 +28,12 @@ trait HasSubscriptions
 
     protected ?Collection $loadedTicketFeatures = null;
 
-    public function featureConsumptions()
+    public function featureConsumptions(): MorphMany
     {
         return $this->morphMany(config('soulbscription.models.feature_consumption'), 'subscriber');
     }
 
-    public function featureTickets()
+    public function featureTickets(): MorphMany
     {
         return $this->morphMany(config('soulbscription.models.feature_ticket'), 'subscriber');
     }
@@ -45,12 +47,12 @@ trait HasSubscriptions
         );
     }
 
-    public function subscription()
+    public function subscription(): MorphOne
     {
         return $this->morphOne(config('soulbscription.models.subscription'), 'subscriber')->ofMany('started_at', 'MAX');
     }
 
-    public function lastSubscription()
+    public function lastSubscription(): ?SubscriptionContract
     {
         return app(config('soulbscription.models.subscription'))
             ->withExpired()
@@ -63,7 +65,7 @@ trait HasSubscriptions
      * @throws OutOfBoundsException
      * @throws OverflowException
      */
-    public function consume($featureName, ?float $consumption = null)
+    public function consume($featureName, ?float $consumption = null): void
     {
         throw_if($this->missingFeature($featureName), new OutOfBoundsException(
             'None of the active plans grants access to this feature.',
@@ -117,7 +119,7 @@ trait HasSubscriptions
         event(new FeatureConsumed($this, $feature, $featureConsumption));
     }
 
-    public function subscribeTo(Plan $plan, $expiration = null, $startDate = null): Subscription
+    public function subscribeTo(PlanContract $plan, $expiration = null, $startDate = null): SubscriptionContract
     {
         if ($plan->periodicity) {
             $expiration = $expiration ?? $plan->calculateNextRecurrenceEnd($startDate);
@@ -140,29 +142,29 @@ trait HasSubscriptions
             ->start($startDate);
     }
 
-    public function hasSubscriptionTo(Plan $plan): bool
+    public function hasSubscriptionTo(PlanContract $plan): bool
     {
         return $this->subscription()
             ->where('plan_id', $plan->id)
             ->exists();
     }
 
-    public function isSubscribedTo(Plan $plan): bool
+    public function isSubscribedTo(PlanContract $plan): bool
     {
         return $this->hasSubscriptionTo($plan);
     }
 
-    public function missingSubscriptionTo(Plan $plan): bool
+    public function missingSubscriptionTo(PlanContract $plan): bool
     {
         return ! $this->hasSubscriptionTo($plan);
     }
 
-    public function isNotSubscribedTo(Plan $plan): bool
+    public function isNotSubscribedTo(PlanContract $plan): bool
     {
         return ! $this->isSubscribedTo($plan);
     }
 
-    public function switchTo(Plan $plan, $expiration = null, $immediately = true): Subscription
+    public function switchTo(PlanContract $plan, $expiration = null, $immediately = true): SubscriptionContract
     {
         if ($immediately) {
             $this->subscription
@@ -187,14 +189,14 @@ trait HasSubscriptions
      * @throws LogicException
      * @throws ModelNotFoundException
      */
-    public function giveTicketFor($featureName, $expiration = null, ?float $charges = null): FeatureTicket
+    public function giveTicketFor($featureName, $expiration = null, ?float $charges = null): FeatureTicketContract
     {
         throw_unless(
             config('soulbscription.feature_tickets'),
             new LogicException('The tickets are not enabled in the configs.'),
         );
 
-        $feature = Feature::whereName($featureName)->firstOrFail();
+        $feature = $this->featureModelQuery()->whereName($featureName)->firstOrFail();
 
         $featureTicket = $this->featureTickets()
             ->make([
@@ -251,7 +253,7 @@ trait HasSubscriptions
         return max($balance, 0);
     }
 
-    public function balance($featureName)
+    public function balance($featureName): float|int
     {
         if (empty($this->getFeature($featureName))) {
             return 0;
@@ -286,7 +288,7 @@ trait HasSubscriptions
         return $subscriptionCharges + $ticketCharges;
     }
 
-    protected function consumeNotQuotaFeature(Feature $feature, ?float $consumption = null)
+    protected function consumeNotQuotaFeature(FeatureContract $feature, ?float $consumption = null): FeatureConsumptionContract
     {
         $consumptionExpiration = $feature->consumable
             ? $feature->calculateNextRecurrenceEnd($this->subscription->started_at)
@@ -305,7 +307,7 @@ trait HasSubscriptions
         return $featureConsumption;
     }
 
-    protected function consumeQuotaFeature(Feature $feature, float $consumption)
+    protected function consumeQuotaFeature(FeatureContract $feature, float $consumption): FeatureConsumptionContract
     {
         $featureConsumption = $this->featureConsumptions()
             ->whereFeatureId($feature->id)
@@ -318,7 +320,7 @@ trait HasSubscriptions
         return $featureConsumption;
     }
 
-    protected function getSubscriptionChargesForAFeature(Model $feature): float
+    protected function getSubscriptionChargesForAFeature(FeatureContract $feature): float
     {
         $subscriptionFeature = $this->loadedSubscriptionFeatures
             ->find($feature);
@@ -332,7 +334,7 @@ trait HasSubscriptions
             ->charges;
     }
 
-    protected function getTicketChargesForAFeature(Model $feature): float
+    protected function getTicketChargesForAFeature(FeatureContract $feature): float
     {
         $ticketFeature = $this->loadedTicketFeatures
             ->find($feature);
@@ -346,7 +348,7 @@ trait HasSubscriptions
             ->sum('charges');
     }
 
-    public function getFeature(string $featureName): ?Feature
+    public function getFeature(string $featureName): ?FeatureContract
     {
         $feature = $this->features->firstWhere('name', $featureName);
 
@@ -386,7 +388,7 @@ trait HasSubscriptions
             return $this->loadedTicketFeatures;
         }
 
-        return $this->loadedTicketFeatures = Feature::with([
+        return $this->loadedTicketFeatures = $this->featureModelQuery()->with([
                 'tickets' => fn (HasMany $query) => $query->withoutExpired()->whereMorphedTo('subscriber', $this),
             ])
             ->whereHas(
@@ -394,5 +396,10 @@ trait HasSubscriptions
                 fn (Builder $query) => $query->withoutExpired()->whereMorphedTo('subscriber', $this),
             )
             ->get();
+    }
+
+    private function featureModelQuery(): Builder
+    {
+        return config('soulbscription.models.feature')::query();
     }
 }
