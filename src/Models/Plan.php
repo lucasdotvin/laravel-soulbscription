@@ -7,8 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use LucasDotVin\Soulbscription\Models\Concerns\HandlesRecurrence;
+use LucasDotVin\Soulbscription\Contracts\PlanContract;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Plan extends Model
+class Plan extends Model implements PlanContract
 {
     use HandlesRecurrence;
     use HasFactory;
@@ -21,19 +24,19 @@ class Plan extends Model
         'periodicity',
     ];
 
-    public function features()
+    public function features(): BelongsToMany
     {
         return $this->belongsToMany(config('soulbscription.models.feature'))
             ->using(config('soulbscription.models.feature_plan'))
             ->withPivot(['charges']);
     }
 
-    public function subscriptions()
+    public function subscriptions(): HasMany
     {
         return $this->hasMany(config('soulbscription.models.subscription'));
     }
 
-    public function calculateGraceDaysEnd(Carbon $recurrenceEnd)
+    public function calculateGraceDaysEnd(Carbon $recurrenceEnd): Carbon
     {
         return $recurrenceEnd->copy()->addDays($this->grace_days);
     }

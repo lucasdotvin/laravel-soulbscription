@@ -29,6 +29,7 @@ class SuppressingScope implements Scope
     protected function addWithSuppressed(Builder $builder)
     {
         $builder->macro('withSuppressed', function (Builder $builder, $withSuppressed = true) {
+            /** @var \Illuminate\Database\Eloquent\Scope $this */
             if ($withSuppressed) {
                 return $builder->withoutGlobalScope($this);
             }
@@ -40,6 +41,7 @@ class SuppressingScope implements Scope
     protected function addWithoutSuppressed(Builder $builder)
     {
         $builder->macro('withoutSuppressed', function (Builder $builder) {
+            /** @var \Illuminate\Database\Eloquent\Scope $this */
             $builder->withoutGlobalScope($this)->whereNull('suppressed_at');
 
             return $builder;
@@ -49,6 +51,7 @@ class SuppressingScope implements Scope
     protected function addOnlySuppressed(Builder $builder)
     {
         $builder->macro('onlySuppressed', function (Builder $builder) {
+            /** @var \Illuminate\Database\Eloquent\Scope $this */
             $builder->withoutGlobalScope($this)->whereNotNull('suppressed_at');
 
             return $builder;
