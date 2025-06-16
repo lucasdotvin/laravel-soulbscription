@@ -3,25 +3,41 @@ name: run-tests
 on:
   workflow_dispatch:
   push:
-    branches: [main, develop]
+    branches:
+      - main
+      - develop
   pull_request:
-    branches: [main, develop]
+    branches:
+      - main
+      - develop
 
 jobs:
   test:
     runs-on: ${{ matrix.os }}
+
     strategy:
       fail-fast: true
       matrix:
         os: [ubuntu-latest]
-        php: [8.1, 8.2]
-        laravel: [9.*, 10.*]
+        php: [8.1, 8.2, 8.3]
+        laravel: ['9.*', '10.*', '11.*', '12.*']
         stability: [prefer-stable]
         include:
           - laravel: 9.*
             testbench: ^7.10
           - laravel: 10.*
             testbench: ^8.0
+          - laravel: 11.*
+            testbench: ^9.0
+          - laravel: 12.*
+            testbench: ^10.0
+        exclude:
+          - laravel: 9.*
+            php: 8.3
+          - laravel: 11.*
+            php: 8.1
+          - laravel: 12.*
+            php: 8.1
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
@@ -50,6 +66,4 @@ jobs:
         run: vendor/bin/phpunit
 
       - name: Codecov
-        # You may pin to the exact commit or the version.
-        # uses: codecov/codecov-action@d9f34f8cd5cb3b3eb79b3e4b5dae3a16df499a70
-        uses: codecov/codecov-action@v3.1.4
+        uses: codecov/codecov-action@v5.4.0

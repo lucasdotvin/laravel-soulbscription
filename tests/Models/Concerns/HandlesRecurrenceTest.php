@@ -100,4 +100,60 @@ class HandlesRecurrenceTest extends TestCase
             $plan->calculateNextRecurrenceEnd($start->toDateTimeString()),
         );
     }
+
+    public function testModelCalculateExpirationWithRenewalAfterOneMonth()
+    {
+        Carbon::setTestNow('2021-02-18');
+
+        $plan = self::MODEL::factory()->create([
+            'periodicity_type' => PeriodicityType::Month,
+            'periodicity' => 1,
+        ]);
+
+        $start = '2021-02-20';
+
+        $this->assertEquals('2021-03-20', $plan->calculateNextRecurrenceEnd($start)->toDateString());
+    }
+
+    public function testModelCalculateExpirationWithTwoRenewalsInOneMonth()
+    {
+        Carbon::setTestNow('2021-02-19');
+
+        $plan = self::MODEL::factory()->create([
+            'periodicity_type' => PeriodicityType::Month,
+            'periodicity' => 1,
+        ]);
+
+        $start = '2021-03-20';
+
+        $this->assertEquals('2021-04-20', $plan->calculateNextRecurrenceEnd($start)->toDateString());
+    }
+
+    public function testModelCalculateExpirationWithThreeRenewalsInOneMonth()
+    {
+        Carbon::setTestNow('2021-02-20');
+
+        $plan = self::MODEL::factory()->create([
+            'periodicity_type' => PeriodicityType::Month,
+            'periodicity' => 1,
+        ]);
+
+        $start = '2021-04-20';
+
+        $this->assertEquals('2021-05-20', $plan->calculateNextRecurrenceEnd($start)->toDateString());
+    }
+
+    public function testModelCalculateExpirationWithRenewalAfterExpiration()
+    {
+        Carbon::setTestNow('2021-02-21');
+
+        $plan = self::MODEL::factory()->create([
+            'periodicity_type' => PeriodicityType::Month,
+            'periodicity' => 1,
+        ]);
+
+        $start = '2021-02-20';
+
+        $this->assertEquals('2021-03-20', $plan->calculateNextRecurrenceEnd($start)->toDateString());
+    }
 }
