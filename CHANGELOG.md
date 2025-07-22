@@ -2,6 +2,17 @@
 
 All notable changes to `laravel-soulbscription` will be documented in this file.
 
+## 4.3.0 - 2025-07-22
+
+### What's Changed
+
+* build(deps): Bump codecov/codecov-action from 5.4.0 to 5.4.2 by @dependabot[bot] in https://github.com/lucasdotvin/laravel-soulbscription/pull/126
+* build(deps): Bump dependabot/fetch-metadata from 2.3.0 to 2.4.0 by @dependabot[bot] in https://github.com/lucasdotvin/laravel-soulbscription/pull/127
+* build(deps): Bump codecov/codecov-action from 5.4.2 to 5.4.3 by @dependabot[bot] in https://github.com/lucasdotvin/laravel-soulbscription/pull/128
+* [Release] Improvements to the handling of subscriptions with no expiration by @lucasdotvin in https://github.com/lucasdotvin/laravel-soulbscription/pull/132
+
+**Full Changelog**: https://github.com/lucasdotvin/laravel-soulbscription/compare/4.2.3...4.3.0
+
 ## 4.2.3 - 2025-03-21
 
 ### What's Changed
