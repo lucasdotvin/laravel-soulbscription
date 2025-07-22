@@ -201,6 +201,24 @@ class SubscriptionTest extends TestCase
         ]);
     }
 
+    public function testModelDoesNotRegisterOverdueIfThereIsNoExpiration()
+    {
+        $subscriber = User::factory()->create();
+        $subscription = Subscription::factory()
+            ->for($subscriber, 'subscriber')
+            ->create([
+                'expired_at' => null,
+            ]);
+
+        $subscription->renew();
+
+        $this->assertDatabaseCount('subscription_renewals', 1);
+        $this->assertDatabaseHas('subscription_renewals', [
+            'subscription_id' => $subscription->id,
+            'overdue' => false,
+        ]);
+    }
+
     public function testModelConsidersGraceDaysOnOverdue()
     {
         $subscriber = User::factory()->create();

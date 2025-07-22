@@ -1077,6 +1077,21 @@ class HasSubscriptionsTest extends TestCase
         $this->assertNull($subscription->expired_at);
     }
 
+    public function testItUsesReceivedExpirationEvenIfThePlanHasNoPeriodicity()
+    {
+        $plan = Plan::factory()->createOne([
+            'periodicity' => null,
+        ]);
+
+        $subscriber = User::factory()->createOne();
+        $subscription = $subscriber->subscribeTo($plan, now()->addDay());
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $subscription->id,
+            'expired_at' => now()->addDay(),
+        ]);
+    }
+
     public function testItReturnsZeroForCurrentConsumptionWhenSubscriberDoesNotHaveFeature()
     {
         $feature = Feature::factory()->createOne();
