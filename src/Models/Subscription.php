@@ -157,6 +157,10 @@ class Subscription extends Model
                 and $this->grace_days_ended_at->isPast();
         }
 
+        if (! $this->expired_at) {
+            return false;
+        }
+
         return $this->expired_at->isPast();
     }
 
