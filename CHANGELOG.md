@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-soulbscription` will be documented in this file.
 
+## v4.3.2 - 2025-07-24
+
+### What's Changed
+
+* [Hotfix] Preset expiration in renewals for plans with no periodicity by @lucasdotvin in https://github.com/lucasdotvin/laravel-soulbscription/pull/135
+
+**Full Changelog**: https://github.com/lucasdotvin/laravel-soulbscription/compare/4.3.1...4.3.2
+
 ## v4.3.1 - 2025-07-24
 
 ### What's Changed
