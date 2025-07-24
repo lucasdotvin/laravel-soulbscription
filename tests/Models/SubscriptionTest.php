@@ -247,6 +247,66 @@ class SubscriptionTest extends TestCase
         ]);
     }
 
+    public function testModelRenewsEvenIfPlanHasNoPeriodicityButHasGraceDays()
+    {
+        $subscriber = User::factory()->create();
+        $plan = Plan::factory()->create([
+            'periodicity' => null,
+            'periodicity_type' => null,
+            'grace_days' => 1,
+        ]);
+
+        $subscription = Subscription::factory()
+            ->for($plan)
+            ->for($subscriber, 'subscriber')
+            ->create([
+                'expired_at' => now()->subDay(),
+            ]);
+
+        Event::fake();
+
+        $subscription->renew();
+
+        Event::assertDispatched(SubscriptionRenewed::class);
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $subscription->id,
+            'expired_at' => null,
+            'grace_days_ended_at' => null,
+        ]);
+    }
+
+    public function testModelRenewsWithDefinedExpirationEvenIfPlanHasNoPeriodicityButHasGraceDays()
+    {
+        $subscriber = User::factory()->create();
+        $plan = Plan::factory()->create([
+            'periodicity' => null,
+            'periodicity_type' => null,
+            'grace_days' => 1,
+        ]);
+
+        $subscription = Subscription::factory()
+            ->for($plan)
+            ->for($subscriber, 'subscriber')
+            ->create([
+                'expired_at' => now()->subDay(),
+            ]);
+
+        $expiration = now();
+
+        Event::fake();
+
+        $subscription->renew(now());
+
+        Event::assertDispatched(SubscriptionRenewed::class);
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $subscription->id,
+            'expired_at' => $expiration->toDateTimeString(),
+            'grace_days_ended_at' => $expiration->addDays(1)->toDateTimeString(),
+        ]);
+    }
+
     public function testModelConsidersGraceDaysOnOverdue()
     {
         $subscriber = User::factory()->create();
