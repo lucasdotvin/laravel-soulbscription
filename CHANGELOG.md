@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-soulbscription` will be documented in this file.
 
+## v4.3.1 - 2025-07-24
+
+### What's Changed
+
+* [Hotfix] Renewing subscriptions from plans with no periodicity by @lucasdotvin in https://github.com/lucasdotvin/laravel-soulbscription/pull/134
+
+**Full Changelog**: https://github.com/lucasdotvin/laravel-soulbscription/compare/4.3.0...4.3.1
+
 ## 4.3.0 - 2025-07-22
 
 ### What's Changed
