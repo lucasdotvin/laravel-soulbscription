@@ -170,6 +170,10 @@ class Subscription extends Model
             return $expirationDate;
         }
 
+        if (empty($this->plan->periodicity)) {
+            return null;
+        }
+
         if ($this->isOverdue) {
             return $this->plan->calculateNextRecurrenceEnd();
         }
