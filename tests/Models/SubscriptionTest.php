@@ -219,6 +219,34 @@ class SubscriptionTest extends TestCase
         ]);
     }
 
+    public function testModelRenewsEvenIfPlanHasNoPeriodicity()
+    {
+        $subscriber = User::factory()->create();
+        $plan = Plan::factory()->create([
+            'periodicity' => null,
+            'periodicity_type' => null,
+            'grace_days' => 0,
+        ]);
+
+        $subscription = Subscription::factory()
+            ->for($plan)
+            ->for($subscriber, 'subscriber')
+            ->create([
+                'expired_at' => now()->subDay(),
+            ]);
+
+        Event::fake();
+
+        $subscription->renew();
+
+        Event::assertDispatched(SubscriptionRenewed::class);
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $subscription->id,
+            'expired_at' => null,
+        ]);
+    }
+
     public function testModelConsidersGraceDaysOnOverdue()
     {
         $subscriber = User::factory()->create();
