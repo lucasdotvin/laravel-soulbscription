@@ -112,7 +112,7 @@ class Subscription extends Model
         $expirationDate = $this->getRenewedExpiration($expirationDate);
         $graceDaysEndedAt = null;
 
-        if ($this->plan->grace_days) {
+        if ($this->plan->grace_days && $expirationDate) {
             $graceDaysEndedAt = $expirationDate->copy()->addDays($this->plan->grace_days);
         }
 
@@ -157,6 +157,10 @@ class Subscription extends Model
                 and $this->grace_days_ended_at->isPast();
         }
 
+        if (! $this->expired_at) {
+            return false;
+        }
+
         return $this->expired_at->isPast();
     }
 
@@ -164,6 +168,10 @@ class Subscription extends Model
     {
         if (! empty($expirationDate)) {
             return $expirationDate;
+        }
+
+        if (empty($this->plan->periodicity)) {
+            return null;
         }
 
         if ($this->isOverdue) {

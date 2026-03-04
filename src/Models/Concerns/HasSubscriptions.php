@@ -121,14 +121,13 @@ trait HasSubscriptions
     {
         if ($plan->periodicity) {
             $expiration = $expiration ?? $plan->calculateNextRecurrenceEnd($startDate);
+        } else {
+            $expiration = $expiration ?? null;
+        }
 
-            $graceDaysEnd = $plan->hasGraceDays
+        $graceDaysEnd = $plan->hasGraceDays && $expiration
                 ? $plan->calculateGraceDaysEnd($expiration)
                 : null;
-        } else {
-            $expiration = null;
-            $graceDaysEnd = null;
-        }
 
         return $this->subscription()
             ->make([
