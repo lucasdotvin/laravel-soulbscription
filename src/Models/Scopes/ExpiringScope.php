@@ -33,6 +33,7 @@ class ExpiringScope implements Scope
     protected function addWithExpired(Builder $builder)
     {
         $builder->macro('withExpired', function (Builder $builder, $withExpired = true) {
+            /** @var \Illuminate\Database\Eloquent\Scope $this */
             if ($withExpired) {
                 return $builder->withoutGlobalScope($this);
             }
@@ -44,6 +45,7 @@ class ExpiringScope implements Scope
     protected function addWithoutExpired(Builder $builder)
     {
         $builder->macro('withoutExpired', function (Builder $builder) {
+            /** @var \Illuminate\Database\Eloquent\Scope $this */
             $builder->withoutGlobalScope($this)->where(
                 fn (Builder $query) =>
                 $query->where('expired_at', '>', now())
@@ -57,6 +59,7 @@ class ExpiringScope implements Scope
     protected function addOnlyExpired(Builder $builder)
     {
         $builder->macro('onlyExpired', function (Builder $builder) {
+            /** @var \Illuminate\Database\Eloquent\Scope $this */
             $builder->withoutGlobalScope($this)->where(
                 fn (Builder $query) =>
                 $query->where('expired_at', '<=', now())

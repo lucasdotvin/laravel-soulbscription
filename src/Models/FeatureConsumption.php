@@ -4,9 +4,10 @@ namespace LucasDotVin\Soulbscription\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use LucasDotVin\Soulbscription\Contracts\FeatureConsumptionContract;
 use LucasDotVin\Soulbscription\Models\Concerns\Expires;
 
-class FeatureConsumption extends Model
+class FeatureConsumption extends Model implements FeatureConsumptionContract
 {
     use Expires;
     use HasFactory;

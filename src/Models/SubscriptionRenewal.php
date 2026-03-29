@@ -4,8 +4,10 @@ namespace LucasDotVin\Soulbscription\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use LucasDotVin\Soulbscription\Contracts\SubscriptionRenewalContract;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class SubscriptionRenewal extends Model
+class SubscriptionRenewal extends Model implements SubscriptionRenewalContract
 {
     use HasFactory;
 
@@ -19,7 +21,7 @@ class SubscriptionRenewal extends Model
         'renewal',
     ];
 
-    public function subscription()
+    public function subscription(): BelongsTo
     {
         return $this->belongsTo(config('soulbscription.models.subscription'));
     }

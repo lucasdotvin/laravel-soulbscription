@@ -5,7 +5,7 @@ namespace LucasDotVin\Soulbscription\Events;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use LucasDotVin\Soulbscription\Models\Subscription;
+use LucasDotVin\Soulbscription\Contracts\SubscriptionContract;
 
 class SubscriptionScheduled
 {
@@ -14,7 +14,7 @@ class SubscriptionScheduled
     use SerializesModels;
 
     public function __construct(
-        public Subscription $subscription,
+        public SubscriptionContract $subscription,
     ) {
         //
     }

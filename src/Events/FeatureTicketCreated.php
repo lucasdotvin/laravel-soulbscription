@@ -5,8 +5,8 @@ namespace LucasDotVin\Soulbscription\Events;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use LucasDotVin\Soulbscription\Models\Feature;
-use LucasDotVin\Soulbscription\Models\FeatureTicket;
+use LucasDotVin\Soulbscription\Contracts\FeatureContract;
+use LucasDotVin\Soulbscription\Contracts\FeatureTicketContract;
 
 class FeatureTicketCreated
 {
@@ -16,8 +16,8 @@ class FeatureTicketCreated
 
     public function __construct(
         public $subscriber,
-        public Feature $feature,
-        public FeatureTicket $featureTicket,
+        public FeatureContract $feature,
+        public FeatureTicketContract $featureTicket,
     ) {
         //
     }

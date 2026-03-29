@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use LucasDotVin\Soulbscription\Contracts\SubscriptionContract;
 use LucasDotVin\Soulbscription\Events\SubscriptionCanceled;
 use LucasDotVin\Soulbscription\Events\SubscriptionRenewed;
 use LucasDotVin\Soulbscription\Events\SubscriptionScheduled;
@@ -18,8 +19,11 @@ use LucasDotVin\Soulbscription\Models\Concerns\Suppresses;
 use LucasDotVin\Soulbscription\Models\Scopes\ExpiringWithGraceDaysScope;
 use LucasDotVin\Soulbscription\Models\Scopes\StartingScope;
 use LucasDotVin\Soulbscription\Models\Scopes\SuppressingScope;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class Subscription extends Model
+class Subscription extends Model implements SubscriptionContract
 {
     use ExpiresAndHasGraceDays;
     use HasFactory;
@@ -40,22 +44,22 @@ class Subscription extends Model
         'was_switched',
     ];
 
-    public function plan()
+    public function plan(): BelongsTo
     {
         return $this->belongsTo(config('soulbscription.models.plan'));
     }
 
-    public function renewals()
+    public function renewals(): HasMany
     {
         return $this->hasMany(config('soulbscription.models.subscription_renewal'));
     }
 
-    public function subscriber()
+    public function subscriber(): MorphTo
     {
         return $this->morphTo('subscriber');
     }
 
-    public function scopeNotActive(Builder $query)
+    public function scopeNotActive(Builder $query): Builder
     {
         return $query->withoutGlobalScopes([
                 ExpiringWithGraceDaysScope::class,
@@ -69,12 +73,12 @@ class Subscription extends Model
             });
     }
 
-    public function scopeCanceled(Builder $query)
+    public function scopeCanceled(Builder $query): Builder
     {
         return $query->whereNotNull('canceled_at');
     }
 
-    public function scopeNotCanceled(Builder $query)
+    public function scopeNotCanceled(Builder $query): Builder
     {
         return $query->whereNull('canceled_at');
     }
@@ -138,7 +142,7 @@ class Subscription extends Model
         return $this;
     }
 
-    public function suppress(?Carbon $suppressation = null)
+    public function suppress(?Carbon $suppressation = null): self
     {
         $suppressationDate = $suppressation ?: now();
 

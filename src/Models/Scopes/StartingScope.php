@@ -29,6 +29,7 @@ class StartingScope implements Scope
     protected function addWithNotStarted(Builder $builder)
     {
         $builder->macro('withNotStarted', function (Builder $builder, $withNotStarted = true) {
+            /** @var \Illuminate\Database\Eloquent\Scope $this */
             if ($withNotStarted) {
                 return $builder->withoutGlobalScope($this);
             }
@@ -40,6 +41,7 @@ class StartingScope implements Scope
     protected function addWithoutNotStarted(Builder $builder)
     {
         $builder->macro('withoutNotStarted', function (Builder $builder) {
+            /** @var \Illuminate\Database\Eloquent\Scope $this */
             $builder->withoutGlobalScope($this)->where('started_at', '<=', now());
 
             return $builder;
@@ -49,6 +51,7 @@ class StartingScope implements Scope
     protected function addOnlyNotStarted(Builder $builder)
     {
         $builder->macro('onlyNotStarted', function (Builder $builder) {
+            /** @var \Illuminate\Database\Eloquent\Scope $this */
             $builder->withoutGlobalScope($this)->where('started_at', '>', now());
 
             return $builder;

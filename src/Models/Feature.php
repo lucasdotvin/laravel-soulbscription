@@ -5,9 +5,10 @@ namespace LucasDotVin\Soulbscription\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use LucasDotVin\Soulbscription\Contracts\FeatureContract;
 use LucasDotVin\Soulbscription\Models\Concerns\HandlesRecurrence;
 
-class Feature extends Model
+class Feature extends Model implements FeatureContract
 {
     use HandlesRecurrence;
     use HasFactory;
