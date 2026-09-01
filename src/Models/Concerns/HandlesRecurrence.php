@@ -7,7 +7,7 @@ use LucasDotVin\Soulbscription\Enums\PeriodicityType;
 
 trait HandlesRecurrence
 {
-    public function calculateNextRecurrenceEnd(Carbon|string $start = null): Carbon
+    public function calculateNextRecurrenceEnd(Carbon|string|null $start = null): Carbon
     {
         if (empty($start)) {
             $start = now();
