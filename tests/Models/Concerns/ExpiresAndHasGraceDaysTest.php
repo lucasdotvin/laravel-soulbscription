@@ -2,23 +2,36 @@
 
 namespace Tests\Feature\Models\Concerns;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+use InvalidArgumentException;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use LucasDotVin\Soulbscription\Models\Concerns\ExpiresAndHasGraceDays;
 use LucasDotVin\Soulbscription\Models\Scopes\ExpiringWithGraceDaysScope;
-use LucasDotVin\Soulbscription\Models\Subscription;
-use Tests\TestCase;
 
 class ExpiresAndHasGraceDaysTest extends TestCase
 {
-    use RefreshDatabase;
     use WithFaker;
+    use RefreshDatabase;
 
-    public const MODEL = Subscription::class;
+    public const MODEL = 'soulbscription.models.subscription';
+
+    protected function getModelClass()
+    {
+        $modelClass = config(self::MODEL);
+
+        throw_if(!is_a($modelClass, Model::class, true), new InvalidArgumentException(
+            "Configured subscription model must be a subclass of " . Model::class
+        ));
+
+        return $modelClass;
+    }
 
     public function testTraitAppliesScope()
     {
-        $model = self::MODEL::factory()->create();
+        $modelClass = $this->getModelClass();
+        $model = $modelClass::factory()->create();
 
         $this->assertArrayHasKey(ExpiresAndHasGraceDays::class, class_uses_recursive($model));
         $this->assertArrayHasKey(ExpiringWithGraceDaysScope::class, $model->getGlobalScopes());
@@ -26,25 +39,19 @@ class ExpiresAndHasGraceDaysTest extends TestCase
 
     public function testModelReturnsExpiredStatus()
     {
-        $expiredModel = self::MODEL::factory()
-            ->expired()
-            ->create();
+        $modelClass = $this->getModelClass();
 
-        $expiredModelWithFutureGraceDays = self::MODEL::factory()
-            ->expired()
-            ->create([
-                'grace_days_ended_at' => now()->addDay(),
-            ]);
+        $expiredModel = $modelClass::factory()->expired()->create();
 
-        $expiredModelWithPastGraceDays = self::MODEL::factory()
-            ->expired()
-            ->create([
-                'grace_days_ended_at' => now()->subDay(),
-            ]);
+        $expiredModelWithFutureGraceDays = $modelClass::factory()->expired()->create([
+            'grace_days_ended_at' => now()->addDay(),
+        ]);
 
-        $notExpiredModel = self::MODEL::factory()
-            ->notExpired()
-            ->create();
+        $expiredModelWithPastGraceDays = $modelClass::factory()->expired()->create([
+            'grace_days_ended_at' => now()->subDay(),
+        ]);
+
+        $notExpiredModel = $modelClass::factory()->notExpired()->create();
 
         $this->assertTrue($expiredModel->expired());
         $this->assertFalse($expiredModelWithFutureGraceDays->expired());
@@ -54,31 +61,23 @@ class ExpiresAndHasGraceDaysTest extends TestCase
 
     public function testModelReturnsNotExpiredStatus()
     {
-        $expiredModel = self::MODEL::factory()
-            ->expired()
-            ->create();
+        $modelClass = $this->getModelClass();
 
-        $modelWithNullExpiredAt = self::MODEL::factory()
-            ->expired()
-            ->create([
-                'expired_at' => null,
-            ]);
+        $expiredModel = $modelClass::factory()->expired()->create();
 
-        $expiredModelWithFutureGraceDays = self::MODEL::factory()
-            ->expired()
-            ->create([
-                'grace_days_ended_at' => now()->addDay(),
-            ]);
+        $modelWithNullExpiredAt = $modelClass::factory()->expired()->create([
+            'expired_at' => null,
+        ]);
 
-        $expiredModelWithPastGraceDays = self::MODEL::factory()
-            ->expired()
-            ->create([
-                'grace_days_ended_at' => now()->subDay(),
-            ]);
+        $expiredModelWithFutureGraceDays = $modelClass::factory()->expired()->create([
+            'grace_days_ended_at' => now()->addDay(),
+        ]);
 
-        $notExpiredModel = self::MODEL::factory()
-            ->notExpired()
-            ->create();
+        $expiredModelWithPastGraceDays = $modelClass::factory()->expired()->create([
+            'grace_days_ended_at' => now()->subDay(),
+        ]);
+
+        $notExpiredModel = $modelClass::factory()->notExpired()->create();
 
         $this->assertFalse($expiredModel->notExpired());
         $this->assertTrue($expiredModelWithFutureGraceDays->notExpired());
@@ -89,31 +88,23 @@ class ExpiresAndHasGraceDaysTest extends TestCase
 
     public function testModelReturnsIfItHasExpired()
     {
-        $expiredModel = self::MODEL::factory()
-            ->expired()
-            ->create();
+        $modelClass = $this->getModelClass();
 
-        $modelWithNullExpiredAt = self::MODEL::factory()
-            ->expired()
-            ->create([
-                'expired_at' => null,
-            ]);
+        $expiredModel = $modelClass::factory()->expired()->create();
 
-        $expiredModelWithFutureGraceDays = self::MODEL::factory()
-            ->expired()
-            ->create([
-                'grace_days_ended_at' => now()->addDay(),
-            ]);
+        $modelWithNullExpiredAt = $modelClass::factory()->expired()->create([
+            'expired_at' => null,
+        ]);
 
-        $expiredModelWithPastGraceDays = self::MODEL::factory()
-            ->expired()
-            ->create([
-                'grace_days_ended_at' => now()->subDay(),
-            ]);
+        $expiredModelWithFutureGraceDays = $modelClass::factory()->expired()->create([
+            'grace_days_ended_at' => now()->addDay(),
+        ]);
 
-        $notExpiredModel = self::MODEL::factory()
-            ->notExpired()
-            ->create();
+        $expiredModelWithPastGraceDays = $modelClass::factory()->expired()->create([
+            'grace_days_ended_at' => now()->subDay(),
+        ]);
+
+        $notExpiredModel = $modelClass::factory()->notExpired()->create();
 
         $this->assertTrue($expiredModel->hasExpired());
         $this->assertFalse($expiredModelWithFutureGraceDays->hasExpired());
@@ -124,31 +115,23 @@ class ExpiresAndHasGraceDaysTest extends TestCase
 
     public function testModelReturnsIfItHasNotExpired()
     {
-        $expiredModel = self::MODEL::factory()
-            ->expired()
-            ->create();
+        $modelClass = $this->getModelClass();
 
-        $modelWithNullExpiredAt = self::MODEL::factory()
-            ->expired()
-            ->create([
-                'expired_at' => null,
-            ]);
+        $expiredModel = $modelClass::factory()->expired()->create();
 
-        $expiredModelWithFutureGraceDays = self::MODEL::factory()
-            ->expired()
-            ->create([
-                'grace_days_ended_at' => now()->addDay(),
-            ]);
+        $modelWithNullExpiredAt = $modelClass::factory()->expired()->create([
+            'expired_at' => null,
+        ]);
 
-        $expiredModelWithPastGraceDays = self::MODEL::factory()
-            ->expired()
-            ->create([
-                'grace_days_ended_at' => now()->subDay(),
-            ]);
+        $expiredModelWithFutureGraceDays = $modelClass::factory()->expired()->create([
+            'grace_days_ended_at' => now()->addDay(),
+        ]);
 
-        $notExpiredModel = self::MODEL::factory()
-            ->notExpired()
-            ->create();
+        $expiredModelWithPastGraceDays = $modelClass::factory()->expired()->create([
+            'grace_days_ended_at' => now()->subDay(),
+        ]);
+
+        $notExpiredModel = $modelClass::factory()->notExpired()->create();
 
         $this->assertFalse($expiredModel->hasNotExpired());
         $this->assertTrue($expiredModelWithFutureGraceDays->hasNotExpired());

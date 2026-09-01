@@ -2,21 +2,34 @@
 
 namespace Tests\Feature\Models\Concerns;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use LucasDotVin\Soulbscription\Models\Subscription;
 use Tests\TestCase;
+use InvalidArgumentException;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class StartsTest extends TestCase
 {
-    use RefreshDatabase;
     use WithFaker;
+    use RefreshDatabase;
 
-    public const MODEL = Subscription::class;
+    public const MODEL = 'soulbscription.models.subscription';
+
+    protected function getModelClass()
+    {
+        $modelClass = config(self::MODEL);
+
+        throw_if(!is_a($modelClass, Model::class, true), new InvalidArgumentException(
+            "Configured subscription model must be a subclass of " . Model::class
+        ));
+
+        return $modelClass;
+    }
 
     public function testModelReturnsStartedWhenStartedAtIsOnThePast()
     {
-        $model = self::MODEL::factory()->make([
+        $modelClass = $this->getModelClass();
+        $model = $modelClass::factory()->make([
             'started_at' => now()->subDay(),
         ]);
 
@@ -26,7 +39,8 @@ class StartsTest extends TestCase
 
     public function testModelReturnsNotStartedWhenStartedAtIsOnTheFuture()
     {
-        $model = self::MODEL::factory()->make([
+        $modelClass = $this->getModelClass();
+        $model = $modelClass::factory()->make([
             'started_at' => now()->addDay(),
         ]);
 
@@ -36,7 +50,8 @@ class StartsTest extends TestCase
 
     public function testModelReturnsNotStartedWhenStartedAtIsNull()
     {
-        $model = self::MODEL::factory()->make();
+        $modelClass = $this->getModelClass();
+        $model = $modelClass::factory()->make();
         $model->started_at = null;
 
         $this->assertFalse($model->started());

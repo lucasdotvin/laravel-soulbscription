@@ -2,13 +2,11 @@
 
 namespace Tests\Feature\Models;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Carbon;
-use LucasDotVin\Soulbscription\Enums\PeriodicityType;
-use LucasDotVin\Soulbscription\Models\Plan;
-use LucasDotVin\Soulbscription\Models\Subscription;
 use Tests\TestCase;
+use Illuminate\Support\Carbon;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use LucasDotVin\Soulbscription\Enums\PeriodicityType;
 
 class PlanTest extends TestCase
 {
@@ -21,7 +19,7 @@ class PlanTest extends TestCase
 
         $days = $this->faker->randomDigitNotNull();
         $graceDays = $this->faker->randomDigitNotNull();
-        $plan = Plan::factory()->create([
+        $plan = config('soulbscription.models.plan')::factory()->create([
             'grace_days' => $graceDays,
             'periodicity_type' => PeriodicityType::Day,
             'periodicity' => $days,
@@ -35,10 +33,10 @@ class PlanTest extends TestCase
 
     public function testModelCanRetrieveSubscriptions()
     {
-        $plan = Plan::factory()
+        $plan = config('soulbscription.models.plan')::factory()
             ->create();
 
-        $subscriptions = Subscription::factory()
+        $subscriptions = config('soulbscription.models.subscription')::factory()
             ->for($plan)
             ->count($subscriptionsCount = $this->faker->randomDigitNotNull())
             ->started()
@@ -54,7 +52,7 @@ class PlanTest extends TestCase
 
     public function testPlanCanBeCreatedWithoutPeriodicity()
     {
-        $plan = Plan::factory()
+        $plan = config('soulbscription.models.plan')::factory()
             ->create([
                 'periodicity' => null,
                 'periodicity_type' => null,

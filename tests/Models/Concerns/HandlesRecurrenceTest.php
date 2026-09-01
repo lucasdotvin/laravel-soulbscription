@@ -2,26 +2,39 @@
 
 namespace Tests\Feature\Models\Concerns;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Carbon;
-use LucasDotVin\Soulbscription\Enums\PeriodicityType;
-use LucasDotVin\Soulbscription\Models\Plan;
 use Tests\TestCase;
+use InvalidArgumentException;
+use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use LucasDotVin\Soulbscription\Enums\PeriodicityType;
 
 class HandlesRecurrenceTest extends TestCase
 {
-    use RefreshDatabase;
     use WithFaker;
+    use RefreshDatabase;
 
-    public const MODEL = Plan::class;
+    public const MODEL = 'soulbscription.models.plan';
+
+    protected function getModelClass()
+    {
+        $modelClass = config(self::MODEL);
+
+        throw_if(!is_a($modelClass, Model::class, true), new InvalidArgumentException(
+            "Configured plan model must be a subclass of " . Model::class
+        ));
+
+        return $modelClass;
+    }
 
     public function testModelCalculateYearlyExpiration()
     {
         Carbon::setTestNow(now());
 
         $years = $this->faker->randomDigitNotNull();
-        $plan = self::MODEL::factory()->create([
+        $modelClass = $this->getModelClass();
+        $plan = $modelClass::factory()->create([
             'periodicity_type' => PeriodicityType::Year,
             'periodicity' => $years,
         ]);
@@ -34,7 +47,8 @@ class HandlesRecurrenceTest extends TestCase
         Carbon::setTestNow(now());
 
         $months = $this->faker->randomDigitNotNull();
-        $plan = self::MODEL::factory()->create([
+        $modelClass = $this->getModelClass();
+        $plan = $modelClass::factory()->create([
             'periodicity_type' => PeriodicityType::Month,
             'periodicity' => $months,
         ]);
@@ -47,7 +61,8 @@ class HandlesRecurrenceTest extends TestCase
         Carbon::setTestNow(now());
 
         $weeks = $this->faker->randomDigitNotNull();
-        $plan = self::MODEL::factory()->create([
+        $modelClass = $this->getModelClass();
+        $plan = $modelClass::factory()->create([
             'periodicity_type' => PeriodicityType::Week,
             'periodicity' => $weeks,
         ]);
@@ -60,7 +75,8 @@ class HandlesRecurrenceTest extends TestCase
         Carbon::setTestNow(now());
 
         $days = $this->faker->randomDigitNotNull();
-        $plan = self::MODEL::factory()->create([
+        $modelClass = $this->getModelClass();
+        $plan = $modelClass::factory()->create([
             'periodicity_type' => PeriodicityType::Day,
             'periodicity' => $days,
         ]);
@@ -73,7 +89,8 @@ class HandlesRecurrenceTest extends TestCase
         Carbon::setTestNow(now());
 
         $weeks = $this->faker->randomDigitNotNull();
-        $plan = self::MODEL::factory()->create([
+        $modelClass = $this->getModelClass();
+        $plan = $modelClass::factory()->create([
             'periodicity_type' => PeriodicityType::Week,
             'periodicity' => $weeks,
         ]);
@@ -88,7 +105,8 @@ class HandlesRecurrenceTest extends TestCase
         Carbon::setTestNow(today());
 
         $weeks = $this->faker->randomDigitNotNull();
-        $plan = self::MODEL::factory()->create([
+        $modelClass = $this->getModelClass();
+        $plan = $modelClass::factory()->create([
             'periodicity_type' => PeriodicityType::Week,
             'periodicity' => $weeks,
         ]);
@@ -97,15 +115,16 @@ class HandlesRecurrenceTest extends TestCase
 
         $this->assertEquals(
             $start->copy()->addWeeks($weeks),
-            $plan->calculateNextRecurrenceEnd($start->toDateTimeString()),
+            $plan->calculateNextRecurrenceEnd($start->toDateTimeString())
         );
     }
 
     public function testModelCalculateExpirationWithRenewalAfterOneMonth()
     {
+        $modelClass = $this->getModelClass();
         Carbon::setTestNow('2021-02-18');
 
-        $plan = self::MODEL::factory()->create([
+        $plan = $modelClass::factory()->create([
             'periodicity_type' => PeriodicityType::Month,
             'periodicity' => 1,
         ]);
@@ -117,9 +136,10 @@ class HandlesRecurrenceTest extends TestCase
 
     public function testModelCalculateExpirationWithTwoRenewalsInOneMonth()
     {
+        $modelClass = $this->getModelClass();
         Carbon::setTestNow('2021-02-19');
 
-        $plan = self::MODEL::factory()->create([
+        $plan = $modelClass::factory()->create([
             'periodicity_type' => PeriodicityType::Month,
             'periodicity' => 1,
         ]);
@@ -131,9 +151,10 @@ class HandlesRecurrenceTest extends TestCase
 
     public function testModelCalculateExpirationWithThreeRenewalsInOneMonth()
     {
+        $modelClass = $this->getModelClass();
         Carbon::setTestNow('2021-02-20');
 
-        $plan = self::MODEL::factory()->create([
+        $plan = $modelClass::factory()->create([
             'periodicity_type' => PeriodicityType::Month,
             'periodicity' => 1,
         ]);
@@ -145,9 +166,10 @@ class HandlesRecurrenceTest extends TestCase
 
     public function testModelCalculateExpirationWithRenewalAfterExpiration()
     {
+        $modelClass = $this->getModelClass();
         Carbon::setTestNow('2021-02-21');
 
-        $plan = self::MODEL::factory()->create([
+        $plan = $modelClass::factory()->create([
             'periodicity_type' => PeriodicityType::Month,
             'periodicity' => 1,
         ]);
