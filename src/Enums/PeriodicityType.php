@@ -26,7 +26,11 @@ class PeriodicityType
         $unitInPlural = Str::plural($unit);
 
         $differenceMethodName = 'diffIn' . $unitInPlural;
-        $difference = abs($from->{$differenceMethodName}($to));
+        // Carbon 3: diffIn*() return float, while the signature promises int — PHP 8.5
+        // deprecates the implicit conversion whenever the difference is fractional.
+        // Whole periods elapsed = the absolute difference truncated, exactly what
+        // Carbon 2 returned here.
+        $difference = (int) floor(abs($from->{$differenceMethodName}($to)));
 
         return $difference * $delta;
     }
