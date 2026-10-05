@@ -6,10 +6,13 @@ use Illuminate\Support\ServiceProvider;
 
 class SoulbscriptionServiceProvider extends ServiceProvider
 {
-    public function boot()
+    public function register()
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/soulbscription.php', 'soulbscription');
+    }
 
+    public function boot()
+    {
         if (! config('soulbscription.database.cancel_migrations_autoloading')) {
             $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         }
@@ -41,5 +44,9 @@ class SoulbscriptionServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../database/migrations/upgrades/4.0-4.1' => database_path('migrations'),
         ], 'soulbscription-migrations-upgrades-4.0-4.1');
+
+        $this->publishes([
+            __DIR__ . '/../database/migrations/upgrades/4.3-4.4' => database_path('migrations'),
+        ], 'soulbscription-migrations-upgrades-4.3-4.4');
     }
 }

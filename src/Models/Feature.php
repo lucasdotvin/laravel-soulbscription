@@ -13,6 +13,11 @@ class Feature extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected static function newFactory()
+    {
+        return \LucasDotVin\Soulbscription\Database\Factories\FeatureFactory::new();
+    }
+
     protected $fillable = [
         'consumable',
         'name',

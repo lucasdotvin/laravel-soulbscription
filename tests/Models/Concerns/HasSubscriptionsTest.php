@@ -1111,4 +1111,52 @@ class HasSubscriptionsTest extends TestCase
 
         $this->assertEquals(0, $totalCharges);
     }
+
+    public function testScheduledSwitchKeepsTheProvidedExpiration()
+    {
+        Carbon::setTestNow(now());
+
+        $oldPlan = Plan::factory()->createOne();
+        $newPlan = Plan::factory()->createOne();
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($oldPlan);
+
+        $expiration = now()->addYear();
+        $newSubscription = $subscriber->switchTo($newPlan, $expiration, immediately: false);
+
+        $this->assertEquals(
+            $expiration->toDateTimeString(),
+            $newSubscription->expired_at->toDateTimeString(),
+        );
+    }
+
+    public function testItDoesNotLoadRenewalsFromAnotherSubscriberType()
+    {
+        $plan = Plan::factory()->createOne();
+        $subscriber = User::factory()->createOne();
+        $subscription = $subscriber->subscribeTo($plan);
+        $subscription->renew();
+
+        $other = Subscription::factory()->for($plan)->create([
+            'subscriber_id' => $subscriber->id,
+            'subscriber_type' => 'OtherSubscriber',
+            'started_at' => now()->subDay(),
+            'expired_at' => now()->addMonth(),
+        ]);
+        $other->renewals()->create([
+            'renewal' => true,
+            'overdue' => false,
+        ]);
+
+        $this->assertCount(1, $subscriber->renewals);
+        $this->assertTrue($subscriber->renewals->first()->subscription->is($subscription));
+    }
+
+    public function testBalanceWithoutASubscriptionDoesNotCrash()
+    {
+        $feature = Feature::factory()->createOne();
+        $subscriber = User::factory()->createOne();
+
+        $this->assertSame(0, $subscriber->balance($feature->name));
+    }
 }

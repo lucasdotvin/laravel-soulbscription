@@ -145,4 +145,16 @@ class SuppressingScopeTest extends TestCase
             $returnedSubscriptions->pluck('id')->toArray(),
         );
     }
+
+    public function testFutureSuppressionDoesNotHideTheSubscription()
+    {
+        $subscription = self::MODEL::factory()->create([
+            'started_at' => now()->subDay(),
+            'expired_at' => now()->addDay(),
+            'suppressed_at' => now()->addDay(),
+        ]);
+
+        $this->assertTrue(self::MODEL::all()->contains($subscription));
+        $this->assertFalse(self::MODEL::onlySuppressed()->get()->contains($subscription));
+    }
 }

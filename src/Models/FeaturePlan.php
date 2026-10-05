@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class FeaturePlan extends Pivot
 {
+    public $incrementing = true;
+
     protected $fillable = [
         'charges',
     ];

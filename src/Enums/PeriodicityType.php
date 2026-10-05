@@ -26,7 +26,7 @@ class PeriodicityType
         $unitInPlural = Str::plural($unit);
 
         $differenceMethodName = 'diffIn' . $unitInPlural;
-        $difference = abs($from->{$differenceMethodName}($to));
+        $difference = (int) abs($from->{$differenceMethodName}($to));
 
         return $difference * $delta;
     }

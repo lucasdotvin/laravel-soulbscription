@@ -14,6 +14,11 @@ class Plan extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected static function newFactory()
+    {
+        return \LucasDotVin\Soulbscription\Database\Factories\PlanFactory::new();
+    }
+
     protected $fillable = [
         'grace_days',
         'name',

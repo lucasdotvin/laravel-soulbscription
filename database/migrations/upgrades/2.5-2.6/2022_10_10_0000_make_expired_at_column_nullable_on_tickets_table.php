@@ -12,7 +12,7 @@ return new class() extends Migration {
      */
     public function up()
     {
-        Schema::table('tickets', function (Blueprint $table) {
+        Schema::table('feature_tickets', function (Blueprint $table) {
             $table->timestamp('expired_at')->nullable()->change();
         });
     }

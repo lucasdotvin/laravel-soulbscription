@@ -19,7 +19,7 @@ return new class() extends Migration {
             $table->timestamp('canceled_at')->nullable();
             $table->timestamp('expired_at')->nullable();
             $table->timestamp('grace_days_ended_at')->nullable();
-            $table->date('started_at');
+            $table->timestamp('started_at');
             $table->timestamp('suppressed_at')->nullable();
             $table->boolean('was_switched')->default(false);
             $table->softDeletes();

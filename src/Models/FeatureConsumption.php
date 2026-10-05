@@ -11,6 +11,11 @@ class FeatureConsumption extends Model
     use Expires;
     use HasFactory;
 
+    protected static function newFactory()
+    {
+        return \LucasDotVin\Soulbscription\Database\Factories\FeatureConsumptionFactory::new();
+    }
+
     protected $fillable = [
         'consumption',
         'expired_at',

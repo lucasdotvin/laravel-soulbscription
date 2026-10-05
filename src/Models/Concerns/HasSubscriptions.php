@@ -38,11 +38,13 @@ trait HasSubscriptions
 
     public function renewals()
     {
+        $subscription = app(config('soulbscription.models.subscription'));
+
         return $this->hasManyThrough(
             config('soulbscription.models.subscription_renewal'),
-            config('soulbscription.models.subscription'),
+            $subscription::class,
             'subscriber_id',
-        );
+        )->where($subscription->getTable() . '.subscriber_type', $this->getMorphClass());
     }
 
     public function subscription()
@@ -74,6 +76,10 @@ trait HasSubscriptions
         ));
 
         $feature = $this->getFeature($featureName);
+
+        if ($feature->quota && is_null($consumption)) {
+            throw new InvalidArgumentException('A quota feature consumption requires an amount.');
+        }
 
         $featureConsumption = $feature->quota
             ? $this->consumeQuotaFeature($feature, $consumption)
@@ -177,9 +183,9 @@ trait HasSubscriptions
             ->save();
 
         $startDate = $this->subscription->expired_at;
-        $newSubscription = $this->subscribeTo($plan, startDate: $startDate);
 
-        return $newSubscription;
+        return $this->subscribeTo($plan, $expiration, $startDate);
+
     }
 
     /**
@@ -193,7 +199,8 @@ trait HasSubscriptions
             new LogicException('The tickets are not enabled in the configs.'),
         );
 
-        $feature = Feature::whereName($featureName)->firstOrFail();
+        $featureModel = config('soulbscription.models.feature');
+        $feature = $featureModel::whereName($featureName)->firstOrFail();
 
         $featureTicket = $this->featureTickets()
             ->make([
@@ -288,7 +295,7 @@ trait HasSubscriptions
     protected function consumeNotQuotaFeature(Feature $feature, ?float $consumption = null)
     {
         $consumptionExpiration = $feature->consumable
-            ? $feature->calculateNextRecurrenceEnd($this->subscription->started_at)
+            ? $feature->calculateNextRecurrenceEnd($this->subscription?->started_at)
             : null;
 
         $featureConsumption = $this->featureConsumptions()
@@ -372,7 +379,7 @@ trait HasSubscriptions
 
         $this->loadMissing('subscription.plan.features');
 
-        return $this->loadedSubscriptionFeatures = $this->subscription->plan->features ?? Collection::empty();
+        return $this->loadedSubscriptionFeatures = $this->subscription?->plan?->features ?? Collection::empty();
     }
 
     protected function loadTicketFeatures(): Collection
@@ -385,7 +392,9 @@ trait HasSubscriptions
             return $this->loadedTicketFeatures;
         }
 
-        return $this->loadedTicketFeatures = Feature::with([
+        $featureModel = config('soulbscription.models.feature');
+
+        return $this->loadedTicketFeatures = $featureModel::with([
                 'tickets' => fn (HasMany $query) => $query->withoutExpired()->whereMorphedTo('subscriber', $this),
             ])
             ->whereHas(

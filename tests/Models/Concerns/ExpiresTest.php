@@ -123,4 +123,14 @@ class ExpiresTest extends TestCase
             $returnedSubscriptions->pluck('id')->toArray(),
         );
     }
+
+    public function testNullExpirationIsNotExpired()
+    {
+        $model = self::MODEL::factory()->create([
+            'expired_at' => null,
+        ]);
+
+        $this->assertFalse($model->expired());
+        $this->assertTrue($model->notExpired());
+    }
 }

@@ -16,7 +16,11 @@ class SuppressingScope implements Scope
 
     public function apply(Builder $builder, Model $model)
     {
-        $builder->whereNull('suppressed_at');
+        $builder->where(
+            fn (Builder $query) => $query
+                ->whereNull('suppressed_at')
+                ->orWhere('suppressed_at', '>', now())
+        );
     }
 
     public function extend(Builder $builder)
@@ -40,7 +44,11 @@ class SuppressingScope implements Scope
     protected function addWithoutSuppressed(Builder $builder)
     {
         $builder->macro('withoutSuppressed', function (Builder $builder) {
-            $builder->withoutGlobalScope($this)->whereNull('suppressed_at');
+            $builder->withoutGlobalScope($this)->where(
+                fn (Builder $query) => $query
+                    ->whereNull('suppressed_at')
+                    ->orWhere('suppressed_at', '>', now())
+            );
 
             return $builder;
         });
@@ -49,7 +57,9 @@ class SuppressingScope implements Scope
     protected function addOnlySuppressed(Builder $builder)
     {
         $builder->macro('onlySuppressed', function (Builder $builder) {
-            $builder->withoutGlobalScope($this)->whereNotNull('suppressed_at');
+            $builder->withoutGlobalScope($this)
+                ->whereNotNull('suppressed_at')
+                ->where('suppressed_at', '<=', now());
 
             return $builder;
         });

@@ -20,6 +20,10 @@ trait Expires
 
     public function expired()
     {
+        if (is_null($this->expired_at)) {
+            return false;
+        }
+
         return $this->expired_at->isPast();
     }
 
