@@ -156,4 +156,31 @@ class HandlesRecurrenceTest extends TestCase
 
         $this->assertEquals('2021-03-20', $plan->calculateNextRecurrenceEnd($start)->toDateString());
     }
+
+    public function testModelCalculateExpirationWithAFractionalStart()
+    {
+        Carbon::setTestNow(now());
+
+        $plan = self::MODEL::factory()->create([
+            'periodicity_type' => PeriodicityType::Month,
+            'periodicity' => 1,
+        ]);
+
+        // Two and a half periods ago: Carbon 3 reports the difference as a float,
+        // and on PHP 8.1+ its implicit conversion to int is a deprecation.
+        $start = now()->subMonths(2)->subDays(15);
+
+        set_error_handler(function (int $errno, string $errstr): never {
+            throw new \ErrorException($errstr, 0, $errno);
+        }, E_DEPRECATED | E_USER_DEPRECATED);
+
+        try {
+            $end = $plan->calculateNextRecurrenceEnd($start);
+        } finally {
+            restore_error_handler();
+        }
+
+        // Two whole periods have elapsed, so the next end is the start plus three.
+        $this->assertEquals($start->copy()->addMonths(3), $end);
+    }
 }
