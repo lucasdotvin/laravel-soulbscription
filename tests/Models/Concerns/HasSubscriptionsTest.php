@@ -4,10 +4,12 @@ namespace Tests\Feature\Models\Concerns;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Schema;
 use InvalidArgumentException;
 use LogicException;
 use LucasDotVin\Soulbscription\Events\FeatureConsumed;
@@ -23,6 +25,7 @@ use LucasDotVin\Soulbscription\Models\SubscriptionRenewal;
 use OutOfBoundsException;
 use OverflowException;
 use ReflectionClass;
+use Tests\Mocks\Models\Team;
 use Tests\Mocks\Models\User;
 use Tests\TestCase;
 
@@ -354,6 +357,34 @@ class HasSubscriptionsTest extends TestCase
         $this->assertEqualsCanonicalizing(
             $renewals->pluck('id'),
             $subscriber->renewals->pluck('id'),
+        );
+    }
+
+    public function testRenewalsAreScopedToTheSubscriberType()
+    {
+        Schema::create('teams', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+        });
+
+        $user = User::factory()->createOne();
+        $team = Team::create();
+
+        $this->assertSame($user->id, $team->id);
+
+        $userRenewal = SubscriptionRenewal::factory()
+            ->for(Subscription::factory()->for($user, 'subscriber'))
+            ->createOne();
+
+        $teamRenewal = SubscriptionRenewal::factory()
+            ->for(Subscription::factory()->for($team, 'subscriber'))
+            ->createOne();
+
+        $this->assertEquals([$userRenewal->id], $user->renewals->pluck('id')->all());
+        $this->assertEquals([$teamRenewal->id], $team->renewals->pluck('id')->all());
+        $this->assertEquals(
+            [$userRenewal->id],
+            User::with('renewals')->find($user->id)->renewals->pluck('id')->all(),
         );
     }
 

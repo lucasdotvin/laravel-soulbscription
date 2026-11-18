@@ -11,17 +11,6 @@ use LucasDotVin\Soulbscription\Models\Feature;
  */
 class CustomFeature extends Feature
 {
-    protected $table = 'features';
-
-    /**
-     * Keep the package's column names, as an overriding model is expected to
-     * reuse the published migrations.
-     */
-    public function getForeignKey()
-    {
-        return 'feature_id';
-    }
-
     /**
      * Create a new factory instance for the model.
      *

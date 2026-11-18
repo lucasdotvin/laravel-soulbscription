@@ -66,4 +66,21 @@ class CustomModelNamesTest extends TestCase
         $this->assertCount(1, $feature->tickets);
         $this->assertTrue($feature->tickets->first()->feature->is($feature));
     }
+
+    public function testFeaturesCanBeConsumed()
+    {
+        config()->set('soulbscription.models.feature', TenantFeature::class);
+        config()->set('soulbscription.models.plan', TenantPlan::class);
+
+        $feature = TenantFeature::create(FeatureFactory::new()->consumable()->raw());
+        $plan = TenantPlan::create(PlanFactory::new()->raw());
+        $plan->features()->attach($feature, ['charges' => 5]);
+
+        $subscriber = User::factory()->createOne();
+        $subscriber->subscribeTo($plan);
+        $subscriber->consume($feature->name, 2);
+
+        $this->assertEquals(2, $subscriber->fresh()->getCurrentConsumption($feature->name));
+        $this->assertEquals(3, $subscriber->fresh()->getRemainingCharges($feature->name));
+    }
 }
