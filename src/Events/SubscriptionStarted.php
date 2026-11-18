@@ -2,27 +2,20 @@
 
 namespace LucasDotVin\Soulbscription\Events;
 
-use Illuminate\Queue\SerializesModels;
-use InvalidArgumentException;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+use LucasDotVin\Soulbscription\Models\Subscription;
 
 class SubscriptionStarted
 {
     use Dispatchable;
-    use SerializesModels;
     use InteractsWithSockets;
+    use SerializesModels;
 
-    public mixed $subscription;
-
-    public function __construct(mixed $subscription)
-    {
-        $subscriptionClass = config('soulbscription.models.subscription');
-
-        throw_if(!($subscription instanceof $subscriptionClass), new InvalidArgumentException(
-            "Subscription must be an instance of $subscriptionClass."
-        ));
-
-        $this->subscription = $subscription;
+    public function __construct(
+        public Subscription $subscription,
+    ) {
+        //
     }
 }

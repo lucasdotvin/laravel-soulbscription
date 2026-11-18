@@ -16,7 +16,7 @@ return new class () extends Migration {
             $table->id();
             $table->boolean('overdue');
             $table->boolean('renewal');
-            $table->foreignIdFor(config('soulbscription.models.subscription'));
+            $table->foreignIdFor(\LucasDotVin\Soulbscription\Models\Subscription::class);
             $table->timestamps();
         });
     }

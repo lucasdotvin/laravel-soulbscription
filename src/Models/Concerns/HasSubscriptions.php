@@ -2,17 +2,21 @@
 
 namespace LucasDotVin\Soulbscription\Models\Concerns;
 
-use LogicException;
-use OverflowException;
-use OutOfBoundsException;
-use InvalidArgumentException;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use LucasDotVin\Soulbscription\Events\FeatureConsumed;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use InvalidArgumentException;
+use LogicException;
+use LucasDotVin\Soulbscription\Events\FeatureConsumed;
 use LucasDotVin\Soulbscription\Events\FeatureTicketCreated;
+use LucasDotVin\Soulbscription\Models\Feature;
+use LucasDotVin\Soulbscription\Models\FeatureTicket;
+use LucasDotVin\Soulbscription\Models\Plan;
+use LucasDotVin\Soulbscription\Models\Subscription;
+use OutOfBoundsException;
+use OverflowException;
 
 trait HasSubscriptions
 {
@@ -113,14 +117,8 @@ trait HasSubscriptions
         event(new FeatureConsumed($this, $feature, $featureConsumption));
     }
 
-    public function subscribeTo(mixed $plan, $expiration = null, $startDate = null): mixed
+    public function subscribeTo(Plan $plan, $expiration = null, $startDate = null): Subscription
     {
-        $planClass = config('soulbscription.models.plan');
-
-        throw_if(!($plan instanceof $planClass), new InvalidArgumentException(
-            "Plan must be an instance of $planClass."
-        ));
-
         if ($plan->periodicity) {
             $expiration = $expiration ?? $plan->calculateNextRecurrenceEnd($startDate);
         } else {
@@ -141,42 +139,30 @@ trait HasSubscriptions
             ->start($startDate);
     }
 
-    public function hasSubscriptionTo(mixed $plan): bool
+    public function hasSubscriptionTo(Plan $plan): bool
     {
-        $planClass = config('soulbscription.models.plan');
-
-        throw_if(!($plan instanceof $planClass), new InvalidArgumentException(
-            "Plan must be an instance of $planClass."
-        ));
-
         return $this->subscription()
             ->where('plan_id', $plan->id)
             ->exists();
     }
 
-    public function isSubscribedTo(mixed $plan): bool
+    public function isSubscribedTo(Plan $plan): bool
     {
         return $this->hasSubscriptionTo($plan);
     }
 
-    public function missingSubscriptionTo(mixed $plan): bool
+    public function missingSubscriptionTo(Plan $plan): bool
     {
         return ! $this->hasSubscriptionTo($plan);
     }
 
-    public function isNotSubscribedTo(mixed $plan): bool
+    public function isNotSubscribedTo(Plan $plan): bool
     {
         return ! $this->isSubscribedTo($plan);
     }
 
-    public function switchTo(mixed $plan, $expiration = null, $immediately = true): mixed
+    public function switchTo(Plan $plan, $expiration = null, $immediately = true): Subscription
     {
-        $planClass = config('soulbscription.models.plan');
-
-        throw_if(!($plan instanceof $planClass), new InvalidArgumentException(
-            "Plan must be an instance of $planClass."
-        ));
-
         if ($immediately) {
             $this->subscription
                 ->markAsSwitched()
@@ -191,14 +177,16 @@ trait HasSubscriptions
             ->save();
 
         $startDate = $this->subscription->expired_at;
-        return $this->subscribeTo($plan, startDate: $startDate);
+        $newSubscription = $this->subscribeTo($plan, startDate: $startDate);
+
+        return $newSubscription;
     }
 
     /**
      * @throws LogicException
      * @throws ModelNotFoundException
      */
-    public function giveTicketFor($featureName, $expiration = null, ?float $charges = null): mixed
+    public function giveTicketFor($featureName, $expiration = null, ?float $charges = null): FeatureTicket
     {
         throw_unless(
             config('soulbscription.feature_tickets'),
@@ -297,14 +285,8 @@ trait HasSubscriptions
         return $subscriptionCharges + $ticketCharges;
     }
 
-    protected function consumeNotQuotaFeature(mixed $feature, ?float $consumption = null)
+    protected function consumeNotQuotaFeature(Feature $feature, ?float $consumption = null)
     {
-        $featureClass = config('soulbscription.models.feature');
-
-        throw_if(!($feature instanceof $featureClass), new InvalidArgumentException(
-            "Feature must be an instance of $featureClass."
-        ));
-
         $consumptionExpiration = $feature->consumable
             ? $feature->calculateNextRecurrenceEnd($this->subscription->started_at)
             : null;
@@ -322,14 +304,8 @@ trait HasSubscriptions
         return $featureConsumption;
     }
 
-    protected function consumeQuotaFeature(mixed $feature, float $consumption)
+    protected function consumeQuotaFeature(Feature $feature, float $consumption)
     {
-        $featureClass = config('soulbscription.models.feature');
-
-        throw_if(!($feature instanceof $featureClass), new InvalidArgumentException(
-            "Feature must be an instance of $featureClass."
-        ));
-
         $featureConsumption = $this->featureConsumptions()
             ->whereFeatureId($feature->id)
             ->firstOrNew();
@@ -369,13 +345,11 @@ trait HasSubscriptions
             ->sum('charges');
     }
 
-    public function getFeature(string $featureName): mixed
+    public function getFeature(string $featureName): ?Feature
     {
-        $featureClass = config('soulbscription.models.feature');
-
         $feature = $this->features->firstWhere('name', $featureName);
 
-        return $feature instanceof $featureClass ? $feature : null;
+        return $feature;
     }
 
     public function getFeaturesAttribute(): Collection
@@ -412,8 +386,8 @@ trait HasSubscriptions
         }
 
         return $this->loadedTicketFeatures = config('soulbscription.models.feature')::with([
-            'tickets' => fn (HasMany $query) => $query->withoutExpired()->whereMorphedTo('subscriber', $this),
-        ])
+                'tickets' => fn (HasMany $query) => $query->withoutExpired()->whereMorphedTo('subscriber', $this),
+            ])
             ->whereHas(
                 'tickets',
                 fn (Builder $query) => $query->withoutExpired()->whereMorphedTo('subscriber', $this),

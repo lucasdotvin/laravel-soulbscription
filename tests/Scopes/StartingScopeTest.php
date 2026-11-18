@@ -2,47 +2,33 @@
 
 namespace Tests\Feature\Models;
 
-use Tests\TestCase;
-use InvalidArgumentException;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use LucasDotVin\Soulbscription\Models\Subscription;
+use Tests\TestCase;
 
 class StartingScopeTest extends TestCase
 {
-    use WithFaker;
     use RefreshDatabase;
+    use WithFaker;
 
-    public const MODEL = 'soulbscription.models.subscription';
-
-    protected function getModelClass()
-    {
-        $modelClass = config(self::MODEL);
-
-        throw_if(!is_a($modelClass, Model::class, true), new InvalidArgumentException(
-            "Configured subscription model must be a subclass of " . Model::class
-        ));
-
-        return $modelClass;
-    }
+    public const MODEL = Subscription::class;
 
     public function testNotStartedModelsAreNotReturnedByDefault()
     {
-        $modelClass = $this->getModelClass();
-        $startedModelsCount = $this->faker->randomDigitNotNull();
-
-        $startedModels = $modelClass::factory()->count($startedModelsCount)->create([
+        $startedModelsCount = $this->faker()->randomDigitNotNull();
+        $startedModels = self::MODEL::factory()->count($startedModelsCount)->create([
             'expired_at' => now()->addDay(),
             'started_at' => now()->subDay(),
         ]);
 
-        $notStartedModelsCount = $this->faker->randomDigitNotNull();
-        $modelClass::factory()->count($notStartedModelsCount)->create([
+        $notStartedModelsCount = $this->faker()->randomDigitNotNull();
+        self::MODEL::factory()->count($notStartedModelsCount)->create([
             'expired_at' => now()->addDay(),
             'started_at' => now()->addDay(),
         ]);
 
-        $returnedSubscriptions = $modelClass::all();
+        $returnedSubscriptions = self::MODEL::all();
 
         $this->assertEqualsCanonicalizing(
             $startedModels->pluck('id')->toArray(),
@@ -52,21 +38,19 @@ class StartingScopeTest extends TestCase
 
     public function testNotStartedModelsAreNotReturnedWhenCallingWithoutNotStarted()
     {
-        $modelClass = $this->getModelClass();
-        $startedModelsCount = $this->faker->randomDigitNotNull();
-
-        $startedModels = $modelClass::factory()->count($startedModelsCount)->create([
+        $startedModelsCount = $this->faker()->randomDigitNotNull();
+        $startedModels = self::MODEL::factory()->count($startedModelsCount)->create([
             'expired_at' => now()->addDay(),
             'started_at' => now()->subDay(),
         ]);
 
-        $notStartedModelsCount = $this->faker->randomDigitNotNull();
-        $modelClass::factory()->count($notStartedModelsCount)->create([
+        $notStartedModelsCount = $this->faker()->randomDigitNotNull();
+        self::MODEL::factory()->count($notStartedModelsCount)->create([
             'expired_at' => now()->addDay(),
             'started_at' => now()->addDay(),
         ]);
 
-        $returnedSubscriptions = $modelClass::withoutNotStarted()->get();
+        $returnedSubscriptions = self::MODEL::withoutNotStarted()->get();
 
         $this->assertEqualsCanonicalizing(
             $startedModels->pluck('id')->toArray(),
@@ -76,22 +60,21 @@ class StartingScopeTest extends TestCase
 
     public function testStartedModelsAreReturnedWhenCallingMethodWithNotStarted()
     {
-        $modelClass = $this->getModelClass();
-        $startedModelsCount = $this->faker->randomDigitNotNull();
-
-        $startedModels = $modelClass::factory()->count($startedModelsCount)->create([
+        $startedModelsCount = $this->faker()->randomDigitNotNull();
+        $startedModels = self::MODEL::factory()->count($startedModelsCount)->create([
             'expired_at' => now()->addDay(),
             'started_at' => now()->subDay(),
         ]);
 
-        $notStartedModelsCount = $this->faker->randomDigitNotNull();
-        $notStartedModels = $modelClass::factory()->count($notStartedModelsCount)->create([
+        $notStartedModelsCount = $this->faker()->randomDigitNotNull();
+        $notStartedModels = self::MODEL::factory()->count($notStartedModelsCount)->create([
             'expired_at' => now()->addDay(),
             'started_at' => now()->addDay(),
         ]);
 
         $expectedSubscriptions = $startedModels->concat($notStartedModels);
-        $returnedSubscriptions = $modelClass::withNotStarted()->get();
+
+        $returnedSubscriptions = self::MODEL::withNotStarted()->get();
 
         $this->assertEqualsCanonicalizing(
             $expectedSubscriptions->pluck('id')->toArray(),
@@ -101,21 +84,19 @@ class StartingScopeTest extends TestCase
 
     public function testNotStartedModelsAreReturnedWhenCallingMethodWithNotStartedAndPassingAFalse()
     {
-        $modelClass = $this->getModelClass();
-        $startedModelsCount = $this->faker->randomDigitNotNull();
-
-        $startedModels = $modelClass::factory()->count($startedModelsCount)->create([
+        $startedModelsCount = $this->faker()->randomDigitNotNull();
+        $startedModels = self::MODEL::factory()->count($startedModelsCount)->create([
             'expired_at' => now()->addDay(),
             'started_at' => now()->subDay(),
         ]);
 
-        $notStartedModelsCount = $this->faker->randomDigitNotNull();
-        $modelClass::factory()->count($notStartedModelsCount)->create([
+        $notStartedModelsCount = $this->faker()->randomDigitNotNull();
+        self::MODEL::factory()->count($notStartedModelsCount)->create([
             'expired_at' => now()->addDay(),
             'started_at' => now()->addDay(),
         ]);
 
-        $returnedSubscriptions = $modelClass::withNotStarted(false)->get();
+        $returnedSubscriptions = self::MODEL::withNotStarted(false)->get();
 
         $this->assertEqualsCanonicalizing(
             $startedModels->pluck('id')->toArray(),
@@ -125,21 +106,19 @@ class StartingScopeTest extends TestCase
 
     public function testOnlyStartedModelsAreReturnedWhenCallingMethodOnlyNotStarted()
     {
-        $modelClass = $this->getModelClass();
-        $startedModelsCount = $this->faker->randomDigitNotNull();
-
-        $modelClass::factory()->count($startedModelsCount)->create([
+        $startedModelsCount = $this->faker()->randomDigitNotNull();
+        self::MODEL::factory()->count($startedModelsCount)->create([
             'expired_at' => now()->addDay(),
             'started_at' => now()->subDay(),
         ]);
 
-        $notStartedModelsCount = $this->faker->randomDigitNotNull();
-        $notStartedModels = $modelClass::factory()->count($notStartedModelsCount)->create([
+        $notStartedModelsCount = $this->faker()->randomDigitNotNull();
+        $notStartedModels = self::MODEL::factory()->count($notStartedModelsCount)->create([
             'expired_at' => now()->addDay(),
             'started_at' => now()->addDay(),
         ]);
 
-        $returnedSubscriptions = $modelClass::onlyNotStarted()->get();
+        $returnedSubscriptions = self::MODEL::onlyNotStarted()->get();
 
         $this->assertEqualsCanonicalizing(
             $notStartedModels->pluck('id')->toArray(),

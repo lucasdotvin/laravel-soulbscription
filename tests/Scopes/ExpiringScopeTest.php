@@ -2,45 +2,31 @@
 
 namespace Tests\Feature\Models;
 
-use Tests\TestCase;
-use InvalidArgumentException;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use LucasDotVin\Soulbscription\Models\FeatureConsumption;
+use Tests\TestCase;
 
 class ExpiringScopeTest extends TestCase
 {
-    use WithFaker;
     use RefreshDatabase;
+    use WithFaker;
 
-    public const MODEL = 'soulbscription.models.feature_consumption';
-
-    protected function getModelClass()
-    {
-        $modelClass = config(self::MODEL);
-
-        throw_if(!is_a($modelClass, Model::class, true), new InvalidArgumentException(
-            "Configured feature consumption model must be a subclass of " . Model::class
-        ));
-
-        return $modelClass;
-    }
+    public const MODEL = FeatureConsumption::class;
 
     public function testExpiredModelsAreNotReturnedByDefault()
     {
-        $modelClass = $this->getModelClass();
-        $expiredModelsCount = $this->faker->randomDigitNotNull();
-
-        $modelClass::factory()->count($expiredModelsCount)->create([
+        $expiredModelsCount = $this->faker()->randomDigitNotNull();
+        self::MODEL::factory()->count($expiredModelsCount)->create([
             'expired_at' => now()->subDay(),
         ]);
 
-        $unexpiredModelsCount = $this->faker->randomDigitNotNull();
-        $unexpiredModels = $modelClass::factory()->count($unexpiredModelsCount)->create([
+        $unexpiredModelsCount = $this->faker()->randomDigitNotNull();
+        $unexpiredModels = self::MODEL::factory()->count($unexpiredModelsCount)->create([
             'expired_at' => now()->addDay(),
         ]);
 
-        $returnedFeatureConsumptions = $modelClass::all();
+        $returnedFeatureConsumptions = self::MODEL::all();
 
         $this->assertEqualsCanonicalizing(
             $unexpiredModels->pluck('id')->toArray(),
@@ -50,20 +36,19 @@ class ExpiringScopeTest extends TestCase
 
     public function testExpiredModelsAreReturnedWhenCallingMethodWithExpired()
     {
-        $modelClass = $this->getModelClass();
-        $expiredModelsCount = $this->faker->randomDigitNotNull();
-
-        $expiredModels = $modelClass::factory()->count($expiredModelsCount)->create([
+        $expiredModelsCount = $this->faker()->randomDigitNotNull();
+        $expiredModels = self::MODEL::factory()->count($expiredModelsCount)->create([
             'expired_at' => now()->subDay(),
         ]);
 
-        $unexpiredModelsCount = $this->faker->randomDigitNotNull();
-        $unexpiredModels = $modelClass::factory()->count($unexpiredModelsCount)->create([
+        $unexpiredModelsCount = $this->faker()->randomDigitNotNull();
+        $unexpiredModels = self::MODEL::factory()->count($unexpiredModelsCount)->create([
             'expired_at' => now()->addDay(),
         ]);
 
         $expectedFeatureConsumptions = $expiredModels->concat($unexpiredModels);
-        $returnedFeatureConsumptions = $modelClass::withExpired()->get();
+
+        $returnedFeatureConsumptions = self::MODEL::withExpired()->get();
 
         $this->assertEqualsCanonicalizing(
             $expectedFeatureConsumptions->pluck('id')->toArray(),
@@ -73,19 +58,17 @@ class ExpiringScopeTest extends TestCase
 
     public function testExpiredModelsAreNotReturnedWhenCallingMethodWithExpiredAndPassingFalse()
     {
-        $modelClass = $this->getModelClass();
-        $expiredModelsCount = $this->faker->randomDigitNotNull();
-
-        $modelClass::factory()->count($expiredModelsCount)->create([
+        $expiredModelsCount = $this->faker()->randomDigitNotNull();
+        self::MODEL::factory()->count($expiredModelsCount)->create([
             'expired_at' => now()->subDay(),
         ]);
 
-        $unexpiredModelsCount = $this->faker->randomDigitNotNull();
-        $unexpiredModels = $modelClass::factory()->count($unexpiredModelsCount)->create([
+        $unexpiredModelsCount = $this->faker()->randomDigitNotNull();
+        $unexpiredModels = self::MODEL::factory()->count($unexpiredModelsCount)->create([
             'expired_at' => now()->addDay(),
         ]);
 
-        $returnedFeatureConsumptions = $modelClass::withExpired(false)->get();
+        $returnedFeatureConsumptions = self::MODEL::withExpired(false)->get();
 
         $this->assertEqualsCanonicalizing(
             $unexpiredModels->pluck('id')->toArray(),
@@ -95,19 +78,17 @@ class ExpiringScopeTest extends TestCase
 
     public function testOnlyExpiredModelsAreReturnedWhenCallingMethodOnlyExpired()
     {
-        $modelClass = $this->getModelClass();
-        $expiredModelsCount = $this->faker->randomDigitNotNull();
-
-        $expiredModels = $modelClass::factory()->count($expiredModelsCount)->create([
+        $expiredModelsCount = $this->faker()->randomDigitNotNull();
+        $expiredModels = self::MODEL::factory()->count($expiredModelsCount)->create([
             'expired_at' => now()->subDay(),
         ]);
 
-        $unexpiredModelsCount = $this->faker->randomDigitNotNull();
-        $modelClass::factory()->count($unexpiredModelsCount)->create([
+        $unexpiredModelsCount = $this->faker()->randomDigitNotNull();
+        self::MODEL::factory()->count($unexpiredModelsCount)->create([
             'expired_at' => now()->addDay(),
         ]);
 
-        $returnedFeatureConsumptions = $modelClass::onlyExpired()->get();
+        $returnedFeatureConsumptions = self::MODEL::onlyExpired()->get();
 
         $this->assertEqualsCanonicalizing(
             $expiredModels->pluck('id')->toArray(),

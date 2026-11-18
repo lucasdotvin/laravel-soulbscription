@@ -2,37 +2,40 @@
 
 namespace Tests\Feature\Models;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use LucasDotVin\Soulbscription\Models\Feature;
+use LucasDotVin\Soulbscription\Models\FeaturePlan;
+use LucasDotVin\Soulbscription\Models\Plan;
+use Tests\TestCase;
 
 class FeaturePlanTest extends TestCase
 {
-    use WithFaker;
     use RefreshDatabase;
+    use WithFaker;
 
     public function testModelCanRetrievePlan()
     {
-        $feature = config('soulbscription.models.feature')::factory()
+        $feature = Feature::factory()
             ->create();
 
-        $plan = config('soulbscription.models.plan')::factory()->create();
+        $plan = Plan::factory()->create();
         $plan->features()->attach($feature);
 
-        $featurePlanPivot = config('soulbscription.models.feature_plan')::first();
+        $featurePlanPivot = FeaturePlan::first();
 
         $this->assertEquals($plan->id, $featurePlanPivot->plan->id);
     }
 
     public function testModelCanRetrieveFeature()
     {
-        $feature = config('soulbscription.models.feature')::factory()
+        $feature = Feature::factory()
             ->create();
 
-        $plan = config('soulbscription.models.plan')::factory()->create();
+        $plan = Plan::factory()->create();
         $plan->features()->attach($feature);
 
-        $featurePlanPivot = config('soulbscription.models.feature_plan')::first();
+        $featurePlanPivot = FeaturePlan::first();
 
         $this->assertEquals($feature->id, $featurePlanPivot->feature->id);
     }

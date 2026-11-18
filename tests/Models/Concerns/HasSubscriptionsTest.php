@@ -15,6 +15,11 @@ use LucasDotVin\Soulbscription\Events\FeatureTicketCreated;
 use LucasDotVin\Soulbscription\Events\SubscriptionScheduled;
 use LucasDotVin\Soulbscription\Events\SubscriptionStarted;
 use LucasDotVin\Soulbscription\Events\SubscriptionSuppressed;
+use LucasDotVin\Soulbscription\Models\Feature;
+use LucasDotVin\Soulbscription\Models\FeatureConsumption;
+use LucasDotVin\Soulbscription\Models\Plan;
+use LucasDotVin\Soulbscription\Models\Subscription;
+use LucasDotVin\Soulbscription\Models\SubscriptionRenewal;
 use OutOfBoundsException;
 use OverflowException;
 use ReflectionClass;
@@ -23,12 +28,12 @@ use Tests\TestCase;
 
 class HasSubscriptionsTest extends TestCase
 {
-    use WithFaker;
     use RefreshDatabase;
+    use WithFaker;
 
     public function testModelCanSubscribeToAPlan()
     {
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
+        $plan = Plan::factory()->createOne();
         $subscriber = User::factory()->createOne();
 
         Event::fake();
@@ -49,7 +54,7 @@ class HasSubscriptionsTest extends TestCase
 
     public function testModelDefinesGraceDaysEnd()
     {
-        $plan = config('soulbscription.models.plan')::factory()
+        $plan = Plan::factory()
             ->withGraceDays()
             ->createOne();
 
@@ -65,8 +70,8 @@ class HasSubscriptionsTest extends TestCase
     {
         Carbon::setTestNow(now());
 
-        $oldPlan = config('soulbscription.models.plan')::factory()->createOne();
-        $newPlan = config('soulbscription.models.plan')::factory()->createOne();
+        $oldPlan = Plan::factory()->createOne();
+        $newPlan = Plan::factory()->createOne();
 
         $subscriber = User::factory()->createOne();
         $oldSubscription = $subscriber->subscribeTo($oldPlan);
@@ -97,8 +102,8 @@ class HasSubscriptionsTest extends TestCase
     {
         Carbon::setTestNow(now());
 
-        $oldPlan = config('soulbscription.models.plan')::factory()->createOne();
-        $newPlan = config('soulbscription.models.plan')::factory()->createOne();
+        $oldPlan = Plan::factory()->createOne();
+        $newPlan = Plan::factory()->createOne();
 
         $subscriber = User::factory()->createOne();
         $oldSubscription = $subscriber->subscribeTo($oldPlan);
@@ -125,8 +130,8 @@ class HasSubscriptionsTest extends TestCase
 
     public function testModelGetNewSubscriptionAfterSwitching()
     {
-        $oldPlan = config('soulbscription.models.plan')::factory()->createOne();
-        $newPlan = config('soulbscription.models.plan')::factory()->createOne();
+        $oldPlan = Plan::factory()->createOne();
+        $newPlan = Plan::factory()->createOne();
 
         $subscriber = User::factory()->createOne();
         $subscriber->subscribeTo($oldPlan, startDate: now()->subDay());
@@ -140,8 +145,8 @@ class HasSubscriptionsTest extends TestCase
     {
         Carbon::setTestNow(now());
 
-        $oldPlan = config('soulbscription.models.plan')::factory()->createOne();
-        $newPlan = config('soulbscription.models.plan')::factory()->createOne();
+        $oldPlan = Plan::factory()->createOne();
+        $newPlan = Plan::factory()->createOne();
 
         $subscriber = User::factory()->createOne();
         $oldSubscription = $subscriber->subscribeTo($oldPlan);
@@ -156,8 +161,8 @@ class HasSubscriptionsTest extends TestCase
         $charges = $this->faker->numberBetween(5, 10);
         $consumption = $this->faker->numberBetween(1, $charges);
 
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
-        $feature = config('soulbscription.models.feature')::factory()->consumable()->createOne();
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
         $feature->plans()->attach($plan, [
             'charges' => $charges,
         ]);
@@ -181,8 +186,8 @@ class HasSubscriptionsTest extends TestCase
 
     public function testModelCanConsumeANotConsumableFeatureIfItIsAvailable()
     {
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
-        $feature = config('soulbscription.models.feature')::factory()->notConsumable()->createOne();
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->notConsumable()->createOne();
         $feature->plans()->attach($plan);
 
         $subscriber = User::factory()->createOne();
@@ -202,8 +207,8 @@ class HasSubscriptionsTest extends TestCase
         $charges = $this->faker->numberBetween(5, 10);
         $consumption = $this->faker->numberBetween(1, $charges);
 
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
-        $feature = config('soulbscription.models.feature')::factory()->consumable()->createOne();
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
         $feature->plans()->attach($plan, [
             'charges' => $charges,
         ]);
@@ -228,8 +233,8 @@ class HasSubscriptionsTest extends TestCase
         $charges = $this->faker->numberBetween(5, 10);
         $consumption = $charges + 1;
 
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
-        $feature = config('soulbscription.models.feature')::factory()->consumable()->createOne();
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
         $feature->plans()->attach($plan, [
             'charges' => $charges,
         ]);
@@ -254,8 +259,8 @@ class HasSubscriptionsTest extends TestCase
         $charges = $this->faker->numberBetween(5, 10);
         $consumption = $this->faker->numberBetween(1, $charges);
 
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
-        $feature = config('soulbscription.models.feature')::factory()->consumable()->createOne();
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
         $feature->plans()->attach($plan, [
             'charges' => $charges,
         ]);
@@ -273,8 +278,8 @@ class HasSubscriptionsTest extends TestCase
         $charges = $this->faker->numberBetween(5, 10);
         $consumption = $this->faker->numberBetween(1, $charges);
 
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
-        $feature = config('soulbscription.models.feature')::factory()->consumable()->createOne();
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
         $feature->plans()->attach($plan, [
             'charges' => $charges,
         ]);
@@ -292,8 +297,8 @@ class HasSubscriptionsTest extends TestCase
         $charges = $this->faker->numberBetween(5, 10);
         $consumption = $charges + 1;
 
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
-        $feature = config('soulbscription.models.feature')::factory()->consumable()->createOne();
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
         $feature->plans()->attach($plan, [
             'charges' => $charges,
         ]);
@@ -311,8 +316,8 @@ class HasSubscriptionsTest extends TestCase
         $charges = $this->faker->numberBetween(5, 10);
         $consumption = $this->faker->numberBetween(1, $charges);
 
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
-        $feature = config('soulbscription.models.feature')::factory()->consumable()->createOne();
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
         $feature->plans()->attach($plan, [
             'charges' => $charges,
         ]);
@@ -320,7 +325,7 @@ class HasSubscriptionsTest extends TestCase
         $subscriber = User::factory()->createOne();
         $subscriber->subscribeTo($plan);
 
-        config('soulbscription.models.feature_consumption')::factory()
+        FeatureConsumption::factory()
             ->for($feature)
             ->for($subscriber, 'subscriber')
             ->createOne([
@@ -336,12 +341,12 @@ class HasSubscriptionsTest extends TestCase
     public function testModelHasSubscriptionRenewals()
     {
         $subscriber = User::factory()->createOne();
-        $subscription = config('soulbscription.models.subscription')::factory()
+        $subscription = Subscription::factory()
             ->for($subscriber, 'subscriber')
             ->createOne();
 
         $renewalsCount = $this->faker->randomDigitNotNull();
-        $renewals = config('soulbscription.models.subscription_renewal')::factory()
+        $renewals = SubscriptionRenewal::factory()
             ->times($renewalsCount)
             ->for($subscription)
             ->createOne();
@@ -354,7 +359,7 @@ class HasSubscriptionsTest extends TestCase
 
     public function testModelHasFeatureTickets()
     {
-        $feature = config('soulbscription.models.feature')::factory()->consumable()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
 
         $subscriber = User::factory()->createOne();
 
@@ -372,7 +377,7 @@ class HasSubscriptionsTest extends TestCase
 
     public function testModelFeatureTicketsGetsOnlyNotExpired()
     {
-        $feature = config('soulbscription.models.feature')::factory()->consumable()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
 
         $subscriber = User::factory()->createOne();
 
@@ -405,7 +410,7 @@ class HasSubscriptionsTest extends TestCase
 
     public function testModelGetFeaturesFromTickets()
     {
-        $feature = config('soulbscription.models.feature')::factory()->consumable()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
 
         $subscriber = User::factory()->createOne();
 
@@ -426,7 +431,7 @@ class HasSubscriptionsTest extends TestCase
 
     public function testModelGetFeaturesFromPreviouslyLoadedTickets()
     {
-        $feature = config('soulbscription.models.feature')::factory()->createOne();
+        $feature = Feature::factory()->createOne();
         $subscriber = User::factory()->createOne();
 
         $reflection = new ReflectionClass($subscriber);
@@ -444,7 +449,7 @@ class HasSubscriptionsTest extends TestCase
 
     public function testModelGetFeaturesFromPreviouslyLoadedSubscription()
     {
-        $feature = config('soulbscription.models.feature')::factory()->createOne();
+        $feature = Feature::factory()->createOne();
         $subscriber = User::factory()->createOne();
 
         $reflection = new ReflectionClass($subscriber);
@@ -462,7 +467,7 @@ class HasSubscriptionsTest extends TestCase
 
     public function testModelGetFeaturesFromNonExpirableTickets()
     {
-        $feature = config('soulbscription.models.feature')::factory()->consumable()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
 
         $subscriber = User::factory()->createOne();
 
@@ -486,7 +491,7 @@ class HasSubscriptionsTest extends TestCase
         $charges = $this->faker->numberBetween(5, 10);
         $consumption = $this->faker->numberBetween(1, $charges);
 
-        $feature = config('soulbscription.models.feature')::factory()->consumable()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
         $subscriber = User::factory()->createOne();
 
         $ticket = $subscriber->featureTickets()->make([
@@ -509,9 +514,9 @@ class HasSubscriptionsTest extends TestCase
         $subscriptionFeatureCharges = $this->faker->numberBetween(5, 10);
         $ticketFeatureCharges = $this->faker->numberBetween(5, 10);
 
-        $feature = config('soulbscription.models.feature')::factory()->consumable()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
 
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
+        $plan = Plan::factory()->createOne();
         $feature->plans()->attach($plan, [
             'charges' => $subscriptionFeatureCharges,
         ]);
@@ -536,7 +541,7 @@ class HasSubscriptionsTest extends TestCase
 
     public function testModelCanConsumeANotConsumableFeatureFromATicket()
     {
-        $feature = config('soulbscription.models.feature')::factory()->notConsumable()->createOne();
+        $feature = Feature::factory()->notConsumable()->createOne();
         $subscriber = User::factory()->createOne();
 
         $ticket = $subscriber->featureTickets()->make([
@@ -557,8 +562,8 @@ class HasSubscriptionsTest extends TestCase
     {
         $consumption = $this->faker->randomDigitNotNull();
 
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
-        $feature = config('soulbscription.models.feature')::factory()->consumable()->createOne();
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
         $feature->plans()->attach($plan);
 
         $subscriber = User::factory()->createOne();
@@ -584,8 +589,8 @@ class HasSubscriptionsTest extends TestCase
         $charges = $this->faker->numberBetween(6, 10);
         $consumption = $this->faker->numberBetween(1, 5);
 
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
-        $feature = config('soulbscription.models.feature')::factory()->consumable()->createOne();
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
         $feature->plans()->attach($plan, [
             'charges' => $charges,
         ]);
@@ -610,10 +615,10 @@ class HasSubscriptionsTest extends TestCase
 
     public function testModelCantUseChargesFromExpiredTickets()
     {
-        $feature = config('soulbscription.models.feature')::factory()->consumable()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
         $subscriber = User::factory()->createOne();
 
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
+        $plan = Plan::factory()->createOne();
         $subscriber->subscribeTo($plan);
 
         $subscriptionFeatureCharges = $this->faker->numberBetween(5, 10);
@@ -648,10 +653,10 @@ class HasSubscriptionsTest extends TestCase
 
     public function testItIgnoresTicketsWhenItIsDisabled()
     {
-        $feature = config('soulbscription.models.feature')::factory()->consumable()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
         $subscriber = User::factory()->createOne();
 
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
+        $plan = Plan::factory()->createOne();
         $plan->features()->attach($feature);
         $subscriber->subscribeTo($plan);
 
@@ -677,7 +682,7 @@ class HasSubscriptionsTest extends TestCase
         $charges = $this->faker->randomDigitNotNull();
         $expiration = $this->faker->dateTime();
 
-        $feature = config('soulbscription.models.feature')::factory()->consumable()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
 
         $subscriber = User::factory()->createOne();
 
@@ -696,7 +701,7 @@ class HasSubscriptionsTest extends TestCase
     {
         $charges = $this->faker->randomDigitNotNull();
 
-        $feature = config('soulbscription.models.feature')::factory()->consumable()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
 
         $subscriber = User::factory()->createOne();
 
@@ -716,7 +721,7 @@ class HasSubscriptionsTest extends TestCase
         $charges = $this->faker->randomDigitNotNull();
         $expiration = $this->faker->dateTime();
 
-        $feature = config('soulbscription.models.feature')::factory()->consumable()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
 
         $subscriber = User::factory()->createOne();
 
@@ -750,7 +755,7 @@ class HasSubscriptionsTest extends TestCase
         $charges = $this->faker->randomDigitNotNull();
         $expiration = $this->faker->dateTime();
 
-        $feature = config('soulbscription.models.feature')::factory()->consumable()->createOne();
+        $feature = Feature::factory()->consumable()->createOne();
 
         $subscriber = User::factory()->createOne();
 
@@ -767,8 +772,8 @@ class HasSubscriptionsTest extends TestCase
         $charges = $this->faker->numberBetween(5, 10);
         $consumption = $this->faker->numberBetween(1, $charges);
 
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
-        $feature = config('soulbscription.models.feature')::factory()->quota()->createOne();
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->quota()->createOne();
         $feature->plans()->attach($plan, [
             'charges' => $charges,
         ]);
@@ -791,8 +796,8 @@ class HasSubscriptionsTest extends TestCase
         $charges = $this->faker->numberBetween(5, 10);
         $consumption = $this->faker->numberBetween(1, $charges / 2);
 
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
-        $feature = config('soulbscription.models.feature')::factory()->quota()->createOne();
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->quota()->createOne();
         $feature->plans()->attach($plan, [
             'charges' => $charges,
         ]);
@@ -817,8 +822,8 @@ class HasSubscriptionsTest extends TestCase
         $charges = $this->faker->numberBetween(5, 10);
         $consumption = $this->faker->numberBetween(1, $charges / 2);
 
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
-        $feature = config('soulbscription.models.feature')::factory()->quota()->createOne();
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->quota()->createOne();
         $feature->plans()->attach($plan, [
             'charges' => $charges,
         ]);
@@ -843,8 +848,8 @@ class HasSubscriptionsTest extends TestCase
         $charges = $this->faker->numberBetween(5, 10);
         $consumption = $this->faker->numberBetween(1, $charges);
 
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
-        $feature = config('soulbscription.models.feature')::factory()->quota()->createOne();
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->quota()->createOne();
         $feature->plans()->attach($plan, [
             'charges' => $charges,
         ]);
@@ -868,8 +873,8 @@ class HasSubscriptionsTest extends TestCase
         $charges = $this->faker->numberBetween(5, 10);
         $consumption = $this->faker->numberBetween(1, $charges / 2);
 
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
-        $feature = config('soulbscription.models.feature')::factory()->notQuota()->createOne();
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->notQuota()->createOne();
         $feature->plans()->attach($plan, [
             'charges' => $charges,
         ]);
@@ -885,7 +890,7 @@ class HasSubscriptionsTest extends TestCase
 
     public function testItChecksIfTheUserHasSubscriptionToAPlan()
     {
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
+        $plan = Plan::factory()->createOne();
 
         $subscriber = User::factory()->createOne();
         $subscriber->subscribeTo($plan);
@@ -899,7 +904,7 @@ class HasSubscriptionsTest extends TestCase
 
     public function testItChecksIfTheUserDoesNotHaveSubscriptionToAPlan()
     {
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
+        $plan = Plan::factory()->createOne();
 
         $subscriber = User::factory()->createOne();
         $subscriber->subscribeTo($plan);
@@ -913,7 +918,7 @@ class HasSubscriptionsTest extends TestCase
 
     public function testItReturnsTheLastSubscriptionWhenRetrievingExpired()
     {
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
+        $plan = Plan::factory()->createOne();
 
         $subscriber = User::factory()->createOne();
         $subscriber->subscribeTo($plan, now()->subDay(), now()->subDay());
@@ -929,8 +934,8 @@ class HasSubscriptionsTest extends TestCase
         $charges = $this->faker->numberBetween(5, 10);
         $consumption = $this->faker->numberBetween(1, $charges * 2);
 
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
-        $feature = config('soulbscription.models.feature')::factory()->postpaid()->createOne();
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->postpaid()->createOne();
         $feature->plans()->attach($plan, [
             'charges' => $charges,
         ]);
@@ -952,8 +957,8 @@ class HasSubscriptionsTest extends TestCase
         $charges = $this->faker->numberBetween(5, 10);
         $consumption = $this->faker->numberBetween($charges + 1, $charges * 2);
 
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
-        $feature = config('soulbscription.models.feature')::factory()->postpaid()->createOne();
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->postpaid()->createOne();
         $feature->plans()->attach($plan, [
             'charges' => $charges,
         ]);
@@ -971,8 +976,8 @@ class HasSubscriptionsTest extends TestCase
         $charges = $this->faker->numberBetween(5, 10);
         $consumption = $this->faker->numberBetween($charges + 1, $charges * 2);
 
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
-        $feature = config('soulbscription.models.feature')::factory()->postpaid()->createOne();
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->postpaid()->createOne();
         $feature->plans()->attach($plan, [
             'charges' => $charges,
         ]);
@@ -987,7 +992,7 @@ class HasSubscriptionsTest extends TestCase
 
     public function testItReturnsZeroForUnavailableFeatures()
     {
-        $feature = config('soulbscription.models.feature')::factory()->createOne();
+        $feature = Feature::factory()->createOne();
         $subscriber = User::factory()->createOne();
 
         $remainingCharges = $subscriber->getRemainingCharges($feature->name);
@@ -1001,7 +1006,7 @@ class HasSubscriptionsTest extends TestCase
 
         $charges = $this->faker->numberBetween(5, 10);
 
-        $feature = config('soulbscription.models.feature')::factory()->createOne();
+        $feature = Feature::factory()->createOne();
 
         $subscriber = User::factory()->createOne();
         $subscriber->giveTicketFor($feature->name, null, $charges);
@@ -1014,8 +1019,8 @@ class HasSubscriptionsTest extends TestCase
 
     public function testItCanCheckIfSubscriberHasFeature()
     {
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
-        $feature = config('soulbscription.models.feature')::factory()->createOne();
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->createOne();
         $feature->plans()->attach($plan);
 
         $subscriber = User::factory()->createOne();
@@ -1026,8 +1031,8 @@ class HasSubscriptionsTest extends TestCase
 
     public function testItCanCheckIfSubscriberDoesNotHaveFeature()
     {
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
-        $feature = config('soulbscription.models.feature')::factory()->createOne();
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->createOne();
 
         $subscriber = User::factory()->createOne();
         $subscriber->subscribeTo($plan);
@@ -1040,8 +1045,8 @@ class HasSubscriptionsTest extends TestCase
         $charges = $this->faker->numberBetween(5, 10);
         $consumption = $this->faker->numberBetween($charges + 1, $charges * 2);
 
-        $plan = config('soulbscription.models.plan')::factory()->createOne();
-        $feature = config('soulbscription.models.feature')::factory()->postpaid()->createOne();
+        $plan = Plan::factory()->createOne();
+        $feature = Feature::factory()->postpaid()->createOne();
         $feature->plans()->attach($plan, [
             'charges' => $charges,
         ]);
@@ -1062,7 +1067,7 @@ class HasSubscriptionsTest extends TestCase
 
     public function testItSetsAnEmptyExpirationIfThePlanHasNoPeriodicity()
     {
-        $plan = config('soulbscription.models.plan')::factory()->createOne([
+        $plan = Plan::factory()->createOne([
             'periodicity' => null,
         ]);
 
@@ -1074,7 +1079,7 @@ class HasSubscriptionsTest extends TestCase
 
     public function testItUsesReceivedExpirationEvenIfThePlanHasNoPeriodicity()
     {
-        $plan = config('soulbscription.models.plan')::factory()->createOne([
+        $plan = Plan::factory()->createOne([
             'periodicity' => null,
         ]);
 
@@ -1089,7 +1094,7 @@ class HasSubscriptionsTest extends TestCase
 
     public function testItReturnsZeroForCurrentConsumptionWhenSubscriberDoesNotHaveFeature()
     {
-        $feature = config('soulbscription.models.feature')::factory()->createOne();
+        $feature = Feature::factory()->createOne();
         $subscriber = User::factory()->createOne();
 
         $currentConsumption = $subscriber->getCurrentConsumption($feature->name);
@@ -1099,7 +1104,7 @@ class HasSubscriptionsTest extends TestCase
 
     public function testItReturnsZeroForTotalChargesWhenSubscriberDoesNotHaveFeature()
     {
-        $feature = config('soulbscription.models.feature')::factory()->createOne();
+        $feature = Feature::factory()->createOne();
         $subscriber = User::factory()->createOne();
 
         $totalCharges = $subscriber->getTotalCharges($feature->name);

@@ -2,11 +2,12 @@
 
 namespace Tests\Feature\Models;
 
-use Tests\TestCase;
-use Illuminate\Support\Carbon;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Carbon;
 use LucasDotVin\Soulbscription\Enums\PeriodicityType;
+use LucasDotVin\Soulbscription\Models\Feature;
+use Tests\TestCase;
 
 class FeatureTest extends TestCase
 {
@@ -18,7 +19,7 @@ class FeatureTest extends TestCase
         Carbon::setTestNow(now());
 
         $years = $this->faker->randomDigitNotNull();
-        $feature = config('soulbscription.models.feature')::factory()->create([
+        $feature = Feature::factory()->create([
             'periodicity_type' => PeriodicityType::Year,
             'periodicity' => $years,
         ]);
@@ -31,7 +32,7 @@ class FeatureTest extends TestCase
         Carbon::setTestNow(now());
 
         $months = $this->faker->randomDigitNotNull();
-        $feature = config('soulbscription.models.feature')::factory()->create([
+        $feature = Feature::factory()->create([
             'periodicity_type' => PeriodicityType::Month,
             'periodicity' => $months,
         ]);
@@ -44,7 +45,7 @@ class FeatureTest extends TestCase
         Carbon::setTestNow(now());
 
         $weeks = $this->faker->randomDigitNotNull();
-        $feature = config('soulbscription.models.feature')::factory()->create([
+        $feature = Feature::factory()->create([
             'periodicity_type' => PeriodicityType::Week,
             'periodicity' => $weeks,
         ]);
@@ -57,7 +58,7 @@ class FeatureTest extends TestCase
         Carbon::setTestNow(now());
 
         $days = $this->faker->randomDigitNotNull();
-        $feature = config('soulbscription.models.feature')::factory()->create([
+        $feature = Feature::factory()->create([
             'periodicity_type' => PeriodicityType::Day,
             'periodicity' => $days,
         ]);
@@ -69,7 +70,7 @@ class FeatureTest extends TestCase
     {
         Carbon::setTestNow(now());
 
-        $feature = config('soulbscription.models.feature')::factory()->create([
+        $feature = Feature::factory()->create([
             'periodicity_type' => PeriodicityType::Week,
             'periodicity' => 1,
         ]);
@@ -81,11 +82,11 @@ class FeatureTest extends TestCase
 
     public function testModelIsNotQuotaByDefault()
     {
-        $creationPayload = config('soulbscription.models.feature')::factory()->raw();
+        $creationPayload = Feature::factory()->raw();
 
         unset($creationPayload['quota']);
 
-        $feature = config('soulbscription.models.feature')::create($creationPayload);
+        $feature = Feature::create($creationPayload);
 
         $this->assertDatabaseHas('features', [
             'id' => $feature->id,
