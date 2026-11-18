@@ -2,6 +2,19 @@
 
 All notable changes to `laravel-soulbscription` will be documented in this file.
 
+## v4.4.2 - 2026-11-18
+
+### Highlights
+
+* Consuming a feature (`consume()`, `balance()`, `getRemainingCharges()`, `canConsume()`, ...) now works with a custom feature model whose class name differs from the package's (e.g. `TenantFeature`). In 4.4.1 it failed with `RelationNotFoundException`.
+* `HasSubscriptions::renewals()` now only returns renewals of the subscriber's own type. Before, subscribers of different models sharing an id (e.g. a `User` and a `Team` with id 1) saw each other's renewals.
+
+### What's Changed
+
+* Scope renewals to the subscriber type and consume with renamed feature models by @lucasdotvin in https://github.com/lucasdotvin/laravel-soulbscription/pull/163
+
+**Full Changelog**: https://github.com/lucasdotvin/laravel-soulbscription/compare/4.4.1...4.4.2
+
 ## v4.4.1 - 2026-11-18
 
 ### Highlights
