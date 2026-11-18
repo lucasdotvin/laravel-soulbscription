@@ -2,7 +2,7 @@
 
 <p align="center"><a href="https://packagist.org/packages/lucasdotvin/laravel-soulbscription"><img alt="Latest Version on Packagist" src="https://img.shields.io/packagist/v/lucasdotvin/laravel-soulbscription.svg?style=flat-square"></a>
 <a href="https://github.com/lucasdotvin/laravel-soulbscription/actions/workflows/run-tests.yml"><img src="https://github.com/lucasdotvin/laravel-soulbscription/actions/workflows/run-tests.yml/badge.svg?branch=main" alt="run-tests"></a>
-<a href="https://codecov.io/gh/lucasdotvin/laravel-soulbscription"><img src="https://codecov.io/gh/lucasdotvin/laravel-soulbscription/branch/main/graph/badge.svg?token=9NUYY1E28D"/></a>
+<a href="https://codecov.io/gh/lucasdotvin/laravel-soulbscription"><img src="https://codecov.io/gh/lucasdotvin/laravel-soulbscription/branch/main/graph/badge.svg?token=9NUYY1E28D" alt="codecov"></a>
 <a href="https://github.com/lucasdotvin/laravel-soulbscription/actions/workflows/php-cs-fixer.yml"><img src="https://github.com/lucasdotvin/laravel-soulbscription/actions/workflows/php-cs-fixer.yml/badge.svg?branch=main" alt="Check &amp; fix styling"></a>
 <a href="https://packagist.org/packages/lucasdotvin/laravel-soulbscription"><img alt="Total Downloads" src="https://img.shields.io/packagist/dt/lucasdotvin/laravel-soulbscription.svg?style=flat-square"></a></p>
 
