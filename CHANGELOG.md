@@ -2,6 +2,21 @@
 
 All notable changes to `laravel-soulbscription` will be documented in this file.
 
+## v4.4.1 - 2026-11-18
+
+### Highlights
+
+* `giveTicketFor()` and ticket feature loading now use the model configured in `soulbscription.models.feature` instead of always using the package's `Feature` model.
+* Package factories use the configured models, and still honor an explicit `$model`.
+* Models and relationships now name their tables, foreign keys and the `feature_plan` pivot explicitly. Custom models with a different class name (e.g. `TenantPlan extends Plan`) keep working against the published tables, without having to override `$table` or keys.
+
+### What's Changed
+
+* Use the configured feature model when giving and loading tickets by @AHMED-GAMAL-AG in https://github.com/lucasdotvin/laravel-soulbscription/pull/158
+* Name tables and keys explicitly so custom models can be renamed by @lucasdotvin in https://github.com/lucasdotvin/laravel-soulbscription/pull/162
+
+**Full Changelog**: https://github.com/lucasdotvin/laravel-soulbscription/compare/4.4.0...4.4.1
+
 ## v4.4.0 - 2026-11-18
 
 ### Highlights
