@@ -40,6 +40,7 @@ class ConfiguredModelsTest extends TestCase
         $featureTicket = $subscriber->giveTicketFor($feature->name, now()->addDay());
 
         $this->assertEquals($feature->id, $featureTicket->feature_id);
+        $this->assertInstanceOf(CustomFeature::class, $featureTicket->getRelation('feature'));
         $this->assertInstanceOf(CustomFeature::class, $subscriber->getFeature($feature->name));
     }
 }

@@ -13,7 +13,7 @@ class FeatureConsumptionFactory extends Factory
      */
     public function modelName()
     {
-        return config('soulbscription.models.feature_consumption');
+        return $this->model ?? config('soulbscription.models.feature_consumption');
     }
 
     /**

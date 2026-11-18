@@ -13,7 +13,7 @@ class SubscriptionRenewalFactory extends Factory
      */
     public function modelName()
     {
-        return config('soulbscription.models.subscription_renewal');
+        return $this->model ?? config('soulbscription.models.subscription_renewal');
     }
 
     /**

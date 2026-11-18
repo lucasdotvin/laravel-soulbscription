@@ -14,7 +14,7 @@ class FeatureFactory extends Factory
      */
     public function modelName()
     {
-        return config('soulbscription.models.feature');
+        return $this->model ?? config('soulbscription.models.feature');
     }
 
     /**

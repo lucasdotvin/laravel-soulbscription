@@ -14,7 +14,7 @@ class PlanFactory extends Factory
      */
     public function modelName()
     {
-        return config('soulbscription.models.plan');
+        return $this->model ?? config('soulbscription.models.plan');
     }
 
     /**

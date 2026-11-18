@@ -13,7 +13,7 @@ class SubscriptionFactory extends Factory
      */
     public function modelName()
     {
-        return config('soulbscription.models.subscription');
+        return $this->model ?? config('soulbscription.models.subscription');
     }
 
     /**
