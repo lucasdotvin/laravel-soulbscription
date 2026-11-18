@@ -13,6 +13,8 @@ class Feature extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected $table = 'features';
+
     protected $fillable = [
         'consumable',
         'name',
@@ -24,12 +26,12 @@ class Feature extends Model
 
     public function plans()
     {
-        return $this->belongsToMany(config('soulbscription.models.plan'))
+        return $this->belongsToMany(config('soulbscription.models.plan'), 'feature_plan', 'feature_id', 'plan_id')
             ->using(config('soulbscription.models.feature_plan'));
     }
 
     public function tickets()
     {
-        return $this->hasMany(config('soulbscription.models.feature_ticket'));
+        return $this->hasMany(config('soulbscription.models.feature_ticket'), 'feature_id');
     }
 }

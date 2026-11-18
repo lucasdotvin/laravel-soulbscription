@@ -9,6 +9,8 @@ class SubscriptionRenewal extends Model
 {
     use HasFactory;
 
+    protected $table = 'subscription_renewals';
+
     protected $casts = [
         'overdue' => 'boolean',
         'renewal' => 'boolean',
@@ -21,6 +23,6 @@ class SubscriptionRenewal extends Model
 
     public function subscription()
     {
-        return $this->belongsTo(config('soulbscription.models.subscription'));
+        return $this->belongsTo(config('soulbscription.models.subscription'), 'subscription_id');
     }
 }

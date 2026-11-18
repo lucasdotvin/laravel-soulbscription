@@ -11,6 +11,8 @@ class FeatureConsumption extends Model
     use Expires;
     use HasFactory;
 
+    protected $table = 'feature_consumptions';
+
     protected $fillable = [
         'consumption',
         'expired_at',
@@ -18,7 +20,7 @@ class FeatureConsumption extends Model
 
     public function feature()
     {
-        return $this->belongsTo(config('soulbscription.models.feature'));
+        return $this->belongsTo(config('soulbscription.models.feature'), 'feature_id');
     }
 
     public function subscriber()

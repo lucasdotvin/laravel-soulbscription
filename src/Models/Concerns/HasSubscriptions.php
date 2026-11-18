@@ -42,6 +42,7 @@ trait HasSubscriptions
             config('soulbscription.models.subscription_renewal'),
             config('soulbscription.models.subscription'),
             'subscriber_id',
+            'subscription_id',
         );
     }
 
