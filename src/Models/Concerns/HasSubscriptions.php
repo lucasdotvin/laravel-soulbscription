@@ -38,12 +38,14 @@ trait HasSubscriptions
 
     public function renewals()
     {
+        $subscription = app(config('soulbscription.models.subscription'));
+
         return $this->hasManyThrough(
             config('soulbscription.models.subscription_renewal'),
-            config('soulbscription.models.subscription'),
+            $subscription::class,
             'subscriber_id',
             'subscription_id',
-        );
+        )->where($subscription->qualifyColumn('subscriber_type'), $this->getMorphClass());
     }
 
     public function subscription()
@@ -270,7 +272,7 @@ trait HasSubscriptions
         }
 
         return $this->featureConsumptions()
-            ->whereBelongsTo($feature)
+            ->whereBelongsTo($feature, 'feature')
             ->sum('consumption');
     }
 
