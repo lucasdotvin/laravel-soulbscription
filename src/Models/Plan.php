@@ -14,6 +14,8 @@ class Plan extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected $table = 'plans';
+
     protected $fillable = [
         'grace_days',
         'name',
@@ -23,14 +25,14 @@ class Plan extends Model
 
     public function features()
     {
-        return $this->belongsToMany(config('soulbscription.models.feature'))
+        return $this->belongsToMany(config('soulbscription.models.feature'), 'feature_plan', 'plan_id', 'feature_id')
             ->using(config('soulbscription.models.feature_plan'))
             ->withPivot(['charges']);
     }
 
     public function subscriptions()
     {
-        return $this->hasMany(config('soulbscription.models.subscription'));
+        return $this->hasMany(config('soulbscription.models.subscription'), 'plan_id');
     }
 
     public function calculateGraceDaysEnd(Carbon $recurrenceEnd)

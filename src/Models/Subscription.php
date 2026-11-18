@@ -27,6 +27,8 @@ class Subscription extends Model
     use Starts;
     use Suppresses;
 
+    protected $table = 'subscriptions';
+
     protected $dates = [
         'canceled_at',
     ];
@@ -42,12 +44,12 @@ class Subscription extends Model
 
     public function plan()
     {
-        return $this->belongsTo(config('soulbscription.models.plan'));
+        return $this->belongsTo(config('soulbscription.models.plan'), 'plan_id');
     }
 
     public function renewals()
     {
-        return $this->hasMany(config('soulbscription.models.subscription_renewal'));
+        return $this->hasMany(config('soulbscription.models.subscription_renewal'), 'subscription_id');
     }
 
     public function subscriber()

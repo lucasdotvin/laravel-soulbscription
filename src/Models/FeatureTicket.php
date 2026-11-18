@@ -9,6 +9,8 @@ class FeatureTicket extends Model
 {
     use Expires;
 
+    protected $table = 'feature_tickets';
+
     protected $fillable = [
         'charges',
         'expired_at',
@@ -16,7 +18,7 @@ class FeatureTicket extends Model
 
     public function feature()
     {
-        return $this->belongsTo(config('soulbscription.models.feature'));
+        return $this->belongsTo(config('soulbscription.models.feature'), 'feature_id');
     }
 
     public function subscriber()
