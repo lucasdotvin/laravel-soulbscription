@@ -2,6 +2,32 @@
 
 All notable changes to `laravel-soulbscription` will be documented in this file.
 
+## v4.4.0 - 2026-11-18
+
+### Highlights
+
+* Laravel 13 and PHP 8.4 support.
+* Fixes "Implicit conversion from float to int loses precision" deprecations with Carbon 3 (Laravel 11+) when calculating recurrences.
+* CI now tests Laravel 12 and 13 on PHP 8.2 to 8.4. Laravel 9 to 11 are no longer tested because Composer blocks their releases over security advisories, but `composer.json` still allows them.
+
+### What's Changed
+
+* build(deps): Bump codecov/codecov-action from 5.4.3 to 5.5.0 by @dependabot[bot] in https://github.com/lucasdotvin/laravel-soulbscription/pull/137
+* build(deps): Bump codecov/codecov-action from 5.5.0 to 5.5.1 by @dependabot[bot] in https://github.com/lucasdotvin/laravel-soulbscription/pull/138
+* build(deps): Bump codecov/codecov-action from 5.5.1 to 5.5.2 by @dependabot[bot] in https://github.com/lucasdotvin/laravel-soulbscription/pull/141
+* build(deps): Bump dependabot/fetch-metadata from 2.4.0 to 2.5.0 by @dependabot[bot] in https://github.com/lucasdotvin/laravel-soulbscription/pull/142
+* build(deps): Bump codecov/codecov-action from 5.5.2 to 5.5.3 by @dependabot[bot] in https://github.com/lucasdotvin/laravel-soulbscription/pull/146
+* Fix CI and retire the develop branch by @lucasdotvin in https://github.com/lucasdotvin/laravel-soulbscription/pull/161
+* Add Laravel 13 and PHP 8.4 support by @AHMED-GAMAL-AG in https://github.com/lucasdotvin/laravel-soulbscription/pull/157
+* Return whole periods from getDateDifference() on Carbon 3 by @pou in https://github.com/lucasdotvin/laravel-soulbscription/pull/159
+
+### New Contributors
+
+* @AHMED-GAMAL-AG made their first contribution in https://github.com/lucasdotvin/laravel-soulbscription/pull/157
+* @pou made their first contribution in https://github.com/lucasdotvin/laravel-soulbscription/pull/159
+
+**Full Changelog**: https://github.com/lucasdotvin/laravel-soulbscription/compare/4.3.2...4.4.0
+
 ## v4.3.2 - 2025-07-24
 
 ### What's Changed
