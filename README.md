@@ -208,6 +208,8 @@ $gold = Plan::create([
 
 With the configuration above, the subscribers of the "gold" plan will have seven days between the plan expiration and their access being suspended.
 
+> Grace days are not granted to canceled subscriptions: once a subscription is canceled (`canceled_at` in the past) and past its expiration, it stops being active right away, even if its grace period has not finished.
+
 ### Associating Plans with Features
 
 As each feature can belong to multiple plans (and they can have multiple features), you have to associate them:

@@ -326,6 +326,40 @@ class SubscriptionTest extends TestCase
         ]);
     }
 
+    public function testModelIsExpiredWhenCanceledDuringGraceDays()
+    {
+        $subscription = Subscription::factory()->make([
+            'expired_at' => now()->subDay(),
+            'grace_days_ended_at' => now()->addDay(),
+            'canceled_at' => null,
+        ]);
+
+        $this->assertFalse($subscription->expired());
+        $this->assertFalse($subscription->isOverdue);
+
+        $subscription->canceled_at = now()->subHour();
+
+        $this->assertTrue($subscription->expired());
+        $this->assertTrue($subscription->isOverdue);
+    }
+
+    public function testModelReturnsCanceledSubscriptionsInGraceDaysInNotActiveScope()
+    {
+        $canceled = Subscription::factory()->create([
+            'expired_at' => now()->subDay(),
+            'grace_days_ended_at' => now()->addDay(),
+            'canceled_at' => now()->subHour(),
+        ]);
+
+        Subscription::factory()->create([
+            'expired_at' => now()->subDay(),
+            'grace_days_ended_at' => now()->addDay(),
+            'canceled_at' => null,
+        ]);
+
+        $this->assertEquals([$canceled->id], Subscription::notActive()->pluck('id')->toArray());
+    }
+
     public function testModelReturnsNotStartedSubscriptionsInNotActiveScope()
     {
         Subscription::factory()
