@@ -33,7 +33,16 @@ trait ExpiresAndHasGraceDays
         }
 
         return $this->expired_at->isPast()
-            and $this->grace_days_ended_at->isPast();
+            and ($this->grace_days_ended_at->isPast() or $this->hasEndedGraceDays());
+    }
+
+    /**
+     * Grace days are not granted to subscriptions that were already canceled.
+     */
+    protected function hasEndedGraceDays(): bool
+    {
+        return ! is_null($this->canceled_at)
+            and $this->canceled_at->isPast();
     }
 
     public function notExpired()

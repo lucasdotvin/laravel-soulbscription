@@ -33,6 +33,10 @@ class Subscription extends Model
         'canceled_at',
     ];
 
+    protected $casts = [
+        'canceled_at' => 'datetime',
+    ];
+
     protected $fillable = [
         'canceled_at',
         'expired_at',
@@ -156,7 +160,7 @@ class Subscription extends Model
     {
         if ($this->grace_days_ended_at) {
             return $this->expired_at->isPast()
-                and $this->grace_days_ended_at->isPast();
+                and ($this->grace_days_ended_at->isPast() or $this->hasEndedGraceDays());
         }
 
         if (! $this->expired_at) {

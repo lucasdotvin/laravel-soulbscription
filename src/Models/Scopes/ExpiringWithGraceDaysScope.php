@@ -20,8 +20,20 @@ class ExpiringWithGraceDaysScope implements Scope
             fn (Builder $query) => $query
             ->where('expired_at', '>', now())
             ->orWhereNull('expired_at')
-            ->orWhere('grace_days_ended_at', '>', now())
+            ->orWhere(fn (Builder $query) => $this->whereInGraceDays($query))
         );
+    }
+
+    /**
+     * Grace days only protect subscriptions that were not canceled yet.
+     */
+    protected function whereInGraceDays(Builder $query): Builder
+    {
+        return $query->where('grace_days_ended_at', '>', now())
+            ->where(
+                fn (Builder $query) => $query->whereNull('canceled_at')
+                    ->orWhere('canceled_at', '>', now())
+            );
     }
 
     public function extend(Builder $builder)
@@ -45,11 +57,11 @@ class ExpiringWithGraceDaysScope implements Scope
     protected function addWithoutExpired(Builder $builder)
     {
         $builder->macro('withoutExpired', function (Builder $builder) {
-            $builder->withoutGlobalScope($this)->where('expired_at', '>', now())
-                ->orWhereNull('expired_at')
-                ->orWhere('grace_days_ended_at', '>', now());
-
-            return $builder;
+            return $builder->withoutGlobalScope($this)->where(
+                fn (Builder $query) => $query->where('expired_at', '>', now())
+                    ->orWhereNull('expired_at')
+                    ->orWhere(fn (Builder $query) => $this->whereInGraceDays($query))
+            );
         });
     }
 
@@ -61,6 +73,7 @@ class ExpiringWithGraceDaysScope implements Scope
                 ->where(
                     fn (Builder $query) => $query->where('grace_days_ended_at', '<=', now())
                         ->orWhereNull('grace_days_ended_at')
+                        ->orWhere('canceled_at', '<=', now())
                 );
 
             return $builder;

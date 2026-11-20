@@ -182,4 +182,71 @@ class ExpiringWithGraceDaysScopeTest extends TestCase
             $returnedSubscriptions->pluck('id')->toArray(),
         );
     }
+
+    public function testCanceledModelsDoNotKeepGraceDays()
+    {
+        $inGraceDays = self::MODEL::factory()->create([
+            'expired_at' => now()->subDay(),
+            'grace_days_ended_at' => now()->addDay(),
+            'canceled_at' => null,
+        ]);
+
+        $canceledInGraceDays = self::MODEL::factory()->create([
+            'expired_at' => now()->subDay(),
+            'grace_days_ended_at' => now()->addDay(),
+            'canceled_at' => now()->subHour(),
+        ]);
+
+        $scheduledCancelationInGraceDays = self::MODEL::factory()->create([
+            'expired_at' => now()->subDay(),
+            'grace_days_ended_at' => now()->addDay(),
+            'canceled_at' => now()->addHour(),
+        ]);
+
+        $canceledBeforeExpiring = self::MODEL::factory()->create([
+            'expired_at' => now()->addDay(),
+            'grace_days_ended_at' => now()->addDays(2),
+            'canceled_at' => now()->subHour(),
+        ]);
+
+        $this->assertEqualsCanonicalizing(
+            [
+                $inGraceDays->id,
+                $scheduledCancelationInGraceDays->id,
+                $canceledBeforeExpiring->id,
+            ],
+            self::MODEL::all()->pluck('id')->toArray(),
+        );
+
+        $this->assertEqualsCanonicalizing(
+            [
+                $inGraceDays->id,
+                $scheduledCancelationInGraceDays->id,
+                $canceledBeforeExpiring->id,
+            ],
+            self::MODEL::withExpired(false)->get()->pluck('id')->toArray(),
+        );
+
+        $this->assertEquals(
+            [$canceledInGraceDays->id],
+            self::MODEL::onlyExpired()->get()->pluck('id')->toArray(),
+        );
+    }
+
+    public function testWithoutExpiredKeepsOtherConstraints()
+    {
+        $notCanceled = self::MODEL::factory()->create([
+            'expired_at' => now()->addDay(),
+            'canceled_at' => null,
+        ]);
+
+        self::MODEL::factory()->canceled()->create([
+            'expired_at' => now()->addDay(),
+        ]);
+
+        $this->assertEquals(
+            [$notCanceled->id],
+            self::MODEL::notCanceled()->withExpired(false)->get()->pluck('id')->toArray(),
+        );
+    }
 }
